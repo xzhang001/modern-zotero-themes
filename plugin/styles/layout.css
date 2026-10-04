@@ -122,26 +122,36 @@
   /* Secondary columns step back so titles carry the row. */
   /* Collection tree hierarchy. Rows are virtualized (fixed height, absolute position), so structure
      comes from type and depth, never from spacing between rows. */
-  /* Library names and the "Group Libraries"/"Feeds" headers read as section labels. */
+  /* Library names and the "Group Libraries"/"Feeds" headers read as section labels. Zotero marks header
+     rows only on macOS (.spacer-header); elsewhere the groups header is known by its icon. */
   :root[data-mzt-layout="modern"] #zotero-collections-tree
-    .row:is(:has(.cell-icon:is(.icon-library, .icon-feed-library)), :has(.spacer-header)) .cell-text:not(input) {
+    .row:is(:has(.cell-icon:is(.icon-library, .icon-feed-library, .icon-groups)), :has(.spacer-header)) .cell-text:not(input) {
     font-size: 0.85em;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
   :root[data-mzt-layout="modern"] #zotero-collections-tree
-    .row:not(.selected):is(:has(.cell-icon:is(.icon-library, .icon-feed-library)), :has(.spacer-header)) .cell-text:not(input) {
+    .row:not(.selected):is(:has(.cell-icon:is(.icon-library, .icon-feed-library, .icon-groups)), :has(.spacer-header)) .cell-text:not(input) {
     color: var(--mzt-muted);
   }
   :root[data-mzt-layout="modern"] #zotero-collections-tree
-    .row:is(:has(.cell-icon:is(.icon-library, .icon-feed-library)), :has(.spacer-header)) .cell-icon {
+    .row:is(:has(.cell-icon:is(.icon-library, .icon-feed-library, .icon-groups)), :has(.spacer-header)) .cell-icon {
     display: none;
   }
-  /* Top-level folders with subfolders act as group headings; deeper parents stay regular so long
-     nested names keep their width. */
+  /* A hairline under each section label separates it from its contents. */
   :root[data-mzt-layout="modern"] #zotero-collections-tree
-    .row[aria-level="2"][aria-expanded]:has(.cell-icon.icon-collection) .cell-text:not(input) {
+    .row:is(:has(.cell-icon:is(.icon-library, .icon-feed-library, .icon-groups)), :has(.spacer-header)) {
+    background-image: linear-gradient(var(--mzt-guide), var(--mzt-guide));
+    background-position: center bottom;
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+  }
+  /* Top-level folders with subfolders act as group headings, as do group libraries under their header;
+     deeper parents stay regular so long nested names keep their width. */
+  :root[data-mzt-layout="modern"] #zotero-collections-tree
+    .row[aria-level="2"][aria-expanded]:has(.cell-icon.icon-collection) .cell-text:not(input),
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .row:has(.cell-icon.icon-library-group) .cell-text:not(input) {
     font-weight: 600;
   }
   /* Built-in views step back so the user's own folders lead. */
