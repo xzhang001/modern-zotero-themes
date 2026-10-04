@@ -77,8 +77,10 @@ function fakeWindow(dark = false, tree = null) {
         return node;
       },
       documentElement: root,
-      readerBrowsers: [],
-      querySelectorAll(selector) { return selector === 'browser.reader' ? this.readerBrowsers : []; },
+      readerBrowsers: [], noteFrames: [],
+      querySelectorAll(selector) {
+        return selector === 'browser.reader' ? this.readerBrowsers : selector === 'note-editor #editor-view' ? this.noteFrames : [];
+      },
       createElementNS() { return { remove() { children.splice(children.indexOf(this), 1); } }; }
     },
     matchMedia() { return media; },
@@ -143,7 +145,7 @@ function setup(windows = [fakeWindow()], { readingProgress } = {}) {
     getMainWindows: () => windows, logError: error => { throw error; },
     File: { async getContentsAsync(channel, charset) {
       assert.equal(charset, 'UTF-8');
-      const file = channel.uri.match(/^jar:file:\/\/\/plugin\.xpi!\/styles\/(reader|viewer)\.css$/)?.[1];
+      const file = channel.uri.match(/^jar:file:\/\/\/plugin\.xpi!\/styles\/(reader|viewer|note)\.css$/)?.[1];
       if (!file) throw new Error('Unexpected URL ' + channel.uri);
       return `/* ${file} */`;
     } },
@@ -379,7 +381,7 @@ test('reader tabs get the reader sheet and theme tokens, follow settings, and ar
   win.events.get('DOMContentLoaded')({ target: view });
   assert.deepEqual(view.head.children.map(node => [node.id, node.textContent.slice(0, 12)]),
     [['mzt-viewer-tokens', '@media (forc'], ['mzt-viewer', '/* viewer */']]);
-  const other = fakeReaderDocument('resource://zotero/note-editor/note-editor.html');
+  const other = fakeReaderDocument('chrome://zotero/content/standalone/basicViewer.xhtml');
   win.events.get('DOMContentLoaded')({ target: other });
   assert.equal(other.head.children.length, 0);
 
@@ -417,7 +419,7 @@ test('a reader sheet that fails to load leaves reader tabs alone but the plugin 
   win.events.get('DOMContentLoaded')({ target: reader });
   assert.equal(reader.head.children.length, 0);
   assert.equal(win.attributes.get('data-mzt-theme'), 'modern-light');
-  assert.equal(errors.length, 2);
+  assert.equal(errors.length, 3);
   s.runtime.stop();
 });
 test('reading page is Zotero\'s by default and can follow the theme, be fixed or original', async () => {
@@ -531,4 +533,33 @@ test('PDF views get a reading progress bar that follows the setting and is remov
   win.events.get('DOMContentLoaded')({ target: second });
   s.runtime.stop();
   assert.equal(bars[2].removed, true);
+});
+test('note editors get the note sheet and theme tokens, follow settings, and are cleaned up', async () => {
+  const win = fakeWindow();
+  // An item pane note already open before the plugin starts; a reader side pane note opened afterwards.
+  const early = fakeReaderDocument('resource://zotero/note-editor/editor.html');
+  win.document.noteFrames.push({ contentDocument: early }, { contentDocument: fakeReaderDocument('about:blank') });
+  const s = setup([win]); await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
+  assert.deepEqual(early.head.children.map(node => [node.id, node.textContent.slice(0, 12)]),
+    [['mzt-note-tokens', '@media (forc'], ['mzt-note', '/* note */']]);
+  assert.equal(early.attributes.get('data-mzt-theme'), 'modern-light');
+  const opened = fakeReaderDocument('resource://zotero/note-editor/editor.html');
+  win.events.get('DOMContentLoaded')({ target: opened });
+  win.events.get('DOMContentLoaded')({ target: opened });
+  assert.equal(opened.head.children.length, 2);
+
+  api.set('theme', 'nord'); api.set('mode', 'fixed');
+  for (const doc of [early, opened]) {
+    assert.equal(doc.attributes.get('data-mzt-theme'), 'nord');
+    assert.match(doc.head.children[0].textContent, /--mzt-accent: #88c0d0/);
+  }
+  // Switching notes can reload the editor; the old document is dropped.
+  opened.events.get('unload')();
+  assert.equal(opened.head.children.length, 0);
+  assert.equal(opened.attributes.size, 0);
+
+  s.runtime.stop();
+  assert.equal(early.head.children.length, 0);
+  assert.equal(early.attributes.size, 0);
+  assert.equal(early.events.size, 0);
 });

@@ -35,11 +35,13 @@
     const sectionTotalProperty = "--mzt-section-shift-total";
     const rowIDPrefix = "collection-tree-row-";
     // Reader tabs load reader.html in a <browser> inside the main window, and the PDF view loads viewer.html
-    // in a frame inside that. Their stylesheets can't be linked from the plugin (these pages' principal
-    // can't load jar:/file: URLs), so the text is read once at startup and injected.
+    // in a frame inside that; note editors (item pane, reader side pane) load editor.html in an iframe inside
+    // <note-editor>. Their stylesheets can't be linked from the plugin (these pages' principal can't load
+    // jar:/file: URLs), so the text is read once at startup and injected.
     const frameKinds = {
       "resource://zotero/reader/reader.html": { kind: "reader", file: "styles/reader.css" },
-      "resource://zotero/reader/pdf/web/viewer.html": { kind: "viewer", file: "styles/viewer.css" }
+      "resource://zotero/reader/pdf/web/viewer.html": { kind: "viewer", file: "styles/viewer.css" },
+      "resource://zotero/note-editor/editor.html": { kind: "note", file: "styles/note.css" }
     };
     // data-mzt-zotero-scheme is Zotero's own light/dark appearance (the main window's prefers-color-scheme,
     // which the plugin's color-scheme doesn't change), not the plugin theme's mode.
@@ -335,8 +337,9 @@
       win.addEventListener("unload", unload, { once: true });
       win.addEventListener("DOMContentLoaded", frameLoaded, true);
       update();
-      // Reader tabs that were already open when the plugin started.
+      // Reader tabs and note editors that were already open when the plugin started.
       for (const browser of doc.querySelectorAll?.("browser.reader") || []) attachFrame(win, browser.contentDocument);
+      for (const frame of doc.querySelectorAll?.("note-editor #editor-view") || []) attachFrame(win, frame.contentDocument);
     }
     function detach(win) {
       const state = windows.get(win);

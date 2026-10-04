@@ -1,0 +1,43 @@
+/* Note editor (resource://zotero/note-editor/editor.html, an iframe inside <note-editor> in the item pane
+   and the reader side pane). Its surfaces, toolbar and popups already use Zotero's variables, which the
+   theme tokens injected before this sheet replace; these rules cover what the editor leaves to the
+   system or hard-codes. Colors only: no spacing or font changes, and the note's own content colors
+   (annotation highlights, text and background colors set in the note) are inline styles that stay. */
+@media (forced-colors: none) {
+  /* The editor's scrollbars (a horizontal one appears when a formula is wider than the pane) keep a
+     system-white track otherwise; same colors as the PDF view's (viewer.css). Inherited by every scroller. */
+  :root[data-mzt-theme] {
+    scrollbar-color: color-mix(in srgb, var(--mzt-text) 55%, transparent) transparent;
+  }
+  /* The editor sets no text color, so the system's black or white shows through. */
+  :root[data-mzt-theme] .primary-editor {
+    color: var(--mzt-text);
+  }
+  :root[data-mzt-theme] .primary-editor a {
+    color: var(--mzt-accent);
+  }
+  /* Zotero draws a light blue (#add8e6) quote bar on every appearance. */
+  :root[data-mzt-theme] .primary-editor blockquote {
+    border-color: var(--mzt-accent);
+  }
+  /* #ccc and #d9d9d9 glare on dark themes; tables keep a visible grid on every surface. */
+  :root[data-mzt-theme] .primary-editor .tableWrapper :is(table, td, th) {
+    border-color: color-mix(in srgb, var(--mzt-text) 25%, transparent);
+  }
+  :root[data-mzt-theme] .external-image .resized-wrapper {
+    border-color: var(--mzt-border);
+  }
+  /* LaTeX source while editing a formula (#8421a2, unreadable on dark themes) and empty or broken formulas. */
+  :root[data-mzt-theme] .math-node .math-src {
+    color: var(--mzt-accent);
+  }
+  :root[data-mzt-theme] :is(.math-node.empty-math .math-render, .math-node .math-render.parse-error)::before {
+    color: var(--mzt-error);
+  }
+  :root[data-mzt-theme] .primary-editor ::selection {
+    background-color: color-mix(in srgb, var(--mzt-accent) 30%, transparent);
+  }
+  :root[data-mzt-theme] .primary-editor .citation:is(.selected, :hover) {
+    background-color: color-mix(in srgb, var(--mzt-accent) 15%, transparent);
+  }
+}
