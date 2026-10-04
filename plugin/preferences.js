@@ -17,6 +17,7 @@ window.MZTPreferences = {
       layoutModern: "现代", layoutClassic: "经典",
       emptyFields: "空字段", emptyHide: "隐藏", emptyShow: "显示",
       folderIcons: "文件夹图标", iconsColor: "彩色", iconsMono: "单色",
+      readingProgress: "阅读进度条", progressShow: "显示", progressHide: "隐藏",
       saved: "✓ 已保存", inactive: "主题插件已停用",
       modes: { light: "浅色", dark: "深色" },
       modeNames: { light: "浅色", dark: "深色" },

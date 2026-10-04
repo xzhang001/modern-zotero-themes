@@ -1,16 +1,18 @@
 (function (scope) {
   "use strict";
-  scope.MZTCreateRuntime = function ({ Zotero, Services, Ci, Cu, rootURI, id, version, themes, collectionIcons }) {
+  scope.MZTCreateRuntime = function ({ Zotero, Services, Ci, Cu, rootURI, id, version, themes, collectionIcons, readingProgress }) {
     // Gecko caches stylesheets by URL, and an upgraded XPI keeps the same jar: URL, so without a
     // per-startup query the old CSS stays in effect until Zotero restarts.
     const assetQuery = `?v=${encodeURIComponent(version || "dev")}.${Date.now()}`;
     const prefix = "extensions.modernZoteroThemes.";
-    const defaults = { mode: "system", theme: "modern-light", lightTheme: "modern-light", darkTheme: "modern-dark", layout: "modern", emptyFields: "hide", folderIcons: "color", pageTheme: "zotero" };
+    const defaults = { mode: "system", theme: "modern-light", lightTheme: "modern-light", darkTheme: "modern-dark", layout: "modern", emptyFields: "hide", folderIcons: "color", pageTheme: "zotero",
+      readingProgress: "show" };
     const layouts = ["modern", "classic"];
     const emptyFieldModes = ["hide", "show"];
     const folderIconModes = ["color", "mono"];
     // Reading page: the theme's own page, Zotero's unthemed page, Zotero's reader setting (Aa menu), or a theme ID.
     const pageModes = ["follow", "original", "zotero"];
+    const readingProgressModes = ["show", "hide"];
     const stylesheets = { "mzt-components": "styles/modern.css", "mzt-layout": "styles/layout.css",
       "mzt-collection-icons-sheet": "styles/collection-icons.css" };
     // Custom collection icons: JSON map of Zotero libraryKey ("<libraryID>/<key>") to a validated entry.
@@ -68,6 +70,7 @@
           folderIconModes.includes(config.folderIcons) ? config.folderIcons : defaults.folderIcons);
         markCollectionSections(win);
         state.page = pageFor(config, theme);
+        state.readingProgress = config.readingProgress !== "hide";
         for (const frameDoc of Array.from(state.frames.keys())) paintFrame(win, frameDoc);
       }
       for (const callback of subscribers) {
@@ -203,6 +206,7 @@
         return;
       }
       if (frame.kind === "reader") applyPage(win, frameDoc).catch(error => Zotero.logError(error));
+      if (frame.kind === "viewer") syncProgress(state, frame, frameDoc);
     }
     // The page is drawn by Zotero's reader from its light/dark reading theme. Setting them on the reader's
     // state (not Zotero's prefs or its synced custom themes) keeps the user's own reader settings intact;
@@ -232,6 +236,20 @@
       // The whole update object must live in the reader's scope, or its code sees an opaque wrapper.
       reader._updateState(Cu.cloneInto({ lightTheme: page, darkTheme: page }, frame.instance._iframeWindow));
       frame.pageApplied = true;
+    }
+    // The progress bar sits at the top of the reader's view container that holds this PDF frame.
+    function syncProgress(state, frame, frameDoc) {
+      if (state.readingProgress && !frame.progress) {
+        try {
+          const host = frame.frameWin?.frameElement?.parentElement;
+          frame.progress = host && readingProgress.attach({ viewerDoc: frameDoc, host, locale: Zotero.locale }) || null;
+        }
+        catch (error) { Zotero.logError(error); }
+      }
+      else if (!state.readingProgress && frame.progress) {
+        frame.progress.remove();
+        frame.progress = null;
+      }
     }
     function restorePage(frame) {
       frame.pageApplied = false;
@@ -270,6 +288,7 @@
       if (!frame) return;
       state.frames.delete(frameDoc);
       if (restore && frame.pageApplied) restorePage(frame);
+      frame.progress?.remove();
       try {
         frame.frameWin?.removeEventListener("unload", frame.unload);
         frame.sheet.remove();
@@ -357,6 +376,9 @@
         }
         else if (key === "folderIcons") {
           if (!folderIconModes.includes(value)) throw new Error("Invalid folder icon mode");
+        }
+        else if (key === "readingProgress") {
+          if (!readingProgressModes.includes(value)) throw new Error("Invalid reading progress mode");
         }
         else if (key === "pageTheme") {
           if (!pageModes.includes(value) && !themes.themes.some(t => t.id === value)) throw new Error("Invalid page theme");

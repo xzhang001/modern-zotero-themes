@@ -85,6 +85,45 @@
     box-shadow: 0 0 0 1px var(--mzt-border), 0 12px 32px -8px var(--mzt-shadow);
   }
 
+  /* Reading progress (PDF, see reading-progress.js): a 2px accent line along the top edge of each view.
+     The element is a taller transparent hit area; it thickens on hover and while dragging. */
+  :root[data-mzt-theme] .mzt-progress {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    z-index: 3;
+    height: 6px;
+    cursor: pointer;
+  }
+  :root[data-mzt-theme] .mzt-progress[hidden] {
+    display: none;
+  }
+  :root[data-mzt-theme] .mzt-progress::before,
+  :root[data-mzt-theme] .mzt-progress-fill {
+    position: absolute;
+    top: 0;
+    height: 2px;
+    transition: height 120ms ease, background-color 120ms ease;
+  }
+  :root[data-mzt-theme] .mzt-progress::before {
+    content: "";
+    inset-inline: 0;
+  }
+  :root[data-mzt-theme] .mzt-progress-fill {
+    inset-inline-start: 0;
+    width: calc(var(--mzt-progress, 0) * 100%);
+    border-start-end-radius: 2px;
+    border-end-end-radius: 2px;
+    background: var(--mzt-accent);
+  }
+  :root[data-mzt-theme] .mzt-progress:is(:hover, [data-dragging])::before {
+    height: 4px;
+    background: color-mix(in srgb, var(--mzt-text) 10%, transparent);
+  }
+  :root[data-mzt-theme] .mzt-progress:is(:hover, [data-dragging]) .mzt-progress-fill {
+    height: 4px;
+  }
+
   /* Modern layout: the reader is one card (see layout.css), and its chrome follows the main window's
      modern style: quiet monochrome icons, segmented controls for mode switches, filled fields, and lists
      with rounded hover/selection rows. Toolbar and sidebar heights stay native (views are positioned
@@ -261,7 +300,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  :root[data-mzt-theme] .toolbar-button {
+  :root[data-mzt-theme] :is(.toolbar-button, .mzt-progress::before, .mzt-progress-fill) {
     transition: none;
   }
 }

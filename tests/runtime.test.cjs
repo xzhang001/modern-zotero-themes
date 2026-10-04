@@ -123,7 +123,7 @@ function fakeReaderInstance(doc) {
     _iframeWindow: {}, _initPromise: Promise.resolve(), _internalReader: internal };
 }
 const settle = () => new Promise(resolve => setImmediate(resolve));
-function setup(windows = [fakeWindow()]) {
+function setup(windows = [fakeWindow()], { readingProgress } = {}) {
   const prefs = new Map();
   const observers = new Map();
   const panes = new Map();
@@ -156,7 +156,8 @@ function setup(windows = [fakeWindow()]) {
     }
   };
   return { windows, prefs, observers, panes, Zotero, runtime: createRuntime({
-    Zotero, Services, Ci, Cu: { cloneInto: value => structuredClone(value) }, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', version: '1.2.3', themes, collectionIcons
+    Zotero, Services, Ci, Cu: { cloneInto: value => structuredClone(value) }, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', version: '1.2.3', themes, collectionIcons,
+    readingProgress
   }) };
 }
 test('startup and repeated attach load exactly one set of styles per window', async () => {
@@ -485,4 +486,42 @@ test('a reader opened before the plugin starts gets its PDF view styled too', as
   assert.equal(view.attributes.get('data-mzt-layout'), 'modern');
   s.runtime.stop();
   assert.equal(view.head.children.length, 0);
+});
+test('PDF views get a reading progress bar that follows the setting and is removed with the view', async () => {
+  const bars = [];
+  const readingProgress = { attach: ({ viewerDoc, host, locale }) => {
+    const bar = { viewerDoc, host, locale, removed: false, remove() { this.removed = true; } };
+    bars.push(bar);
+    return bar;
+  } };
+  const win = fakeWindow();
+  const s = setup([win], { readingProgress }); s.Zotero.locale = 'zh-CN';
+  await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
+  const host = { id: 'primary-view' };
+  const view = fakeReaderDocument('resource://zotero/reader/pdf/web/viewer.html');
+  view.defaultView.frameElement = { parentElement: host };
+  win.events.get('DOMContentLoaded')({ target: view });
+  assert.equal(api.settings().readingProgress, 'show');
+  assert.equal(bars.length, 1);
+  assert.equal(bars[0].host, host);
+  assert.equal(bars[0].locale, 'zh-CN');
+  // Readers themselves don't get one; only their PDF views do.
+  win.events.get('DOMContentLoaded')({ target: fakeReaderDocument() });
+  assert.equal(bars.length, 1);
+
+  api.set('layout', 'classic');
+  assert.equal(bars.length, 1);
+  api.set('readingProgress', 'hide');
+  assert.equal(bars[0].removed, true);
+  api.set('readingProgress', 'show');
+  assert.equal(bars.length, 2);
+  assert.throws(() => api.set('readingProgress', 'auto'));
+
+  view.events.get('unload')();
+  assert.equal(bars[1].removed, true);
+  const second = fakeReaderDocument('resource://zotero/reader/pdf/web/viewer.html');
+  second.defaultView.frameElement = { parentElement: host };
+  win.events.get('DOMContentLoaded')({ target: second });
+  s.runtime.stop();
+  assert.equal(bars[2].removed, true);
 });
