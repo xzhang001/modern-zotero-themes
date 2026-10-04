@@ -1,0 +1,41 @@
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+      xmlns:html="http://www.w3.org/1999/xhtml"
+      id="mzt-preferences" onload="window.MZTPreferences.init()">
+  <groupbox>
+    <html:div class="mzt-eyebrow">MODERN ZOTERO THEMES</html:div>
+    <html:h2 data-mzt-text="heading">Make room for your research.</html:h2>
+    <html:p class="mzt-description" data-mzt-text="description">A quieter interface. The Zotero you know.</html:p>
+    <html:label class="mzt-setting">
+      <html:span data-mzt-text="appearance">Appearance</html:span>
+      <html:select id="mzt-mode">
+        <html:option value="fixed" data-mzt-text="fixed">Choose a theme</html:option>
+        <html:option value="system" data-mzt-text="system">Follow system</html:option>
+      </html:select>
+    </html:label>
+    <html:label class="mzt-setting">
+      <html:span data-mzt-text="layout">Layout</html:span>
+      <html:select id="mzt-layout">
+        <html:option value="modern" data-mzt-text="layoutModern">Modern</html:option>
+        <html:option value="classic" data-mzt-text="layoutClassic">Classic (colors only)</html:option>
+      </html:select>
+    </html:label>
+    <html:label class="mzt-setting">
+      <html:span data-mzt-text="emptyFields">Empty fields</html:span>
+      <html:select id="mzt-emptyFields">
+        <html:option value="hide" data-mzt-text="emptyHide">Hide until editing</html:option>
+        <html:option value="show" data-mzt-text="emptyShow">Always show</html:option>
+      </html:select>
+    </html:label>
+    <html:div id="mzt-theme-cards" role="group" aria-label="Themes"/>
+    <html:div id="mzt-system-settings">
+      <html:label class="mzt-setting"><html:span data-mzt-text="light">Light appearance</html:span><html:select id="mzt-lightTheme"/></html:label>
+      <html:label class="mzt-setting"><html:span data-mzt-text="dark">Dark appearance</html:span><html:select id="mzt-darkTheme"/></html:label>
+    </html:div>
+    <html:div id="mzt-appearance-notice" hidden="hidden">
+      <html:p id="mzt-appearance-message"/>
+      <html:button id="mzt-appearance-fix" type="button"/>
+    </html:div>
+    <html:p id="mzt-status" role="status" aria-live="polite"/>
+    <html:p class="mzt-footnote" data-mzt-text="note">Changes apply immediately. Your items, tag colors and annotations are never changed.</html:p>
+  </groupbox>
+</vbox>

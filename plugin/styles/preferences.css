@@ -1,0 +1,27 @@
+#mzt-preferences { max-width: 780px; }
+#mzt-preferences .mzt-eyebrow { font-size: 10px; letter-spacing: 1.6px; font-weight: 700; color: var(--fill-secondary); margin-top: 12px; }
+#mzt-preferences h2 { font-size: 24px; font-weight: 600; margin: 12px 0 8px; }
+#mzt-preferences .mzt-description { color: var(--fill-secondary); margin: 0 0 28px; }
+#mzt-preferences .mzt-setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 16px 0; }
+/* Native select styling: custom borders/backgrounds make Gecko drop the dropdown arrow. */
+#mzt-preferences select { font: inherit; }
+#mzt-theme-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 24px 0; }
+/* Zotero's platform button rules cap height (Windows height: 28px, macOS max-height: 25px); cards must size to content. */
+#mzt-preferences .mzt-theme-card { appearance: none; display: block; height: auto; min-height: 0; max-height: none; margin: 0; padding: 8px; border: 1px solid var(--color-border); border-radius: 10px; background: transparent; color: inherit; text-align: start; cursor: pointer; font: inherit; }
+#mzt-preferences .mzt-theme-card:not(:disabled):hover { background: var(--fill-quinary); }
+#mzt-preferences .mzt-theme-card[aria-pressed="true"] { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+#mzt-preferences .mzt-theme-card:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+#mzt-preferences .mzt-theme-name { display: block; margin: 12px 2px 6px; font-weight: 600; font-size: 12px; }
+#mzt-preferences .mzt-miniature { height: 92px; display: grid; grid-template-columns: 25% 47% 28%; border: 1px solid var(--mzt-border); border-radius: 5px; overflow: hidden; background: var(--mzt-background); }
+#mzt-preferences .mzt-miniature > span { padding: 12px 5px; }
+#mzt-preferences .mzt-mini-sidebar { background: var(--mzt-sidebar); }
+#mzt-preferences .mzt-mini-detail { border-inline-start: 1px solid var(--mzt-border); }
+#mzt-preferences .mzt-miniature i { display: block; height: 4px; margin-bottom: 8px; border-radius: 2px; background: var(--mzt-border); }
+#mzt-preferences .mzt-mini-list i:nth-child(2) { background: var(--mzt-accent); height: 8px; }
+#mzt-preferences .mzt-mini-detail i:nth-child(even) { width: 65%; }
+#mzt-preferences .mzt-footnote, #mzt-status { font-size: 12px; color: var(--fill-secondary); line-height: 1.6; }
+#mzt-appearance-notice { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 16px 0; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--fill-quinary); }
+#mzt-appearance-message { margin: 0; line-height: 1.5; }
+#mzt-appearance-fix { flex-shrink: 0; }
+:is(#mzt-system-settings, #mzt-appearance-notice)[hidden] { display: none; }
+@media (max-width: 520px) { #mzt-theme-cards { grid-template-columns: 1fr; } }

@@ -1,0 +1,136 @@
+/* Paint and shape only: never change table geometry, pane sizes or DOM ordering.
+   Scoped to attached main windows, with OS high-contrast colors left intact. */
+@media (forced-colors: none) {
+  :root[data-mzt-theme] {
+    --mzt-radius: 7px;
+    --mzt-radius-small: 5px;
+    color: var(--mzt-text);
+    background-color: var(--mzt-background);
+  }
+
+  :root[data-mzt-theme] :is(#zotero-collections-pane, #zotero-tag-selector-container,
+    #zotero-collections-tree, #tab-bar-container) {
+    background: var(--mzt-sidebar);
+    color: var(--mzt-text);
+  }
+  :root[data-mzt-theme] :is(#zotero-items-pane, #zotero-items-tree, #zotero-item-pane) {
+    background: var(--mzt-background);
+    color: var(--mzt-text);
+  }
+  :root[data-mzt-theme] #zotero-pane .zotero-toolbar {
+    background: var(--mzt-toolbar);
+    box-shadow: inset 0 -1px var(--mzt-border);
+  }
+  :root[data-mzt-theme] :is(#zotero-collections-splitter, #zotero-items-splitter, #zotero-tags-splitter) {
+    background-color: var(--mzt-border);
+    border-color: var(--mzt-border);
+  }
+
+  /* Preserve native icon masks, disabled handling, hit targets and drag behavior. */
+  :root[data-mzt-theme] #zotero-pane :is(toolbarbutton, .toolbar-button) {
+    border-radius: var(--mzt-radius-small);
+    transition: background-color 120ms ease, box-shadow 120ms ease;
+  }
+  :root[data-mzt-theme] #zotero-pane :is(toolbarbutton, .toolbar-button):not([disabled="true"]):not(:disabled):hover {
+    background-color: var(--mzt-hover);
+    box-shadow: inset 0 0 0 1px var(--mzt-border);
+  }
+  :root[data-mzt-theme] #zotero-pane toolbarbutton:is([open="true"], [checked="true"]) {
+    background-color: var(--mzt-selected);
+    color: var(--mzt-selectedText);
+  }
+  :root[data-mzt-theme] #zotero-pane :is(quick-search-textbox, search-textbox) {
+    appearance: none;
+    background: var(--mzt-elevated);
+    color: var(--mzt-text);
+    border-color: var(--mzt-border);
+    border-radius: var(--mzt-radius);
+    box-shadow: 0 1px 2px var(--mzt-shadow);
+    transition: box-shadow 120ms ease, border-color 120ms ease;
+  }
+  :root[data-mzt-theme] #zotero-pane :is(quick-search-textbox, search-textbox):focus-within {
+    border-color: var(--mzt-accent);
+    box-shadow: 0 0 0 1px var(--mzt-accent);
+  }
+
+  /* No padding/height overrides: row positions belong to the virtualized table. */
+  :root[data-mzt-theme] :is(#zotero-collections-tree, #zotero-items-tree) .row {
+    border-radius: var(--mzt-radius-small);
+  }
+  :root[data-mzt-theme] :is(#zotero-collections-tree, #zotero-items-tree)
+    .row:not(.selected):not(.highlighted):not(.drop):not(.flashing):hover {
+    background-color: var(--mzt-hover);
+  }
+  :root[data-mzt-theme] :is(#zotero-collections-tree, #zotero-items-tree)
+    .row.selected:not(.drop):not(.flashing) {
+    background-color: var(--mzt-inactiveSelected);
+    color: var(--mzt-text);
+    box-shadow: none;
+  }
+  :root[data-mzt-theme] :is(#zotero-collections-tree, #zotero-items-tree):focus-within
+    .row.selected:not(.drop):not(.flashing) {
+    --color-accent-text: var(--mzt-selectedText);
+    background-color: var(--mzt-selected);
+    color: var(--mzt-selectedText);
+    box-shadow: inset 2px 0 var(--mzt-accent);
+  }
+  :root[data-mzt-theme] :is(#zotero-collections-tree, #zotero-items-tree):dir(rtl):focus-within
+    .row.selected:not(.drop):not(.flashing) {
+    box-shadow: inset -2px 0 var(--mzt-accent);
+  }
+  :root[data-mzt-theme] #zotero-items-tree .virtualized-table-header {
+    background: var(--mzt-toolbar);
+    color: var(--mzt-muted);
+    box-shadow: inset 0 -1px var(--mzt-border);
+  }
+  :root[data-mzt-theme] #zotero-items-tree .virtualized-table-header .cell {
+    font-weight: 600;
+    border-color: var(--mzt-border);
+  }
+  /* Zotero 10's sticky headers must remain opaque; no position/z-index changes. */
+  :root[data-mzt-theme] #zotero-items-tree .virtualized-table-sticky-section-header-content {
+    background: var(--mzt-background);
+    box-shadow: 0 1px var(--mzt-border);
+  }
+
+  :root[data-mzt-theme] #zotero-item-pane collapsible-section {
+    border-color: var(--mzt-border);
+  }
+  :root[data-mzt-theme] #zotero-item-pane collapsible-section > .head {
+    border-radius: var(--mzt-radius-small);
+    background: var(--mzt-toolbar);
+  }
+  :root[data-mzt-theme] #zotero-item-pane collapsible-section > .head .title {
+    color: var(--mzt-muted);
+    font-weight: 600;
+  }
+  :root[data-mzt-theme] #zotero-item-pane :is(input, textarea, menulist) {
+    border-radius: var(--mzt-radius-small);
+    color: var(--mzt-text);
+    accent-color: var(--mzt-accent);
+  }
+  :root[data-mzt-theme] #zotero-item-pane :is(input, textarea):focus {
+    background: var(--mzt-elevated);
+    outline: 2px solid var(--mzt-accent);
+    outline-offset: -2px;
+  }
+  :root[data-mzt-theme] #tab-bar-container .tab {
+    border-radius: var(--mzt-radius) var(--mzt-radius) 0 0;
+  }
+  :root[data-mzt-theme] #tab-bar-container .tab.selected {
+    background: var(--mzt-background);
+    box-shadow: inset 0 2px var(--mzt-accent);
+  }
+  :root[data-mzt-theme] #tab-bar-container .tab:not(.selected):hover {
+    background: var(--mzt-hover);
+  }
+  :root[data-mzt-theme] #zotero-pane :is(button, toolbarbutton, input, select):focus-visible {
+    outline: 2px solid var(--mzt-accent);
+    outline-offset: -2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-mzt-theme] #zotero-pane :is(toolbarbutton, .toolbar-button, quick-search-textbox, search-textbox) {
+    transition: none;
+  }
+}

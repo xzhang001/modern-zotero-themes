@@ -1,0 +1,210 @@
+/* Modern layout (Notion/Linear-style): one content card on a sidebar canvas, hairline dividers,
+   pill tabs and quieter headers. Switch to the "Classic" layout to keep only the colors.
+   Spacing changes stay in non-virtualized chrome: never row height/position, column widths or DOM order. */
+@media (forced-colors: none) {
+  :root[data-mzt-layout="modern"] {
+    --mzt-gutter: 12px;
+    --mzt-card-radius: 12px;
+    --mzt-control-radius: 8px;
+    --mzt-icon-tint: var(--mzt-muted);
+  }
+
+  /* Canvas and content card */
+  :root[data-mzt-layout="modern"] :is(#zotero-trees, #zotero-collections-pane, #zotero-toolbar-collection-tree,
+    #zotero-tag-selector-container, #zotero-tag-selector) {
+    background: var(--mzt-canvas);
+  }
+  /* Sidebar states are re-tinted for the darker canvas: hover darkens, inactive selection lifts to the card color. */
+  :root[data-mzt-layout="modern"] #zotero-collections-pane {
+    --mzt-hover: color-mix(in srgb, var(--mzt-text) 7%, transparent);
+    --mzt-inactiveSelected: var(--mzt-background);
+    --color-quarternary-on-sidepane: var(--mzt-background);
+  }
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .virtualized-table:not(:focus-within) .row.selected {
+    box-shadow: 0 0 0 1px var(--mzt-border), 0 1px 2px var(--mzt-shadow);
+  }
+  :root[data-mzt-layout="modern"] #zotero-layout-switcher {
+    margin: calc(var(--mzt-gutter) / 2) var(--mzt-gutter) var(--mzt-gutter) 0;
+    border: 1px solid var(--mzt-border);
+    border-radius: var(--mzt-card-radius);
+    background: var(--mzt-background);
+    box-shadow: 0 1px 2px var(--mzt-shadow), 0 8px 24px -12px var(--mzt-shadow);
+    overflow: hidden;
+  }
+  /* Zotero paints the item pane with sidepane material; inside the card it should match the list. */
+  :root[data-mzt-layout="modern"] #zotero-layout-switcher {
+    --color-sidepane: var(--mzt-background);
+    --material-sidepane: var(--mzt-background);
+  }
+  :root[data-mzt-layout="modern"] #zotero-layout-switcher :is(#zotero-items-pane-container, #zotero-items-pane,
+    #zotero-items-tree, #zotero-item-pane, #zotero-view-item-sidenav) {
+    background: var(--mzt-background);
+  }
+
+  /* Dividers: the sidebar gap needs no line; inside the card a centered hairline keeps the native hit area. */
+  :root[data-mzt-layout="modern"] #zotero-collections-splitter {
+    background: transparent;
+    border-color: transparent;
+  }
+  :root[data-mzt-layout="modern"] #zotero-tags-splitter {
+    border-color: transparent;
+    background: linear-gradient(var(--mzt-border), var(--mzt-border)) center / calc(100% - 24px) 1px no-repeat;
+  }
+  :root[data-mzt-layout="modern"] #zotero-items-splitter {
+    border: none;
+    background: linear-gradient(var(--mzt-border), var(--mzt-border)) center / 1px 100% no-repeat;
+  }
+  :root[data-mzt-layout="modern"] #zotero-layout-switcher[orient="vertical"] #zotero-items-splitter {
+    background-size: 100% 1px;
+  }
+
+  /* Toolbars */
+  :root[data-mzt-layout="modern"] #zotero-pane .zotero-toolbar {
+    background: transparent;
+    box-shadow: none;
+  }
+  :root[data-mzt-layout="modern"] #zotero-toolbar-collection-tree {
+    border-bottom: none;
+  }
+  :root[data-mzt-layout="modern"] :is(#zotero-toolbar-item-tree, #zotero-item-pane-header) {
+    border-bottom: 1px solid var(--mzt-border);
+  }
+  :root[data-mzt-layout="modern"] #zotero-pane :is(toolbarbutton, .toolbar-button):not([disabled="true"]):not(:disabled):hover {
+    box-shadow: none;
+  }
+
+  /* Search: filled field, no outline until focused */
+  :root[data-mzt-layout="modern"] #zotero-pane quick-search-textbox {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  :root[data-mzt-layout="modern"] #zotero-pane search-textbox {
+    background: var(--mzt-hover);
+    border-color: transparent;
+    border-radius: var(--mzt-control-radius);
+    box-shadow: none;
+  }
+  :root[data-mzt-layout="modern"] #zotero-pane search-textbox:focus-within {
+    background: var(--mzt-elevated);
+    border-color: var(--mzt-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--mzt-accent) 18%, transparent);
+  }
+
+  /* Trees: rounded rows; selection keeps Zotero's solid fill because native icons turn white there. */
+  :root[data-mzt-layout="modern"] :is(#zotero-collections-tree, #zotero-items-tree) .row,
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .row.selected:is(.first-selected, .last-selected) {
+    border-radius: 6px;
+  }
+  :root[data-mzt-layout="modern"] :is(#zotero-collections-tree, #zotero-items-tree):focus-within
+    .row.selected:not(.drop):not(.flashing) {
+    box-shadow: none;
+  }
+  /* Secondary columns step back so titles carry the row. */
+  :root[data-mzt-layout="modern"] #zotero-items-tree .row:not(.selected) .cell:not(.primary) {
+    color: var(--mzt-muted);
+  }
+  :root[data-mzt-layout="modern"] #zotero-items-tree .virtualized-table-header {
+    background: var(--mzt-background);
+    box-shadow: inset 0 -1px var(--mzt-border);
+  }
+  :root[data-mzt-layout="modern"] #zotero-items-tree .virtualized-table-header .cell {
+    color: var(--mzt-muted);
+    font-weight: 500;
+    border-color: transparent;
+  }
+  :root[data-mzt-layout="modern"] #zotero-items-tree .virtualized-table-header:hover .cell {
+    border-color: var(--mzt-border);
+  }
+
+  /* Item pane: page-style title, plain section headers, left-aligned property labels */
+  :root[data-mzt-layout="modern"] #zotero-item-pane-header .title {
+    font-size: 1.3em;
+    line-height: 1.3;
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane-header {
+    padding-inline: 16px 12px;
+  }
+  :root[data-mzt-layout="modern"] #zotero-view-item {
+    padding-inline: 16px 12px;
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane collapsible-section {
+    padding-block: 6px 10px;
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane collapsible-section > .head {
+    margin-block-end: 6px;
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane #info-table {
+    row-gap: 7px;
+    column-gap: 16px;
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane :is(abstract-box, notes-box, attachments-box) editable-text {
+    line-height: 1.6;
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane collapsible-section > .head {
+    background: transparent;
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane collapsible-section > .head .title {
+    color: var(--mzt-text);
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane collapsible-section > .head .title::before {
+    fill: var(--mzt-icon-tint);
+    stroke: var(--mzt-icon-tint);
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane .meta-label {
+    justify-content: flex-start;
+    text-align: start;
+    color: var(--mzt-subtle);
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane .meta-label > label {
+    text-align: start;
+  }
+  /* Creator labels: drag handle moves to the column end and the type dropmarker follows the text,
+     so "Author" lines up with the other labels. */
+  :root[data-mzt-layout="modern"] #zotero-item-pane .meta-label[fieldname^="creator"] {
+    justify-content: flex-start;
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane .meta-label > .zotero-clicky-grippy {
+    order: 1;
+    margin-inline-start: auto;
+  }
+  :root[data-mzt-layout="modern"] #zotero-item-pane .creator-type-label {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    margin-inline-start: -4px;
+  }
+
+  /* Empty fields stay out of the way until the user starts editing anything in the Info section. */
+  :root[data-mzt-layout="modern"][data-mzt-empty-fields="hide"] #zotero-item-pane #info-box:not(:focus-within)
+    .meta-row:has(editable-text.value):not(:has(editable-text.value[value]:not([value=""]))):not(:has(.meta-label[fieldname="title"])) {
+    display: none;
+  }
+
+  /* Side navigation: monochrome icons, accent when hovered */
+  :root[data-mzt-layout="modern"] #zotero-view-item-sidenav .btn {
+    fill: var(--mzt-icon-tint);
+    stroke: var(--mzt-icon-tint);
+    border-radius: var(--mzt-control-radius);
+  }
+  :root[data-mzt-layout="modern"] #zotero-view-item-sidenav .btn:hover {
+    fill: var(--mzt-accent);
+    stroke: var(--mzt-accent);
+    background-color: var(--mzt-hover);
+  }
+
+  /* Tabs: floating pills on the canvas */
+  :root[data-mzt-layout="modern"] :is(#tab-bar-container, #zotero-tabs-toolbar) {
+    background: var(--mzt-canvas);
+  }
+  :root[data-mzt-layout="modern"] #tab-bar-container {
+    --tab-border: transparent;
+  }
+  :root[data-mzt-layout="modern"] #tab-bar-container .tab {
+    border-radius: var(--mzt-control-radius);
+    border-inline-end-color: transparent;
+  }
+  :root[data-mzt-layout="modern"] #tab-bar-container .tab.selected {
+    background: var(--mzt-elevated);
+    box-shadow: 0 0 0 1px var(--mzt-border), 0 1px 2px var(--mzt-shadow);
+  }
+}
