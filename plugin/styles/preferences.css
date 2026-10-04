@@ -1,27 +1,168 @@
-#mzt-preferences { max-width: 780px; }
-#mzt-preferences .mzt-eyebrow { font-size: 10px; letter-spacing: 1.6px; font-weight: 700; color: var(--fill-secondary); margin-top: 12px; }
-#mzt-preferences h2 { font-size: 24px; font-weight: 600; margin: 12px 0 8px; }
-#mzt-preferences .mzt-description { color: var(--fill-secondary); margin: 0 0 28px; }
-#mzt-preferences .mzt-setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 16px 0; }
-/* Native select styling: custom borders/backgrounds make Gecko drop the dropdown arrow. */
-#mzt-preferences select { font: inherit; }
-#mzt-theme-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 24px 0; }
-/* Zotero's platform button rules cap height (Windows height: 28px, macOS max-height: 25px); cards must size to content. */
-#mzt-preferences .mzt-theme-card { appearance: none; display: block; height: auto; min-height: 0; max-height: none; margin: 0; padding: 8px; border: 1px solid var(--color-border); border-radius: 10px; background: transparent; color: inherit; text-align: start; cursor: pointer; font: inherit; }
-#mzt-preferences .mzt-theme-card:not(:disabled):hover { background: var(--fill-quinary); }
-#mzt-preferences .mzt-theme-card[aria-pressed="true"] { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
-#mzt-preferences .mzt-theme-card:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
-#mzt-preferences .mzt-theme-name { display: block; margin: 12px 2px 6px; font-weight: 600; font-size: 12px; }
-#mzt-preferences .mzt-miniature { height: 92px; display: grid; grid-template-columns: 25% 47% 28%; border: 1px solid var(--mzt-border); border-radius: 5px; overflow: hidden; background: var(--mzt-background); }
-#mzt-preferences .mzt-miniature > span { padding: 12px 5px; }
-#mzt-preferences .mzt-mini-sidebar { background: var(--mzt-sidebar); }
-#mzt-preferences .mzt-mini-detail { border-inline-start: 1px solid var(--mzt-border); }
-#mzt-preferences .mzt-miniature i { display: block; height: 4px; margin-bottom: 8px; border-radius: 2px; background: var(--mzt-border); }
-#mzt-preferences .mzt-mini-list i:nth-child(2) { background: var(--mzt-accent); height: 8px; }
-#mzt-preferences .mzt-mini-detail i:nth-child(even) { width: 65%; }
-#mzt-preferences .mzt-footnote, #mzt-status { font-size: 12px; color: var(--fill-secondary); line-height: 1.6; }
-#mzt-appearance-notice { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 16px 0; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--fill-quinary); }
-#mzt-appearance-message { margin: 0; line-height: 1.5; }
-#mzt-appearance-fix { flex-shrink: 0; }
-:is(#mzt-system-settings, #mzt-appearance-notice)[hidden] { display: none; }
-@media (max-width: 520px) { #mzt-theme-cards { grid-template-columns: 1fr; } }
+/* Settings pane. Uses Zotero's own tokens (not the plugin theme), so it matches the settings window.
+   Zotero's platform button rules (Windows: 28px gradient-bordered fields; macOS: max-height 25px and
+   negative margins) are reset on every custom control here. */
+#mzt-preferences {
+  --mzt-p-surface: var(--material-background, var(--color-background));
+  --mzt-p-line: var(--color-border50, var(--color-border));
+  --mzt-p-track: var(--fill-quinary);
+  --mzt-p-thumb: var(--material-background, var(--color-background));
+  --mzt-p-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 2px 8px -4px rgb(0 0 0 / 0.08);
+  --mzt-p-ease: 140ms ease;
+  max-width: 780px;
+}
+/* The settings window background is lighter than the content in dark mode, so surfaces lift with a tint. */
+@media (prefers-color-scheme: dark) {
+  #mzt-preferences {
+    --mzt-p-surface: var(--fill-quinary);
+    --mzt-p-thumb: rgb(255 255 255 / 0.16);
+    --mzt-p-shadow: none;
+  }
+}
+#mzt-preferences :is(.mzt-seg button, .mzt-theme-card, #mzt-appearance-fix) {
+  appearance: none;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  background-image: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+#mzt-preferences :is(.mzt-seg button, .mzt-theme-card, #mzt-appearance-fix):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Header */
+#mzt-preferences .mzt-hero { margin: 8px 0 24px; }
+#mzt-preferences h2 { margin: 0; font-size: 22px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.25; }
+
+/* Sections */
+#mzt-preferences .mzt-section { margin-bottom: 28px; }
+#mzt-preferences .mzt-section-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin: 0 2px 10px;
+}
+#mzt-preferences h3 { margin: 0; font-size: 13px; font-weight: 600; color: var(--fill-primary); }
+
+/* Segmented control: a tinted track with a raised thumb on the chosen option. */
+#mzt-preferences .mzt-seg {
+  display: inline-flex; flex: none; gap: 2px; padding: 2px;
+  border-radius: 8px; background: var(--mzt-p-track);
+}
+#mzt-preferences .mzt-seg button {
+  padding: 3px 12px; border-radius: 6px; background-color: transparent;
+  color: var(--fill-secondary); font-size: 12px; line-height: 18px; white-space: nowrap;
+  transition: background-color var(--mzt-p-ease), color var(--mzt-p-ease), box-shadow var(--mzt-p-ease);
+}
+#mzt-preferences .mzt-seg button:not(:disabled):hover { color: var(--fill-primary); }
+#mzt-preferences .mzt-seg button[aria-checked="true"] {
+  background-color: var(--mzt-p-thumb); color: var(--fill-primary); font-weight: 600;
+  box-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.12);
+}
+#mzt-preferences .mzt-seg button:disabled { cursor: default; }
+
+/* Grouped list: one surface, rows separated by hairlines. */
+#mzt-preferences .mzt-list {
+  border: 1px solid var(--mzt-p-line); border-radius: 12px;
+  background: var(--mzt-p-surface); box-shadow: var(--mzt-p-shadow);
+}
+#mzt-preferences .mzt-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  min-height: 48px; padding: 8px 14px 8px 16px;
+  transition: opacity var(--mzt-p-ease);
+}
+#mzt-preferences .mzt-row + .mzt-row { border-top: 1px solid var(--mzt-p-line); }
+#mzt-preferences .mzt-row[data-disabled] { opacity: 0.45; }
+#mzt-preferences .mzt-row-title { font-size: 13px; font-weight: 500; color: var(--fill-primary); }
+
+/* Theme cards */
+#mzt-theme-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 12px; }
+#mzt-preferences .mzt-theme-card {
+  position: relative; display: flex; flex-direction: column; gap: 10px;
+  padding: 6px 6px 10px; border: 1px solid var(--mzt-p-line); border-radius: 12px;
+  background-color: var(--mzt-p-surface); box-shadow: var(--mzt-p-shadow); text-align: start;
+  transition: border-color var(--mzt-p-ease), box-shadow var(--mzt-p-ease), translate var(--mzt-p-ease);
+}
+#mzt-preferences .mzt-theme-card:not(:disabled):hover {
+  border-color: var(--color-border);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.05), 0 8px 20px -10px rgb(0 0 0 / 0.25);
+  translate: 0 -1px;
+}
+#mzt-preferences .mzt-theme-card[aria-pressed="true"],
+#mzt-preferences .mzt-theme-card[aria-pressed="true"]:not(:disabled):hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent), 0 6px 18px -10px var(--color-accent);
+}
+#mzt-preferences .mzt-theme-card:disabled { cursor: default; opacity: 0.6; }
+#mzt-preferences .mzt-theme-label { display: flex; flex-direction: column; gap: 1px; padding: 0 6px; }
+#mzt-preferences .mzt-theme-name { font-size: 13px; font-weight: 600; color: var(--fill-primary); }
+#mzt-preferences .mzt-theme-meta { font-size: 11.5px; color: var(--fill-secondary); }
+#mzt-preferences .mzt-theme-card[aria-pressed="true"] .mzt-theme-meta { color: var(--color-accent); }
+#mzt-preferences .mzt-check {
+  position: absolute; top: 12px; inset-inline-end: 12px; width: 18px; height: 18px;
+  border-radius: 50%; background: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--mzt-p-thumb), 0 1px 3px rgb(0 0 0 / 0.25);
+  opacity: 0; scale: 0.6; transition: opacity var(--mzt-p-ease), scale var(--mzt-p-ease);
+}
+#mzt-preferences .mzt-check::after {
+  content: ""; position: absolute; left: 6.5px; top: 3.5px; width: 4px; height: 8px;
+  border: solid var(--color-accent-text, #fff); border-width: 0 2px 2px 0; rotate: 45deg;
+}
+#mzt-preferences .mzt-theme-card[aria-pressed="true"] .mzt-check { opacity: 1; scale: 1; }
+
+/* Miniature of the modern layout in the theme's own colors: canvas, sidebar, list card, item card. */
+#mzt-preferences .mzt-miniature {
+  display: grid; grid-template-columns: 24% 1fr 30%; gap: 4px; height: 96px; padding: 5px;
+  border-radius: 8px; background: var(--mzt-sidebar); box-shadow: inset 0 0 0 1px var(--mzt-border);
+  overflow: hidden;
+}
+#mzt-preferences .mzt-miniature > span { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 7px 6px; border-radius: 5px; }
+#mzt-preferences .mzt-mini-sidebar { padding-inline: 3px; }
+#mzt-preferences :is(.mzt-mini-list, .mzt-mini-detail) { background: var(--mzt-background); box-shadow: 0 0 0 1px var(--mzt-border), 0 1px 2px var(--mzt-shadow); }
+#mzt-preferences .mzt-miniature i { display: block; flex: none; height: 4px; border-radius: 2px; background: var(--mzt-border); }
+#mzt-preferences .mzt-mini-sidebar i:first-child { width: 55%; background: var(--mzt-subtle); opacity: 0.45; }
+#mzt-preferences .mzt-mini-sidebar i:nth-child(3) { height: 8px; margin-block: -2px; background: var(--mzt-background); box-shadow: 0 0 0 1px var(--mzt-border); }
+#mzt-preferences .mzt-mini-sidebar i:nth-child(even) { width: 80%; }
+#mzt-preferences .mzt-mini-list i:nth-child(odd) { width: 85%; }
+#mzt-preferences .mzt-mini-list i:nth-child(2) { width: auto; height: 8px; margin-block: -2px; background: var(--mzt-selected); }
+#mzt-preferences .mzt-mini-detail i:first-child { width: 80%; height: 6px; background: var(--mzt-text); opacity: 0.75; }
+#mzt-preferences .mzt-mini-detail i:nth-child(even) { width: 60%; }
+#mzt-preferences .mzt-mini-detail i:last-child { background: var(--mzt-accent); opacity: 0.6; width: 45%; }
+
+/* Appearance notice */
+#mzt-appearance-notice {
+  display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 10px 10px 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent); border-radius: 10px;
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+#mzt-appearance-notice[hidden] { display: none; }
+#mzt-preferences .mzt-notice-icon {
+  display: grid; place-content: center; flex: none; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--color-accent); color: var(--color-accent-text, #fff);
+  font: italic 700 11px/1 Georgia, serif;
+}
+#mzt-appearance-message { flex: 1; margin: 0; font-size: 12px; line-height: 1.5; }
+#mzt-preferences #mzt-appearance-fix {
+  flex: none; padding: 4px 12px; border-radius: 6px; background-color: var(--color-accent);
+  color: var(--color-accent-text, #fff); font-size: 12px; font-weight: 600; line-height: 18px;
+}
+#mzt-preferences #mzt-appearance-fix:not(:disabled):hover { filter: brightness(1.08); }
+
+/* Footer */
+#mzt-preferences .mzt-footer { display: flex; justify-content: flex-end; min-height: 18px; margin: 0 2px; }
+#mzt-status {
+  flex: none; margin: 0; font-size: 12px; color: var(--fill-secondary);
+  opacity: 0; transition: opacity 200ms ease;
+}
+#mzt-status.mzt-visible { opacity: 1; }
+
+@media (max-width: 560px) {
+  #mzt-preferences :is(.mzt-row, .mzt-section-head) { flex-direction: column; align-items: flex-start; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #mzt-preferences *, #mzt-preferences *::before, #mzt-preferences *::after { transition: none !important; }
+  #mzt-preferences .mzt-theme-card:not(:disabled):hover { translate: none; }
+}

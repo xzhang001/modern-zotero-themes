@@ -1,4 +1,4 @@
-Catppuccin Latte palette — https://github.com/catppuccin/palette
+Catppuccin Latte and Frappé palettes — https://github.com/catppuccin/palette
 
 The notice below applies to the Catppuccin palette incorporated in themes.js.
 

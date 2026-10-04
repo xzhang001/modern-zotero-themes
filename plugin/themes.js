@@ -31,6 +31,17 @@
         inactiveSelected: "#dce0e8", accent: "#8839ef", onAccent: "#ffffff",
         error: "#d20f39", errorBackground: "#fbecef", shadow: "#4c4f6914"
       }
+    },
+    {
+      // Focused selection is a deepened mauve: Zotero swaps in white icons there, which pale mauve can't carry.
+      id: "catppuccin-frappe", name: "Catppuccin Frappé", mode: "dark", author: "Catppuccin",
+      colors: {
+        background: "#303446", sidebar: "#292c3c", toolbar: "#292c3c", elevated: "#414559",
+        text: "#c6d0f5", muted: "#a5adce", subtle: "#949cbb", border: "#414559",
+        hover: "#3a3e51", selected: "#7f5aa8", selectedText: "#ffffff",
+        inactiveSelected: "#414559", accent: "#ca9ee6", onAccent: "#232634",
+        error: "#e78284", errorBackground: "#3b3040", shadow: "#00000040"
+      }
     }
   ];
   const required = Object.keys(themes[0].colors);

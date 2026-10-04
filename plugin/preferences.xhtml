@@ -2,47 +2,57 @@
       xmlns:html="http://www.w3.org/1999/xhtml"
       id="mzt-preferences" onload="window.MZTPreferences.init()">
   <groupbox>
-    <html:div class="mzt-eyebrow">MODERN ZOTERO THEMES</html:div>
-    <html:h2 data-mzt-text="heading">Make room for your research.</html:h2>
-    <html:p class="mzt-description" data-mzt-text="description">A quieter interface. The Zotero you know.</html:p>
-    <html:label class="mzt-setting">
-      <html:span data-mzt-text="appearance">Appearance</html:span>
-      <html:select id="mzt-mode">
-        <html:option value="fixed" data-mzt-text="fixed">Choose a theme</html:option>
-        <html:option value="system" data-mzt-text="system">Follow system</html:option>
-      </html:select>
-    </html:label>
-    <html:label class="mzt-setting">
-      <html:span data-mzt-text="layout">Layout</html:span>
-      <html:select id="mzt-layout">
-        <html:option value="modern" data-mzt-text="layoutModern">Modern</html:option>
-        <html:option value="classic" data-mzt-text="layoutClassic">Classic (colors only)</html:option>
-      </html:select>
-    </html:label>
-    <html:label class="mzt-setting">
-      <html:span data-mzt-text="emptyFields">Empty fields</html:span>
-      <html:select id="mzt-emptyFields">
-        <html:option value="hide" data-mzt-text="emptyHide">Hide until editing</html:option>
-        <html:option value="show" data-mzt-text="emptyShow">Always show</html:option>
-      </html:select>
-    </html:label>
-    <html:label class="mzt-setting">
-      <html:span data-mzt-text="folderIcons">Folder icons</html:span>
-      <html:select id="mzt-folderIcons">
-        <html:option value="color" data-mzt-text="iconsColor">Color</html:option>
-        <html:option value="mono" data-mzt-text="iconsMono">Monochrome</html:option>
-      </html:select>
-    </html:label>
-    <html:div id="mzt-theme-cards" role="group" aria-label="Themes"/>
-    <html:div id="mzt-system-settings">
-      <html:label class="mzt-setting"><html:span data-mzt-text="light">Light appearance</html:span><html:select id="mzt-lightTheme"/></html:label>
-      <html:label class="mzt-setting"><html:span data-mzt-text="dark">Dark appearance</html:span><html:select id="mzt-darkTheme"/></html:label>
-    </html:div>
-    <html:div id="mzt-appearance-notice" hidden="hidden">
-      <html:p id="mzt-appearance-message"/>
-      <html:button id="mzt-appearance-fix" type="button"/>
-    </html:div>
-    <html:p id="mzt-status" role="status" aria-live="polite"/>
-    <html:p class="mzt-footnote" data-mzt-text="note">Changes apply immediately. Your items, tag colors and annotations are never changed.</html:p>
+    <html:header class="mzt-hero">
+      <html:h2 data-mzt-text="heading">Make room for your research.</html:h2>
+    </html:header>
+
+    <html:section class="mzt-section" aria-labelledby="mzt-theme-heading">
+      <html:div class="mzt-section-head">
+        <html:h3 id="mzt-theme-heading" data-mzt-text="themes">Theme</html:h3>
+        <html:div class="mzt-seg" data-key="mode" role="radiogroup" aria-labelledby="mzt-theme-heading">
+          <html:button type="button" role="radio" data-value="fixed" data-mzt-text="fixed">Fixed</html:button>
+          <html:button type="button" role="radio" data-value="system" data-mzt-text="system">Match system</html:button>
+        </html:div>
+      </html:div>
+      <html:div id="mzt-theme-cards" role="group" aria-labelledby="mzt-theme-heading"/>
+      <html:div id="mzt-appearance-notice" hidden="hidden">
+        <html:span class="mzt-notice-icon" aria-hidden="true">i</html:span>
+        <html:p id="mzt-appearance-message"/>
+        <html:button id="mzt-appearance-fix" type="button"/>
+      </html:div>
+    </html:section>
+
+    <html:section class="mzt-section" aria-labelledby="mzt-interface-heading">
+      <html:div class="mzt-section-head">
+        <html:h3 id="mzt-interface-heading" data-mzt-text="interface">Interface</html:h3>
+      </html:div>
+      <html:div class="mzt-list">
+        <html:div class="mzt-row">
+          <html:span id="mzt-layout-label" class="mzt-row-title" data-mzt-text="layout">Layout</html:span>
+          <html:div class="mzt-seg" data-key="layout" role="radiogroup" aria-labelledby="mzt-layout-label">
+            <html:button type="button" role="radio" data-value="modern" data-mzt-text="layoutModern">Modern</html:button>
+            <html:button type="button" role="radio" data-value="classic" data-mzt-text="layoutClassic">Classic</html:button>
+          </html:div>
+        </html:div>
+        <html:div class="mzt-row" data-modern-only="true">
+          <html:span id="mzt-emptyFields-label" class="mzt-row-title" data-mzt-text="emptyFields">Empty fields</html:span>
+          <html:div class="mzt-seg" data-key="emptyFields" role="radiogroup" aria-labelledby="mzt-emptyFields-label">
+            <html:button type="button" role="radio" data-value="hide" data-mzt-text="emptyHide">Hide</html:button>
+            <html:button type="button" role="radio" data-value="show" data-mzt-text="emptyShow">Show</html:button>
+          </html:div>
+        </html:div>
+        <html:div class="mzt-row" data-modern-only="true">
+          <html:span id="mzt-folderIcons-label" class="mzt-row-title" data-mzt-text="folderIcons">Folder icons</html:span>
+          <html:div class="mzt-seg" data-key="folderIcons" role="radiogroup" aria-labelledby="mzt-folderIcons-label">
+            <html:button type="button" role="radio" data-value="color" data-mzt-text="iconsColor">Color</html:button>
+            <html:button type="button" role="radio" data-value="mono" data-mzt-text="iconsMono">Monochrome</html:button>
+          </html:div>
+        </html:div>
+      </html:div>
+    </html:section>
+
+    <html:footer class="mzt-footer">
+      <html:p id="mzt-status" role="status" aria-live="polite"/>
+    </html:footer>
   </groupbox>
 </vbox>

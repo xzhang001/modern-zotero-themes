@@ -185,7 +185,7 @@ test('subscripts expose their API on an explicit Zotero-style target scope', () 
   for (const file of ['themes.js', 'runtime.js']) {
     vm.runInContext(fs.readFileSync(require('node:path').join(__dirname, '../plugin', file), 'utf8'), scope);
   }
-  assert.equal(scope.MZTThemes.themes.length, 3);
+  assert.equal(scope.MZTThemes.themes.length, require('../plugin/themes.js').themes.length);
   assert.equal(typeof scope.MZTCreateRuntime, 'function');
 });
 test('Zotero appearance is read, written only with valid values, and notifies settings panes', async () => {
