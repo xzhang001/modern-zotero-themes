@@ -1,10 +1,10 @@
 {
   "name": "modern-zotero-themes",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "private": true,
   "description": "Modern, layout-preserving themes for Zotero",
   "scripts": {
-    "test": "node tests/themes.test.cjs && node tests/runtime.test.cjs && node tests/manifest.test.cjs",
+    "test": "node tests/themes.test.cjs && node tests/runtime.test.cjs && node tests/manifest.test.cjs && node tests/collection-icons.test.cjs",
     "build": "python3 scripts/build.py",
     "preview": "python3 -m http.server 5173 --bind 0.0.0.0"
   }

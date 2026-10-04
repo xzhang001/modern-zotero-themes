@@ -4,8 +4,11 @@ var modernThemes;
 async function startup({ id, version, rootURI }) {
   const scope = {};
   Services.scriptloader.loadSubScript(rootURI + "themes.js", scope);
+  Services.scriptloader.loadSubScript(rootURI + "collection-icons.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "runtime.js", scope);
-  modernThemes = scope.MZTCreateRuntime({ Zotero, Services, rootURI, id, version, themes: scope.MZTThemes });
+  modernThemes = scope.MZTCreateRuntime({
+    Zotero, Services, rootURI, id, version, themes: scope.MZTThemes, collectionIcons: scope.MZTCollectionIcons
+  });
   try {
     await modernThemes.start();
   }

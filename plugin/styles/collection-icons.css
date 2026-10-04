@@ -1,0 +1,148 @@
+/* Custom collection icons (both layouts: the user chose them explicitly) and the icon picker panel.
+   Masks and per-mode colors come from collection-icons.js via the #mzt-collection-icons style. */
+@media (forced-colors: none) {
+  /* !important: Zotero draws folder icons as per-state backgrounds (focus-states mixin) whose selectors
+     outrank anything reasonable here; the monochrome option's filter must not grey a chosen color. */
+  :root[data-mzt-theme] #zotero-collections-tree .cell-icon[data-mzt-icon] {
+    background: var(--mzt-icon-color, var(--mzt-muted)) !important;
+    mask: var(--mzt-icon-mask) center / 16px 16px no-repeat;
+    filter: none !important;
+  }
+  :root[data-mzt-theme] #zotero-collections-tree .virtualized-table:focus-within .row.selected .cell-icon[data-mzt-icon] {
+    background: var(--mzt-selectedText) !important;
+  }
+  :root[data-mzt-theme] #zotero-collections-tree .cell-icon[data-mzt-emoji] {
+    background: none !important;
+    filter: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    line-height: 1;
+  }
+  :root[data-mzt-theme] #zotero-collections-tree .cell-icon[data-mzt-emoji]::before {
+    content: attr(data-mzt-emoji);
+  }
+
+  /* Picker */
+  #mzt-icon-picker {
+    --arrowpanel-background: var(--mzt-elevated);
+    --arrowpanel-color: var(--mzt-text);
+    --arrowpanel-border-color: var(--mzt-border);
+    --panel-background: var(--mzt-elevated);
+    --panel-color: var(--mzt-text);
+    --panel-border-color: var(--mzt-border);
+  }
+  #mzt-icon-picker .mzt-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 304px;
+    padding: 12px;
+    color: var(--mzt-text);
+  }
+  #mzt-icon-picker .mzt-picker-label {
+    margin-top: 2px;
+    color: var(--mzt-muted);
+    font-size: 0.85em;
+    font-weight: 600;
+  }
+  #mzt-icon-picker .mzt-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 28px);
+    gap: 4px;
+  }
+  /* Zotero's platform button rules fix heights and paint gradients; options size themselves. */
+  #mzt-icon-picker :is(.mzt-picker-option, .mzt-picker-swatch, .mzt-picker-reset) {
+    appearance: none;
+    min-height: 0;
+    max-height: none;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  #mzt-icon-picker .mzt-picker-option {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+  }
+  #mzt-icon-picker .mzt-picker-option:hover {
+    background: var(--mzt-hover);
+  }
+  #mzt-icon-picker .mzt-picker-option[aria-pressed="true"] {
+    border-color: var(--mzt-accent);
+    background: color-mix(in srgb, var(--mzt-accent) 12%, transparent);
+  }
+  #mzt-icon-picker .mzt-picker-glyph {
+    width: 16px;
+    height: 16px;
+    background: var(--mzt-picker-color, var(--mzt-text));
+    mask: var(--mzt-icon-mask) center / 16px 16px no-repeat;
+  }
+  #mzt-icon-picker .mzt-picker-emoji {
+    font-size: 16px;
+    line-height: 1;
+  }
+  #mzt-icon-picker .mzt-picker-colors {
+    display: flex;
+    gap: 8px;
+  }
+  #mzt-icon-picker .mzt-picker-swatch {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 2px solid var(--mzt-elevated);
+    border-radius: 50%;
+    background: var(--mzt-swatch, var(--mzt-muted));
+    box-shadow: 0 0 0 1px var(--mzt-border);
+  }
+  #mzt-icon-picker .mzt-picker-swatch[aria-pressed="true"] {
+    box-shadow: 0 0 0 2px var(--mzt-accent);
+  }
+  #mzt-icon-picker .mzt-picker-swatch:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  #mzt-icon-picker .mzt-picker-input {
+    padding: 5px 8px;
+    border: 1px solid var(--mzt-border);
+    border-radius: 6px;
+    background: var(--mzt-background);
+    color: var(--mzt-text);
+    font: inherit;
+  }
+  #mzt-icon-picker .mzt-picker-input[aria-invalid="true"] {
+    border-color: var(--mzt-error);
+  }
+  #mzt-icon-picker .mzt-picker-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  #mzt-icon-picker .mzt-picker-note {
+    color: var(--mzt-subtle);
+    font-size: 0.85em;
+  }
+  #mzt-icon-picker .mzt-picker-reset {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--mzt-accent);
+  }
+  #mzt-icon-picker .mzt-picker-reset:hover {
+    background: var(--mzt-hover);
+  }
+  #mzt-icon-picker :is(.mzt-picker-option, .mzt-picker-swatch, .mzt-picker-reset, .mzt-picker-input):focus-visible {
+    outline: 2px solid var(--mzt-accent);
+    outline-offset: 1px;
+  }
+}

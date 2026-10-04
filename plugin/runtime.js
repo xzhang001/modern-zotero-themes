@@ -1,6 +1,6 @@
 (function (scope) {
   "use strict";
-  scope.MZTCreateRuntime = function ({ Zotero, Services, rootURI, id, version, themes }) {
+  scope.MZTCreateRuntime = function ({ Zotero, Services, rootURI, id, version, themes, collectionIcons }) {
     // Gecko caches stylesheets by URL, and an upgraded XPI keeps the same jar: URL, so without a
     // per-startup query the old CSS stays in effect until Zotero restarts.
     const assetQuery = `?v=${encodeURIComponent(version || "dev")}.${Date.now()}`;
@@ -9,7 +9,13 @@
     const layouts = ["modern", "classic"];
     const emptyFieldModes = ["hide", "show"];
     const folderIconModes = ["color", "mono"];
-    const stylesheets = { "mzt-components": "styles/modern.css", "mzt-layout": "styles/layout.css" };
+    const stylesheets = { "mzt-components": "styles/modern.css", "mzt-layout": "styles/layout.css",
+      "mzt-collection-icons-sheet": "styles/collection-icons.css" };
+    // Custom collection icons: JSON map of Zotero libraryKey ("<libraryID>/<key>") to a validated entry.
+    // Local to this profile by design; Zotero has no synced field for it.
+    const iconsPref = prefix + "collectionIcons";
+    const libraryKeyPattern = /^\d+\/[23456789ABCDEFGHIJKLMNPQRSTUVWXYZ]{8}$/;
+    const menuItemID = "mzt-set-collection-icon";
     const rootAttributes = ["data-mzt-theme", "data-mzt-layout", "data-mzt-empty-fields", "data-mzt-folder-icons"];
     // Zotero's General → Appearance setting (Zotero 7–10).
     const appearancePref = "browser.theme.toolbar-theme";
@@ -37,6 +43,7 @@
         const config = settings();
         const theme = themes.resolve(config, state.media.matches);
         state.tokens.textContent = themes.css(theme);
+        state.iconStyles.textContent = collectionIcons.css(theme.mode);
         win.document.documentElement.setAttribute("data-mzt-theme", theme.id);
         win.document.documentElement.setAttribute("data-mzt-layout",
           layouts.includes(config.layout) ? config.layout : defaults.layout);
@@ -44,6 +51,7 @@
           emptyFieldModes.includes(config.emptyFields) ? config.emptyFields : defaults.emptyFields);
         win.document.documentElement.setAttribute("data-mzt-folder-icons",
           folderIconModes.includes(config.folderIcons) ? config.folderIcons : defaults.folderIcons);
+        markCollectionSections(win);
       }
       for (const callback of subscribers) {
         try { callback(); } catch (error) { Zotero.logError(error); }
@@ -52,6 +60,33 @@
     function collectionRows(win) {
       const tree = win.document.getElementById?.("zotero-collections-tree");
       return tree ? Array.from(tree.querySelectorAll(`.row[id^="${rowIDPrefix}"]`)) : [];
+    }
+    function storedIcons() {
+      let parsed;
+      try { parsed = JSON.parse(Services.prefs.getStringPref(iconsPref, "{}")); }
+      catch (error) { return new Map(); }
+      const entries = new Map();
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return entries;
+      for (const [key, value] of Object.entries(parsed)) {
+        if (!libraryKeyPattern.test(key)) continue;
+        try {
+          const entry = collectionIcons.validate(value);
+          if (entry) entries.set(key, entry);
+        }
+        catch (error) { /* Skip entries this version can't show. */ }
+      }
+      return entries;
+    }
+    function decorateIcon(row, treeRow, icons) {
+      const icon = row.querySelector?.(".cell-icon");
+      if (!icon) return;
+      const entry = treeRow?.type === "collection" ? icons.get(treeRow.ref?.libraryKey) : null;
+      if (entry?.icon) icon.setAttribute("data-mzt-icon", entry.icon);
+      else icon.removeAttribute("data-mzt-icon");
+      if (entry?.emoji) icon.setAttribute("data-mzt-emoji", entry.emoji);
+      else icon.removeAttribute("data-mzt-emoji");
+      if (entry?.color) icon.style.setProperty("--mzt-icon-color", `var(--mzt-icon-${entry.color})`);
+      else icon.style.removeProperty("--mzt-icon-color");
     }
     function markCollectionSections(win) {
       const view = win.ZoteroPane?.collectionsView;
@@ -65,13 +100,52 @@
         shifts.push(shift);
       }
       tree.style.setProperty(sectionTotalProperty, shifts.length ? shifts[shifts.length - 1] : 0);
+      const icons = storedIcons();
       for (const row of collectionRows(win)) {
         const index = Number(row.id.slice(rowIDPrefix.length));
+        decorateIcon(row, view.getRow(index), icons);
         const shift = shifts[index] ?? 0;
         row.toggleAttribute(sectionStartAttribute, index > 0 && shift > shifts[index - 1]);
         if (shift) row.style.setProperty(sectionShiftProperty, shift);
         else row.style.removeProperty(sectionShiftProperty);
       }
+    }
+    // "Set Icon…" in the collection context menu, shown only for collections.
+    function addIconMenu(win) {
+      const doc = win.document;
+      const menu = doc.getElementById?.("zotero-collectionmenu");
+      if (!menu || !doc.createXULElement) return null;
+      const t = collectionIcons.strings[String(Zotero.locale || "").startsWith("zh") ? "zh" : "en"];
+      const item = doc.createXULElement("menuitem");
+      item.id = menuItemID;
+      item.setAttribute("label", t.menu);
+      const anchor = menu.querySelector(".zotero-menuitem-edit-collection");
+      if (anchor) anchor.after(item);
+      else menu.append(item);
+      const selected = () => {
+        const treeRow = win.ZoteroPane?.getCollectionTreeRow?.();
+        return treeRow?.type === "collection" && libraryKeyPattern.test(treeRow.ref?.libraryKey) ? treeRow : null;
+      };
+      const showing = event => { if (event.target === menu) item.hidden = !selected(); };
+      const command = () => {
+        const treeRow = selected();
+        if (!treeRow) return;
+        const key = treeRow.ref.libraryKey;
+        const index = win.ZoteroPane.collectionsView.selection?.focused;
+        const anchorRow = doc.getElementById(rowIDPrefix + index) || doc.getElementById("zotero-collections-tree");
+        collectionIcons.openPicker({
+          win, anchor: anchorRow, current: storedIcons().get(key) || null, locale: Zotero.locale,
+          onChange: entry => api.setCollectionIcon(key, entry)
+        });
+      };
+      menu.addEventListener("popupshowing", showing);
+      item.addEventListener("command", command);
+      return {
+        remove() {
+          menu.removeEventListener("popupshowing", showing);
+          item.remove();
+        }
+      };
     }
     function attach(win) {
       if (!active || windows.has(win) || win.closed) return;
@@ -86,12 +160,15 @@
       });
       const tokens = doc.createElementNS("http://www.w3.org/1999/xhtml", "style");
       tokens.id = "mzt-tokens";
+      const iconStyles = doc.createElementNS("http://www.w3.org/1999/xhtml", "style");
+      iconStyles.id = "mzt-collection-icons";
       const media = win.matchMedia("(prefers-color-scheme: dark)");
       const unload = () => detach(win);
       const previous = Object.fromEntries(rootAttributes.map(name => [name, root.getAttribute(name)]));
       const sections = new win.MutationObserver(() => markCollectionSections(win));
-      windows.set(win, { links, tokens, media, unload, previous, sections });
-      root.append(...links, tokens);
+      const menu = addIconMenu(win);
+      windows.set(win, { links, tokens, iconStyles, media, unload, previous, sections, menu });
+      root.append(...links, tokens, iconStyles);
       const tree = doc.getElementById?.("zotero-collections-tree");
       if (tree) sections.observe(tree, { childList: true, subtree: true });
       markCollectionSections(win);
@@ -110,8 +187,12 @@
         row.style.removeProperty(sectionShiftProperty);
       }
       win.document.getElementById?.("zotero-collections-tree")?.style.removeProperty(sectionTotalProperty);
+      for (const row of collectionRows(win)) decorateIcon(row, null, new Map());
+      state.menu?.remove();
+      win.document.getElementById?.("mzt-icon-picker")?.hidePopup?.();
       for (const link of state.links) link.remove();
       state.tokens.remove();
+      state.iconStyles.remove();
       const root = win.document.documentElement;
       for (const [name, value] of Object.entries(state.previous)) {
         if (value === null) root.removeAttribute(name);
@@ -144,6 +225,19 @@
             || (key === "darkTheme" && theme.mode !== "dark")) throw new Error("Invalid theme");
         }
         Services.prefs.setStringPref(prefix + key, value);
+      },
+      collectionIcon(libraryKey) {
+        return storedIcons().get(libraryKey) || null;
+      },
+      // entry: { icon, color } or { emoji }; null restores Zotero's folder icon.
+      setCollectionIcon(libraryKey, entry) {
+        if (!active) return;
+        if (!libraryKeyPattern.test(libraryKey)) throw new Error("Invalid collection");
+        const normalized = collectionIcons.validate(entry);
+        const icons = storedIcons();
+        if (normalized) icons.set(libraryKey, normalized);
+        else icons.delete(libraryKey);
+        Services.prefs.setStringPref(iconsPref, JSON.stringify(Object.fromEntries(icons)));
       },
       zoteroAppearance() {
         const value = Services.prefs.getIntPref(appearancePref, appearances.auto);

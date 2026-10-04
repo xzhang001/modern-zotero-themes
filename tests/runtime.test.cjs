@@ -2,6 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const createRuntime = require('../plugin/runtime.js');
 const themes = require('../plugin/themes.js');
+const collectionIcons = require('../plugin/collection-icons.js');
 
 class FakeMutationObserver {
   constructor(callback) { this.callback = callback; this.target = null; }
@@ -9,12 +10,23 @@ class FakeMutationObserver {
   disconnect() { this.target?.observers.delete(this); this.target = null; }
 }
 // Collection tree whose rendered rows (any DOM order, as after scrolling) map to Zotero row types.
-function fakeCollectionTree(types, rendered = types.map((_, index) => index)) {
+function fakeElement() {
+  const attributes = new Map();
+  const style = new Map();
+  return {
+    attributes, styleMap: style,
+    setAttribute: (k, v) => attributes.set(k, v), removeAttribute: k => attributes.delete(k),
+    style: { setProperty: (k, v) => style.set(k, v), removeProperty: k => style.delete(k) }
+  };
+}
+function fakeCollectionTree(types, rendered = types.map((_, index) => index), keys = {}) {
   const observers = new Set();
   const rows = rendered.map(index => {
     const attributes = new Set();
     const style = new Map();
+    const icon = fakeElement();
     return {
+      icon, querySelector: selector => (selector === '.cell-icon' ? icon : null),
       id: 'collection-tree-row-' + index, attributes,
       style: { setProperty: (k, v) => style.set(k, v), removeProperty: k => style.delete(k), get: k => style.get(k) },
       toggleAttribute(name, on) { if (on) attributes.add(name); else attributes.delete(name); },
@@ -24,7 +36,9 @@ function fakeCollectionTree(types, rendered = types.map((_, index) => index)) {
   const treeStyle = new Map();
   return {
     observers, rows, treeStyle,
-    view: { getRow: index => (index in types ? { type: types[index] } : undefined), get rowCount() { return types.length; } },
+    view: { getRow: index => (index in types ? { type: types[index], ref: { libraryKey: keys[index] } } : undefined),
+      get rowCount() { return types.length; } },
+    icon: index => rows.find(row => row.id === 'collection-tree-row-' + index).icon,
     element: { observers, querySelectorAll: () => rows,
       style: { setProperty: (k, v) => treeStyle.set(k, v), removeProperty: k => treeStyle.delete(k) } },
     shift: index => rows.find(row => row.id === 'collection-tree-row-' + index).style.get('--mzt-section-shift'),
@@ -84,13 +98,14 @@ function setup(windows = [fakeWindow()]) {
     }
   };
   return { windows, prefs, observers, panes, Zotero, runtime: createRuntime({
-    Zotero, Services, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', version: '1.2.3', themes
+    Zotero, Services, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', version: '1.2.3', themes, collectionIcons
   }) };
 }
 test('startup and repeated attach load exactly one set of styles per window', async () => {
   const s = setup(); await s.runtime.start();
   s.runtime.attach(s.windows[0]);
-  assert.equal(s.windows[0].children.length, 3);
+  // Three stylesheets, theme tokens, collection icon rules.
+  assert.equal(s.windows[0].children.length, 5);
   const [modern, layout] = s.windows[0].children.slice(0, 2).map(link => link.href);
   // Per-startup query: an upgraded XPI keeps its jar: URL, and Gecko would reuse the cached sheet.
   assert.match(modern, /^jar:file:\/\/\/plugin\.xpi!\/styles\/modern\.css\?v=1\.2\.3\.\d+$/);
@@ -226,4 +241,38 @@ test('first built-in view of each library is marked as a section start, in any D
   assert.deepEqual([4, 12].map(tree.shift), [undefined, undefined]);
   assert.equal(tree.treeStyle.has('--mzt-section-shift-total'), false);
   assert.equal(tree.observers.size, 0);
+});
+test('collection icons persist per libraryKey, decorate rows, and clear on reset and disable', async () => {
+  const types = ['library', 'collection', 'collection', 'trash'];
+  const tree = fakeCollectionTree(types, undefined, { 1: '1/ABCD2345', 2: '1/WXYZ6789' });
+  const s = setup([fakeWindow(false, tree)]); await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
+  api.setCollectionIcon('1/ABCD2345', { icon: 'brain', color: 'teal' });
+  api.setCollectionIcon('1/WXYZ6789', { emoji: '📚' });
+  assert.deepEqual(JSON.parse(s.prefs.get('extensions.modernZoteroThemes.collectionIcons')),
+    { '1/ABCD2345': { icon: 'brain', color: 'teal' }, '1/WXYZ6789': { emoji: '📚' } });
+  assert.equal(tree.icon(1).attributes.get('data-mzt-icon'), 'brain');
+  assert.equal(tree.icon(1).styleMap.get('--mzt-icon-color'), 'var(--mzt-icon-teal)');
+  assert.equal(tree.icon(2).attributes.get('data-mzt-emoji'), '📚');
+  assert.equal(tree.icon(3).attributes.size, 0);
+  assert.deepEqual(api.collectionIcon('1/ABCD2345'), { icon: 'brain', color: 'teal' });
+  for (const [key, entry] of [['../x', { icon: 'brain' }], ['1/ABCD2345', { icon: 'nope' }],
+    ['1/ABCD2345', { emoji: 'ab' }], ['1/ABCD2345', { emoji: '📚', color: 'red' }]]) {
+    assert.throws(() => api.setCollectionIcon(key, entry));
+  }
+  api.setCollectionIcon('1/ABCD2345', null);
+  assert.equal(tree.icon(1).attributes.has('data-mzt-icon'), false);
+  assert.equal(tree.icon(1).styleMap.size, 0);
+  s.runtime.stop();
+  assert.equal(tree.icon(2).attributes.size, 0);
+});
+test('corrupt or foreign collection icon prefs are ignored', async () => {
+  const tree = fakeCollectionTree(['library', 'collection'], undefined, { 1: '1/ABCD2345' });
+  const s = setup([fakeWindow(false, tree)]);
+  s.prefs.set('extensions.modernZoteroThemes.collectionIcons', '{"1/ABCD2345":{"icon":"gone"},"bad key":{"icon":"brain"}');
+  await s.runtime.start();
+  assert.equal(tree.icon(1).attributes.size, 0);
+  s.prefs.set('extensions.modernZoteroThemes.collectionIcons', '{"1/ABCD2345":{"icon":"gone"},"bad":{"icon":"brain"},"1/WXYZ6789":{"icon":"star"}}');
+  assert.equal(s.Zotero.ModernZoteroThemes.collectionIcon('1/ABCD2345'), null);
+  assert.deepEqual(s.Zotero.ModernZoteroThemes.collectionIcon('1/WXYZ6789'), { icon: 'star' });
+  s.runtime.stop();
 });
