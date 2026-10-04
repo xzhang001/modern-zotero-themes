@@ -10,6 +10,7 @@ window.MZTPreferences = {
       heading: "让阅读更专注。", description: "更清爽的界面，熟悉的 Zotero。",
       appearance: "外观切换", layout: "界面风格", layoutModern: "现代", layoutClassic: "经典（仅换色）",
       emptyFields: "空字段", emptyHide: "隐藏，编辑时显示", emptyShow: "始终显示",
+      folderIcons: "文件夹图标", iconsColor: "彩色", iconsMono: "单色",
       fixed: "固定主题", system: "跟随系统", light: "浅色模式主题", dark: "深色模式主题",
       note: "即时生效，不会改动文献数据、标签颜色与批注。", saved: "主题设置已保存", inactive: "主题插件已停用",
       modes: { light: "浅色", dark: "深色" },
@@ -66,7 +67,7 @@ window.MZTPreferences = {
         select.append(option);
       }
     }
-    for (const key of ["mode", "layout", "emptyFields", "lightTheme", "darkTheme"]) {
+    for (const key of ["mode", "layout", "emptyFields", "folderIcons", "lightTheme", "darkTheme"]) {
       root.querySelector("#mzt-" + key).addEventListener("change", event => save([key, event.target.value]));
     }
     const notice = root.querySelector("#mzt-appearance-notice");
@@ -95,9 +96,11 @@ window.MZTPreferences = {
         noticeButton.textContent = copy.useAuto;
       }
       notice.hidden = !wantedAppearance;
-      for (const key of ["mode", "layout", "emptyFields", "lightTheme", "darkTheme"]) root.querySelector("#mzt-" + key).value = settings[key];
-      // Hiding empty fields is part of the modern layout; classic only changes colors.
-      root.querySelector("#mzt-emptyFields").disabled = !available || settings.layout !== "modern";
+      for (const key of ["mode", "layout", "emptyFields", "folderIcons", "lightTheme", "darkTheme"]) root.querySelector("#mzt-" + key).value = settings[key];
+      // These belong to the modern layout; classic only changes colors.
+      for (const key of ["emptyFields", "folderIcons"]) {
+        root.querySelector("#mzt-" + key).disabled = !available || settings.layout !== "modern";
+      }
       root.querySelector("#mzt-system-settings").hidden = settings.mode !== "system";
       for (const card of cards.children) {
         card.setAttribute("aria-pressed", String(settings.mode === "fixed" && settings.theme === card.dataset.theme));

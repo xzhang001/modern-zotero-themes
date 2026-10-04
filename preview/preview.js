@@ -47,7 +47,7 @@ function renderPapers(query = '') {
 renderPapers();
 document.getElementById('library-search').addEventListener('input', event => renderPapers(event.target.value));
 const saved = (() => { try { return JSON.parse(localStorage.getItem('mzt-preview-settings')) || {}; } catch { return {}; } })();
-const config = { mode: 'fixed', theme: 'catppuccin-latte', lightTheme: 'catppuccin-latte', darkTheme: 'modern-dark', layout: 'modern', emptyFields: 'hide', ...saved };
+const config = { mode: 'fixed', theme: 'catppuccin-latte', lightTheme: 'catppuccin-latte', darkTheme: 'modern-dark', layout: 'modern', emptyFields: 'hide', folderIcons: 'color', ...saved };
 const callbacks = new Set();
 const media = matchMedia('(prefers-color-scheme: dark)');
 const picker = document.getElementById('theme-picker');
@@ -56,6 +56,8 @@ function updateTheme() {
   const theme = MZTThemes.resolve(config, media.matches);
   document.documentElement.dataset.mztTheme = theme.id;
   document.documentElement.dataset.mztLayout = config.layout;
+  document.documentElement.dataset.mztEmptyFields = config.emptyFields;
+  document.documentElement.dataset.mztFolderIcons = config.folderIcons;
   document.getElementById('theme-tokens').textContent = MZTThemes.css(theme);
   picker.value = theme.id;
   localStorage.setItem('mzt-preview-settings', JSON.stringify(config));

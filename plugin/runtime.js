@@ -2,11 +2,12 @@
   "use strict";
   scope.MZTCreateRuntime = function ({ Zotero, Services, rootURI, id, themes }) {
     const prefix = "extensions.modernZoteroThemes.";
-    const defaults = { mode: "system", theme: "modern-light", lightTheme: "modern-light", darkTheme: "modern-dark", layout: "modern", emptyFields: "hide" };
+    const defaults = { mode: "system", theme: "modern-light", lightTheme: "modern-light", darkTheme: "modern-dark", layout: "modern", emptyFields: "hide", folderIcons: "color" };
     const layouts = ["modern", "classic"];
     const emptyFieldModes = ["hide", "show"];
+    const folderIconModes = ["color", "mono"];
     const stylesheets = { "mzt-components": "styles/modern.css", "mzt-layout": "styles/layout.css" };
-    const rootAttributes = ["data-mzt-theme", "data-mzt-layout", "data-mzt-empty-fields"];
+    const rootAttributes = ["data-mzt-theme", "data-mzt-layout", "data-mzt-empty-fields", "data-mzt-folder-icons"];
     // Zotero's General → Appearance setting (Zotero 7–10).
     const appearancePref = "browser.theme.toolbar-theme";
     const appearances = { dark: 0, light: 1, auto: 2 };
@@ -29,6 +30,8 @@
           layouts.includes(config.layout) ? config.layout : defaults.layout);
         win.document.documentElement.setAttribute("data-mzt-empty-fields",
           emptyFieldModes.includes(config.emptyFields) ? config.emptyFields : defaults.emptyFields);
+        win.document.documentElement.setAttribute("data-mzt-folder-icons",
+          folderIconModes.includes(config.folderIcons) ? config.folderIcons : defaults.folderIcons);
       }
       for (const callback of subscribers) {
         try { callback(); } catch (error) { Zotero.logError(error); }
@@ -85,6 +88,9 @@
         }
         else if (key === "emptyFields") {
           if (!emptyFieldModes.includes(value)) throw new Error("Invalid empty field mode");
+        }
+        else if (key === "folderIcons") {
+          if (!folderIconModes.includes(value)) throw new Error("Invalid folder icon mode");
         }
         else {
           const theme = themes.themes.find(t => t.id === value);

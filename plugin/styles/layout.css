@@ -11,6 +11,8 @@
     --mzt-icon-tint: var(--mzt-muted);
     /* Card edges are drawn against the canvas, not the card, so they survive low-contrast displays. */
     --mzt-card-border: color-mix(in srgb, var(--mzt-canvas) 82%, var(--mzt-text));
+    /* Lines drawn on the canvas (indent guides, sidebar dividers) need the same canvas-relative contrast. */
+    --mzt-guide: color-mix(in srgb, var(--mzt-text) 14%, transparent);
   }
 
   /* Frame: title/menu bar joins the tab bar and sidebar as one surface. */
@@ -60,7 +62,7 @@
   }
   :root[data-mzt-layout="modern"] #zotero-tags-splitter {
     border-color: transparent;
-    background: linear-gradient(var(--mzt-border), var(--mzt-border)) center / calc(100% - 24px) 1px no-repeat;
+    background: linear-gradient(var(--mzt-guide), var(--mzt-guide)) center / calc(100% - 24px) 1px no-repeat;
   }
   :root[data-mzt-layout="modern"] #zotero-items-splitter {
     border: none;
@@ -118,6 +120,71 @@
     box-shadow: none;
   }
   /* Secondary columns step back so titles carry the row. */
+  /* Collection tree hierarchy. Rows are virtualized (fixed height, absolute position), so structure
+     comes from type and depth, never from spacing between rows. */
+  /* Library names and the "Group Libraries"/"Feeds" headers read as section labels. */
+  :root[data-mzt-layout="modern"] #zotero-collections-tree
+    .row:is(:has(.cell-icon:is(.icon-library, .icon-feed-library)), :has(.spacer-header)) .cell-text:not(input) {
+    font-size: 0.85em;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  :root[data-mzt-layout="modern"] #zotero-collections-tree
+    .row:not(.selected):is(:has(.cell-icon:is(.icon-library, .icon-feed-library)), :has(.spacer-header)) .cell-text:not(input) {
+    color: var(--mzt-muted);
+  }
+  :root[data-mzt-layout="modern"] #zotero-collections-tree
+    .row:is(:has(.cell-icon:is(.icon-library, .icon-feed-library)), :has(.spacer-header)) .cell-icon {
+    display: none;
+  }
+  /* Top-level folders with subfolders act as group headings; deeper parents stay regular so long
+     nested names keep their width. */
+  :root[data-mzt-layout="modern"] #zotero-collections-tree
+    .row[aria-level="2"][aria-expanded]:has(.cell-icon.icon-collection) .cell-text:not(input) {
+    font-weight: 600;
+  }
+  /* Built-in views step back so the user's own folders lead. */
+  :root[data-mzt-layout="modern"] #zotero-collections-tree
+    .row:not(.selected):has(.cell-icon:is(.icon-recent, .icon-publications, .icon-duplicates, .icon-unfiled,
+      .icon-retracted, .icon-trash, .icon-trash-full)) {
+    color: var(--mzt-muted);
+  }
+  :root[data-mzt-layout="modern"] #zotero-collections-tree
+    .row:not(.selected):has(.cell-icon:is(.icon-recent, .icon-publications, .icon-duplicates, .icon-unfiled,
+      .icon-retracted, .icon-trash, .icon-trash-full)) .cell-icon {
+    opacity: 0.7;
+  }
+  /* Indent guides: one hairline per nesting level below the top folders, drawn inside Zotero's own
+     16px indent padding under the parent's twisty. Whole-pixel stops: half-pixel lines vanish at
+     some row offsets. */
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .row .cell-indent {
+    align-self: stretch;
+    background-image: repeating-linear-gradient(to right,
+      transparent 0 7px, var(--mzt-guide) 7px 8px, transparent 8px 16px);
+    background-position: 16px 0;
+    background-size: calc(100% - 16px) 100%;
+    background-repeat: no-repeat;
+  }
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .row .cell-indent:dir(rtl) {
+    background-image: repeating-linear-gradient(to left,
+      transparent 0 7px, var(--mzt-guide) 7px 8px, transparent 8px 16px);
+    background-position: calc(100% - 16px) 0;
+  }
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .virtualized-table:focus-within .row.selected .cell-indent {
+    background-image: none;
+  }
+  /* Zotero's blank separator row before groups and feeds becomes a hairline. It carries no marker
+     besides its fixed 8px height (collectionTree.jsx _separatorHeight). */
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .row[style*="height: 8px;"] {
+    background: linear-gradient(var(--mzt-guide), var(--mzt-guide)) center / calc(100% - 16px) 1px no-repeat;
+  }
+  /* Optional: monochrome folder icons; color returns on hover and selection. */
+  :root[data-mzt-layout="modern"][data-mzt-folder-icons="mono"] #zotero-collections-tree
+    .row:not(.selected):not(:hover) .cell-icon {
+    filter: grayscale(1);
+  }
+
   :root[data-mzt-layout="modern"] #zotero-items-tree .row:not(.selected) .cell:not(.primary) {
     color: var(--mzt-muted);
   }

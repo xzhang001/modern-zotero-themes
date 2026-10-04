@@ -155,6 +155,15 @@ test('layout switches between modern and classic; unknown stored layouts fall ba
   assert.equal(s.windows[0].attributes.get('data-mzt-layout'), 'modern');
   s.runtime.stop();
 });
+test('folder icons default to color, accept only color/mono, and are restored on disable', async () => {
+  const s = setup(); const win = s.windows[0]; await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
+  assert.equal(win.attributes.get('data-mzt-folder-icons'), 'color');
+  api.set('folderIcons', 'mono');
+  assert.equal(win.attributes.get('data-mzt-folder-icons'), 'mono');
+  assert.throws(() => api.set('folderIcons', 'grey'));
+  s.runtime.stop();
+  assert.equal(win.attributes.has('data-mzt-folder-icons'), false);
+});
 test('empty fields default to hidden, accept only hide/show, and are restored on disable', async () => {
   const s = setup(); const win = s.windows[0]; await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
   assert.equal(win.attributes.get('data-mzt-empty-fields'), 'hide');
