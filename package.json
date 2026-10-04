@@ -1,7 +1,8 @@
 {
   "name": "modern-zotero-themes",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "private": true,
+  "license": "MIT",
   "description": "Modern, layout-preserving themes for Zotero",
   "scripts": {
     "test": "node tests/themes.test.cjs && node tests/runtime.test.cjs && node tests/manifest.test.cjs && node tests/collection-icons.test.cjs && node tests/reading-progress.test.cjs",

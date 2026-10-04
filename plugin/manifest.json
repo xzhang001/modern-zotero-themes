@@ -1,12 +1,12 @@
 {
   "manifest_version": 2,
   "name": "Modern Zotero Themes",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "A modern visual layer with Light, Dark, Catppuccin Latte and Frappé, Paper, Solarized Light and Nord themes.",
   "applications": {
     "zotero": {
-      "id": "modern-zotero-themes@local.dev",
-      "update_url": "https://example.com/modern-zotero-themes/updates.json",
+      "id": "modern-zotero-themes@xzhang001.github.io",
+      "update_url": "https://raw.githubusercontent.com/xzhang001/modern-zotero-themes/main/updates.json",
       "strict_min_version": "7.0",
       "strict_max_version": "10.0.*"
     }

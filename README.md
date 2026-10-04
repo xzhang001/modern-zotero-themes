@@ -2,7 +2,7 @@
 
 面向 Zotero 的现代视觉主题插件，保留原有三栏、工具位置和文献管理操作。
 
-**当前为 0.13.0 开发预览版。** 已按 Zotero 7.0、8.0、9.0、10.0.5 源码检查接口，主要开发目标为 10.0.5；尚未完成 Windows/macOS 原生客户端验收。安装版本范围是测试入口，不等于已验证全部版本兼容。
+**当前为 0.14.0 开发预览版。** 已按 Zotero 7.0、8.0、9.0、10.0.5 源码检查接口，主要开发目标为 10.0.5；尚未完成 Windows/macOS 原生客户端验收。安装版本范围是测试入口，不等于已验证全部版本兼容。
 
 ## 已实现
 
@@ -28,10 +28,14 @@ Zotero 原生图标和设置窗口跟随 Zotero 自身的外观设置（设置 �
 
 ## 安装
 
-1. 下载/复制 `dist/modern-zotero-themes-0.13.0.xpi`。
+1. 从 [Releases](https://github.com/xzhang001/modern-zotero-themes/releases) 下载最新的 `modern-zotero-themes-<版本>.xpi`。
 2. Zotero → 工具 → 插件，选择“从文件安装插件”，打开 XPI。
 3. 打开 Zotero 设置 → **Modern Themes**，选择主题卡片，或配置跟随系统的主题组合。
 4. 若要恢复原样，在插件管理器中停用 Modern Zotero Themes。
+
+之后的新版本由 Zotero 自动更新（约每天检查一次），也可在插件管理器的齿轮菜单中“检查更新”。
+
+**从 0.13.0 及更早版本升级**：0.14.0 起插件 ID 改为 `modern-zotero-themes@xzhang001.github.io`，旧版不会自动更新到新版。请先在插件管理器中移除旧版，再安装新版；主题选择、文件夹图标等设置保存在 Zotero 配置中，会保留。不移除旧版时，两个版本会同时运行。
 
 建议首次使用在独立测试配置中验收。原生检查项目见 [兼容性检查表](docs/compatibility.md)。
 
@@ -47,13 +51,24 @@ npm run preview
 
 预览地址：`http://localhost:5173/preview/`。浏览器预览使用与插件相同的配色、组件样式、设置面板，但使用 HTML 模拟 Zotero 布局，仅供设计审阅，不能代替 Gecko/XUL 实测。
 
-构建产物为可复现 ZIP 格式 XPI。仅 `plugin/` 内容进入安装包，预览及测试不会打包。
+构建产物为可复现 ZIP 格式 XPI。仅 `plugin/` 内容和 `LICENSE` 进入安装包，预览及测试不会打包。
+
+`npm run build` 同时把当前版本写入 `updates.json`（Zotero 从 `update_url` 读取的更新清单：下载地址、sha256、兼容版本），其他版本的条目保留。发布一个版本：
+
+1. 修改 `plugin/manifest.json` 与 `package.json` 中的版本号，运行 `npm test` 和 `npm run build`。
+2. 提交代码与 `updates.json`，打标签 `v<版本>`，先只推送标签（`git push origin v<版本>`）。
+3. 在 GitHub 上为该标签创建 Release，上传 `dist/modern-zotero-themes-<版本>.xpi`。XPI 可复现，同一提交构建出的文件与 `updates.json` 中的 sha256 一致。
+4. 推送 `main`。`update_url` 读取的是 `main` 上的 `updates.json`，推送后已安装的用户开始收到更新；放在最后，是为了不让清单指向尚未上传的 XPI。
 
 ## 扩展主题
 
 主题定义在 `plugin/themes.js`，每个主题包含 `id`、`name`、`author`、`mode` 和语义颜色 `colors`。新增定义后，设置卡片和明暗下拉框会自动列出它。参见 [主题设计约定](docs/themes.md)。
 
 当前主题定义随插件内置，不支持直接导入 VS Code 主题或外部执行脚本。配置文件导入是后续扩展点。
+
+## 许可
+
+[MIT](LICENSE)。第三方色板与图标的许可见下文。
 
 ## 来源
 
