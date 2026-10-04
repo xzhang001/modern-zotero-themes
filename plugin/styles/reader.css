@@ -12,6 +12,8 @@
     --color-focus-border: var(--mzt-accent);
     --mzt-radius: 7px;
     --mzt-radius-small: 5px;
+    /* Sidebar lists scroll inside this document, which never sets scrollbar colors (the main window does). */
+    scrollbar-color: var(--color-scrollbar) var(--color-scrollbar-background);
   }
   /* Hard-coded grays and blues in the reader's own sheet that ignore the color scheme. */
   :root[data-mzt-theme] .toolbar {
@@ -71,20 +73,179 @@
     box-shadow: 0 0 0 1px var(--mzt-border), 0 12px 32px -8px var(--mzt-shadow);
   }
 
-  /* Modern layout: the reader is one card (see layout.css). Toolbar and sidebar read as parts of the
-     page rather than gray chrome; annotation cards lift slightly off the sidebar. */
+  /* Modern layout: the reader is one card (see layout.css), and its chrome follows the main window's
+     modern style: quiet monochrome icons, segmented controls for mode switches, filled fields, and lists
+     with rounded hover/selection rows. Toolbar and sidebar heights stay native (views are positioned
+     against them). */
   :root[data-mzt-layout="modern"] {
     --color-toolbar: var(--mzt-background);
     --material-toolbar: var(--mzt-background);
     --color-panedivider: var(--mzt-border);
+    --mzt-control-radius: 8px;
+    --mzt-icon-tint: var(--mzt-muted);
+    /* Neutral wells and hovers, mixed from the text color so they work on light and dark surfaces. */
+    --mzt-fill: color-mix(in srgb, var(--mzt-text) 6%, transparent);
+    --mzt-fill-strong: color-mix(in srgb, var(--mzt-text) 10%, transparent);
+    --mzt-guide: color-mix(in srgb, var(--mzt-text) 14%, transparent);
+    --mzt-chip-shadow: 0 0 0 1px var(--mzt-border), 0 1px 2px var(--mzt-shadow);
   }
+
+  /* Toolbar */
+  :root[data-mzt-layout="modern"] .toolbar .toolbar-button {
+    color: var(--mzt-icon-tint);
+    border-radius: var(--mzt-control-radius);
+  }
+  :root[data-mzt-layout="modern"] .toolbar .toolbar-button:not([disabled]):hover {
+    color: var(--mzt-text);
+    background-color: var(--mzt-fill);
+  }
+  :root[data-mzt-layout="modern"] .toolbar .divider {
+    height: 16px;
+    background: var(--mzt-border);
+  }
+  /* Annotation tools: one well, the active tool raised in it. */
+  :root[data-mzt-layout="modern"] .toolbar .center.tools {
+    gap: 2px;
+    padding: 2px;
+    border-radius: calc(var(--mzt-control-radius) + 2px);
+    background: var(--mzt-fill);
+  }
+  :root[data-mzt-layout="modern"] .toolbar .center.tools .toolbar-button:not([disabled]):hover {
+    background-color: var(--mzt-fill-strong);
+  }
+  :root[data-mzt-layout="modern"] .toolbar .center.tools .toolbar-button:is(.active, :active) {
+    color: var(--mzt-text);
+    background-color: var(--mzt-elevated);
+    box-shadow: var(--mzt-chip-shadow);
+  }
+  :root[data-mzt-layout="modern"] .toolbar .center.tools .divider {
+    margin-inline: 3px;
+    background: var(--mzt-guide);
+  }
+  :root[data-mzt-layout="modern"] .toolbar-text-input {
+    border-color: transparent;
+    border-radius: var(--mzt-control-radius);
+    background: var(--mzt-fill);
+  }
+  :root[data-mzt-layout="modern"] .toolbar-text-input:focus {
+    border-color: var(--mzt-accent);
+    background: var(--mzt-elevated);
+  }
+  :root[data-mzt-layout="modern"] .toolbar #numPages {
+    color: var(--mzt-subtle);
+  }
+
+  /* Sidebar: view switcher as a segmented control, filled search field. */
+  :root[data-mzt-layout="modern"] #sidebarContainer .sidebar-toolbar .start {
+    gap: 2px;
+    padding: 2px;
+    border-radius: calc(var(--mzt-control-radius) + 2px);
+    background: var(--mzt-fill);
+  }
+  :root[data-mzt-layout="modern"] #sidebarContainer .sidebar-toolbar .toolbar-button {
+    color: var(--mzt-icon-tint);
+    border-radius: var(--mzt-control-radius);
+  }
+  :root[data-mzt-layout="modern"] #sidebarContainer .sidebar-toolbar .toolbar-button:not(.active):hover {
+    color: var(--mzt-text);
+    background-color: var(--mzt-fill);
+  }
+  :root[data-mzt-layout="modern"] #sidebarContainer .sidebar-toolbar .toolbar-button.active {
+    color: var(--mzt-accent);
+    background-color: var(--mzt-elevated);
+    box-shadow: var(--mzt-chip-shadow);
+  }
+  :root[data-mzt-layout="modern"] .search-box {
+    border-radius: var(--mzt-control-radius);
+  }
+  :root[data-mzt-layout="modern"] .search-box:not(.expanded) {
+    color: var(--mzt-icon-tint);
+  }
+  :root[data-mzt-layout="modern"] .search-box:not(.expanded):hover {
+    color: var(--mzt-text);
+    background-color: var(--mzt-fill);
+  }
+  :root[data-mzt-layout="modern"] .search-box.expanded {
+    border: 1px solid var(--mzt-border);
+    background: var(--mzt-elevated);
+  }
+  :root[data-mzt-layout="modern"] .search-box:focus-within {
+    border-color: var(--mzt-accent);
+    box-shadow: 0 0 0 1px var(--mzt-accent);
+  }
+
+  /* Outline: readable size, full-width rounded rows, current section as a tinted row instead of a ring;
+     sub-sections are quieter and hang from an indent guide, like the collection tree. */
+  :root[data-mzt-layout="modern"] .outline-view {
+    padding: 6px 8px;
+  }
+  :root[data-mzt-layout="modern"] .outline-view ul li .item {
+    margin-block-end: 1px;
+    border-radius: 6px;
+  }
+  :root[data-mzt-layout="modern"] .outline-view ul li .item:hover {
+    background-color: var(--mzt-fill);
+  }
+  :root[data-mzt-layout="modern"] .outline-view ul li .item .title {
+    flex: 1;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    padding: 4px 6px 4px 2px;
+    color: var(--mzt-text);
+  }
+  :root[data-mzt-layout="modern"] .outline-view ul li .item .toggle {
+    color: var(--mzt-subtle);
+  }
+  :root[data-mzt-layout="modern"] .outline-view ul li .item.active {
+    background-color: color-mix(in srgb, var(--mzt-accent) 14%, transparent);
+  }
+  :root[data-mzt-layout="modern"] .outline-view ul li .item.active .title {
+    outline: none;
+    font-weight: 600;
+  }
+  :root[data-mzt-layout="modern"] .outline-view ul li .children {
+    margin-inline-start: 7px;
+    padding-inline-start: 8px;
+    border-inline-start: 1px solid var(--mzt-guide);
+  }
+  :root[data-mzt-layout="modern"] .outline-view .children .item:not(.active) .title {
+    color: var(--mzt-muted);
+  }
+  :root[data-mzt-layout="modern"] .outline-view ul li .item.unmatched .title {
+    color: var(--mzt-subtle);
+  }
+
+  /* Thumbnails: pages as paper on the sidebar; the current page gets an accent ring with breathing room. */
+  :root[data-mzt-layout="modern"] .thumbnails-view .thumbnail .image {
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px var(--mzt-border), 0 2px 8px -2px var(--mzt-shadow);
+  }
+  :root[data-mzt-layout="modern"] .thumbnails-view .thumbnail.selected .image {
+    outline-offset: 3px;
+  }
+  :root[data-mzt-layout="modern"] .thumbnails-view .thumbnail .label {
+    color: var(--mzt-muted);
+  }
+  :root[data-mzt-layout="modern"] .thumbnails-view .thumbnail.selected .label {
+    color: var(--mzt-accent);
+    font-weight: 600;
+  }
+
+  /* Annotation cards lift off the sidebar like the main window's cards. */
   :root[data-mzt-layout="modern"] #annotationsView .annotations .annotation {
+    border-radius: 10px;
     background: var(--mzt-elevated);
     outline-color: var(--mzt-border);
-    box-shadow: 0 1px 2px var(--mzt-shadow);
+    box-shadow: 0 1px 2px var(--mzt-shadow), 0 4px 12px -6px var(--mzt-shadow);
   }
   :root[data-mzt-layout="modern"] #annotationsView .annotations .annotation.selected {
     outline-color: var(--mzt-accent);
+  }
+  :root[data-mzt-layout="modern"] #annotationsView .preview header {
+    border-bottom-color: var(--mzt-fill-strong);
+  }
+  :root[data-mzt-layout="modern"] #annotationsView .preview header .page {
+    color: var(--mzt-muted);
   }
 }
 @media (prefers-reduced-motion: reduce) {
