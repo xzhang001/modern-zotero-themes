@@ -1,6 +1,9 @@
 (function (scope) {
   "use strict";
-  scope.MZTCreateRuntime = function ({ Zotero, Services, rootURI, id, themes }) {
+  scope.MZTCreateRuntime = function ({ Zotero, Services, rootURI, id, version, themes }) {
+    // Gecko caches stylesheets by URL, and an upgraded XPI keeps the same jar: URL, so without a
+    // per-startup query the old CSS stays in effect until Zotero restarts.
+    const assetQuery = `?v=${encodeURIComponent(version || "dev")}.${Date.now()}`;
     const prefix = "extensions.modernZoteroThemes.";
     const defaults = { mode: "system", theme: "modern-light", lightTheme: "modern-light", darkTheme: "modern-dark", layout: "modern", emptyFields: "hide", folderIcons: "color" };
     const layouts = ["modern", "classic"];
@@ -78,7 +81,7 @@
         const link = doc.createElementNS("http://www.w3.org/1999/xhtml", "link");
         link.id = linkID;
         link.rel = "stylesheet";
-        link.href = rootURI + path;
+        link.href = rootURI + path + assetQuery;
         return link;
       });
       const tokens = doc.createElementNS("http://www.w3.org/1999/xhtml", "style");
@@ -164,7 +167,7 @@
         Services.prefs.addObserver(appearancePref, observer);
         const registeredPane = await Zotero.PreferencePanes.register({
           pluginID: id, label: "Modern Themes", src: rootURI + "preferences.xhtml",
-          scripts: [rootURI + "preferences.js"], stylesheets: [rootURI + "styles/preferences.css"]
+          scripts: [rootURI + "preferences.js"], stylesheets: [rootURI + "styles/preferences.css" + assetQuery]
         });
         if (!active) {
           Zotero.PreferencePanes.unregister(registeredPane);

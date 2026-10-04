@@ -84,15 +84,18 @@ function setup(windows = [fakeWindow()]) {
     }
   };
   return { windows, prefs, observers, panes, Zotero, runtime: createRuntime({
-    Zotero, Services, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', themes
+    Zotero, Services, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', version: '1.2.3', themes
   }) };
 }
 test('startup and repeated attach load exactly one set of styles per window', async () => {
   const s = setup(); await s.runtime.start();
   s.runtime.attach(s.windows[0]);
   assert.equal(s.windows[0].children.length, 3);
-  assert.deepEqual(s.windows[0].children.slice(0, 2).map(link => link.href),
-    ['jar:file:///plugin.xpi!/styles/modern.css', 'jar:file:///plugin.xpi!/styles/layout.css']);
+  const [modern, layout] = s.windows[0].children.slice(0, 2).map(link => link.href);
+  // Per-startup query: an upgraded XPI keeps its jar: URL, and Gecko would reuse the cached sheet.
+  assert.match(modern, /^jar:file:\/\/\/plugin\.xpi!\/styles\/modern\.css\?v=1\.2\.3\.\d+$/);
+  assert.match(layout, /^jar:file:\/\/\/plugin\.xpi!\/styles\/layout\.css\?v=1\.2\.3\.\d+$/);
+  assert.match(s.panes.get('pane').stylesheets[0], /styles\/preferences\.css\?v=1\.2\.3\.\d+$/);
   assert.equal(s.windows[0].attributes.get('data-mzt-theme'), 'modern-light');
   assert.equal(s.windows[0].attributes.get('data-mzt-layout'), 'modern');
   assert.equal(s.panes.size, 1);

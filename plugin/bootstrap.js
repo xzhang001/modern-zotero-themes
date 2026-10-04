@@ -1,11 +1,11 @@
 /* Zotero 7–10 bootstrapped extension; deliberately avoids version-specific imports. */
 var modernThemes;
 
-async function startup({ id, rootURI }) {
+async function startup({ id, version, rootURI }) {
   const scope = {};
   Services.scriptloader.loadSubScript(rootURI + "themes.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "runtime.js", scope);
-  modernThemes = scope.MZTCreateRuntime({ Zotero, Services, rootURI, id, themes: scope.MZTThemes });
+  modernThemes = scope.MZTCreateRuntime({ Zotero, Services, rootURI, id, version, themes: scope.MZTThemes });
   try {
     await modernThemes.start();
   }
