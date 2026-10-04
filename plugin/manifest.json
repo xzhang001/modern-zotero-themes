@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Modern Zotero Themes",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "A modern visual layer with Light, Dark and Catppuccin Latte themes.",
   "applications": {
     "zotero": {

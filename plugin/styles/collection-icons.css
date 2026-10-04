@@ -37,7 +37,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    width: 304px;
+    width: 372px;
     padding: 12px;
     color: var(--mzt-text);
   }
@@ -49,8 +49,23 @@
   }
   #mzt-icon-picker .mzt-picker-grid {
     display: grid;
-    grid-template-columns: repeat(9, 28px);
+    grid-template-columns: repeat(11, 28px);
     gap: 4px;
+  }
+  /* 105 icons in five groups: a fixed-height scroll area keeps colors and emoji in view. */
+  #mzt-icon-picker .mzt-picker-icons {
+    max-height: 248px;
+    overflow-y: auto;
+    padding-inline-end: 4px;
+    scrollbar-width: thin;
+  }
+  #mzt-icon-picker .mzt-picker-group {
+    margin: 8px 0 4px;
+    color: var(--mzt-subtle);
+    font-size: 0.8em;
+  }
+  #mzt-icon-picker .mzt-picker-group:first-child {
+    margin-top: 0;
   }
   /* Zotero's platform button rules fix heights and paint gradients; options size themselves. */
   #mzt-icon-picker :is(.mzt-picker-option, .mzt-picker-swatch, .mzt-picker-reset) {
@@ -91,6 +106,7 @@
   }
   #mzt-icon-picker .mzt-picker-colors {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
   }
   #mzt-icon-picker .mzt-picker-swatch {
@@ -101,6 +117,12 @@
     border-radius: 50%;
     background: var(--mzt-swatch, var(--mzt-muted));
     box-shadow: 0 0 0 1px var(--mzt-border);
+  }
+  /* "Default" is drawn as an empty, struck-through swatch so it can't be mistaken for gray. */
+  #mzt-icon-picker .mzt-picker-swatch[data-color="default"] {
+    background: linear-gradient(135deg, transparent calc(50% - 1px), var(--mzt-muted) calc(50% - 1px),
+      var(--mzt-muted) calc(50% + 1px), transparent calc(50% + 1px)), var(--mzt-elevated);
+    box-shadow: 0 0 0 1px var(--mzt-muted);
   }
   #mzt-icon-picker .mzt-picker-swatch[aria-pressed="true"] {
     box-shadow: 0 0 0 2px var(--mzt-accent);

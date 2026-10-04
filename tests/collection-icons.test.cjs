@@ -48,3 +48,16 @@ test('generated CSS defines a mask for every icon and the palette for the mode',
   // SVG markup is URL-encoded inside the data URI, so no raw tags reach the stylesheet.
   assert.doesNotMatch(light, /<svg/);
 });
+test('every icon sits in exactly one picker group', () => {
+  const grouped = icons.groups.flatMap(group => group.icons);
+  assert.equal(grouped.length, new Set(grouped).size);
+  assert.deepEqual([...grouped].sort(), [...icons.icons].sort());
+});
+test('icons and colors saved by 0.5.x stay valid', () => {
+  const v05icons = ['folder', 'book-open', 'bookmark', 'library', 'graduation-cap', 'file-text', 'pencil', 'archive',
+    'inbox', 'flask-conical', 'microscope', 'atom', 'brain', 'cpu', 'code', 'database', 'chart-line', 'sigma', 'globe',
+    'leaf', 'users', 'briefcase', 'layers', 'puzzle', 'lightbulb', 'rocket', 'star', 'heart', 'flag', 'tag', 'clock',
+    'calendar', 'circle-check', 'circle-alert'];
+  const v05colors = ['red', 'orange', 'yellow', 'green', 'teal', 'blue', 'purple', 'pink'];
+  for (const icon of v05icons) for (const color of v05colors) assert.deepEqual(icons.validate({ icon, color }), { icon, color });
+});
