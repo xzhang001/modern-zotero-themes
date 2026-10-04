@@ -3,7 +3,9 @@
    Spacing changes stay in non-virtualized chrome: never row height/position, column widths or DOM order. */
 @media (forced-colors: none) {
   :root[data-mzt-layout="modern"] {
-    --mzt-gutter: 8px;
+    --mzt-gutter: 6px;
+    /* Tab pills already sit ~5px above the bar edge, so the card needs less space on top. */
+    --mzt-gutter-top: 4px;
     --mzt-card-radius: 12px;
     --mzt-control-radius: 8px;
     --mzt-icon-tint: var(--mzt-muted);
@@ -33,7 +35,7 @@
   }
   /* Content: list and item pane are separate cards; the native splitter between them is the gap. */
   :root[data-mzt-layout="modern"] #zotero-layout-switcher {
-    margin: calc(var(--mzt-gutter) / 2) var(--mzt-gutter) var(--mzt-gutter) 0;
+    margin: var(--mzt-gutter-top) var(--mzt-gutter) var(--mzt-gutter) 0;
     background: transparent;
     /* Zotero paints the item pane with sidepane material; on a card it should match the list. */
     --color-sidepane: var(--mzt-background);
