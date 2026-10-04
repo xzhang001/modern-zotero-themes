@@ -3,7 +3,7 @@
    Spacing changes stay in non-virtualized chrome: never row height/position, column widths or DOM order. */
 @media (forced-colors: none) {
   :root[data-mzt-layout="modern"] {
-    --mzt-gutter: 12px;
+    --mzt-gutter: 8px;
     --mzt-card-radius: 12px;
     --mzt-control-radius: 8px;
     --mzt-icon-tint: var(--mzt-muted);
