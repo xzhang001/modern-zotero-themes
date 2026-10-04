@@ -93,23 +93,23 @@
     box-shadow: 0 1px var(--mzt-border);
   }
 
-  :root[data-mzt-theme] #zotero-item-pane collapsible-section {
+  :root[data-mzt-theme] :is(#zotero-item-pane, #zotero-context-pane) collapsible-section {
     border-color: var(--mzt-border);
   }
-  :root[data-mzt-theme] #zotero-item-pane collapsible-section > .head {
+  :root[data-mzt-theme] :is(#zotero-item-pane, #zotero-context-pane) collapsible-section > .head {
     border-radius: var(--mzt-radius-small);
     background: var(--mzt-toolbar);
   }
-  :root[data-mzt-theme] #zotero-item-pane collapsible-section > .head .title {
+  :root[data-mzt-theme] :is(#zotero-item-pane, #zotero-context-pane) collapsible-section > .head .title {
     color: var(--mzt-muted);
     font-weight: 600;
   }
-  :root[data-mzt-theme] #zotero-item-pane :is(input, textarea, menulist) {
+  :root[data-mzt-theme] :is(#zotero-item-pane, #zotero-context-pane) :is(input, textarea, menulist) {
     border-radius: var(--mzt-radius-small);
     color: var(--mzt-text);
     accent-color: var(--mzt-accent);
   }
-  :root[data-mzt-theme] #zotero-item-pane :is(input, textarea):focus {
+  :root[data-mzt-theme] :is(#zotero-item-pane, #zotero-context-pane) :is(input, textarea):focus {
     background: var(--mzt-elevated);
     outline: 2px solid var(--mzt-accent);
     outline-offset: -2px;

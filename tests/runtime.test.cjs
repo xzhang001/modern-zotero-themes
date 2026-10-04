@@ -77,11 +77,34 @@ function fakeWindow(dark = false, tree = null) {
         return node;
       },
       documentElement: root,
+      readerBrowsers: [],
+      querySelectorAll(selector) { return selector === 'browser.reader' ? this.readerBrowsers : []; },
       createElementNS() { return { remove() { children.splice(children.indexOf(this), 1); } }; }
     },
     matchMedia() { return media; },
     addEventListener(name, cb) { events.set(name, cb); },
     removeEventListener(name) { events.delete(name); }
+  };
+}
+// A reader tab's document (resource://zotero/reader/reader.html) as seen from the main window.
+function fakeReaderDocument(uri = 'resource://zotero/reader/reader.html') {
+  const head = [];
+  const attributes = new Map();
+  const events = new Map();
+  return {
+    head: { append(...nodes) { head.push(...nodes); }, children: head },
+    attributes, events, documentURI: uri,
+    documentElement: {
+      setAttribute: (k, v) => attributes.set(k, v), removeAttribute: k => attributes.delete(k),
+      getAttribute: k => attributes.get(k) ?? null
+    },
+    defaultView: {
+      addEventListener: (name, cb) => events.set(name, cb),
+      removeEventListener: (name, cb) => { if (events.get(name) === cb) events.delete(name); }
+    },
+    createElement(tag) {
+      return { localName: tag, textContent: '', remove() { head.splice(head.indexOf(this), 1); } };
+    }
   };
 }
 function setup(windows = [fakeWindow()]) {
@@ -99,6 +122,10 @@ function setup(windows = [fakeWindow()]) {
   } };
   const Zotero = {
     getMainWindows: () => windows, logError: error => { throw error; },
+    File: { async getContentsFromURLAsync(url) {
+      if (!/^jar:file:\/\/\/plugin\.xpi!\/styles\/reader\.css\?v=/.test(url)) throw new Error('Unexpected URL ' + url);
+      return '/* reader */';
+    } },
     PreferencePanes: {
       async register(options) { panes.set('pane', options); return 'pane'; },
       unregister(id) { panes.delete(id); }
@@ -297,4 +324,59 @@ test('"Set Icon…" goes after all of Zotero\'s collection menu entries and is r
   s.runtime.stop();
   assert.deepEqual(tree.menu.children, native);
   assert.equal(listeners.size, 0);
+});
+test('reader tabs get the reader sheet and theme tokens, follow settings, and are cleaned up', async () => {
+  const win = fakeWindow();
+  const early = fakeReaderDocument();
+  // A reader tab already open before the plugin starts; one still on about:blank is picked up on load.
+  win.document.readerBrowsers.push({ contentDocument: early }, { contentDocument: fakeReaderDocument('about:blank') });
+  const s = setup([win]); await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
+  assert.deepEqual(early.head.children.map(node => node.id), ['mzt-reader-tokens', 'mzt-reader']);
+  assert.equal(early.head.children[1].textContent, '/* reader */');
+  assert.match(early.head.children[0].textContent, /--mzt-accent: #6554c0/);
+  assert.equal(early.attributes.get('data-mzt-theme'), 'modern-light');
+  assert.equal(early.attributes.get('data-mzt-layout'), 'modern');
+
+  const opened = fakeReaderDocument();
+  win.events.get('DOMContentLoaded')({ target: opened });
+  win.events.get('DOMContentLoaded')({ target: opened });
+  assert.equal(opened.head.children.length, 2);
+  // Other documents loading in the window (e.g. the PDF view inside the reader) are left alone.
+  const view = fakeReaderDocument('resource://zotero/reader/pdf/web/viewer.html');
+  win.events.get('DOMContentLoaded')({ target: view });
+  assert.equal(view.head.children.length, 0);
+
+  api.set('theme', 'modern-dark'); api.set('mode', 'fixed'); api.set('layout', 'classic');
+  for (const doc of [early, opened]) {
+    assert.equal(doc.attributes.get('data-mzt-theme'), 'modern-dark');
+    assert.equal(doc.attributes.get('data-mzt-layout'), 'classic');
+    assert.match(doc.head.children[0].textContent, /color-scheme: dark/);
+  }
+
+  // Closing a tab drops its document; settings changes afterwards don't touch it.
+  opened.events.get('unload')();
+  assert.equal(opened.head.children.length, 0);
+  api.set('layout', 'modern');
+  assert.equal(opened.attributes.has('data-mzt-layout'), false);
+  assert.equal(early.attributes.get('data-mzt-layout'), 'modern');
+
+  s.runtime.stop();
+  assert.equal(early.head.children.length, 0);
+  assert.equal(early.attributes.size, 0);
+  assert.equal(early.events.size, 0);
+  assert.equal(win.events.size, 0);
+});
+test('a reader sheet that fails to load leaves reader tabs alone but the plugin still starts', async () => {
+  const win = fakeWindow();
+  const s = setup([win]);
+  const errors = [];
+  s.Zotero.logError = error => errors.push(error);
+  s.Zotero.File.getContentsFromURLAsync = () => { throw new Error('missing'); };
+  await s.runtime.start();
+  const reader = fakeReaderDocument();
+  win.events.get('DOMContentLoaded')({ target: reader });
+  assert.equal(reader.head.children.length, 0);
+  assert.equal(win.attributes.get('data-mzt-theme'), 'modern-light');
+  assert.equal(errors.length, 1);
+  s.runtime.stop();
 });

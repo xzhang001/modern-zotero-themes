@@ -17,7 +17,7 @@ window.MZTPreferences = {
       modes: { light: "浅色", dark: "深色" },
       modeNames: { light: "浅色", dark: "深色" },
       usedFor: { light: "用于浅色模式", dark: "用于深色模式" },
-      mismatch: m => `Zotero 自身外观为${m.current}，部分图标、阅读器和其他窗口仍会显示为${m.current}。`,
+      mismatch: m => `Zotero 自身外观为${m.current}，部分图标、PDF 页面和其他窗口仍会显示为${m.current}。`,
       matchMode: m => `改为${m.wanted}`,
       notAuto: m => `Zotero 自身外观固定为${m.current}，不会跟随系统切换。`,
       useAuto: "改为自动"
@@ -26,7 +26,7 @@ window.MZTPreferences = {
       modes: { light: "light", dark: "dark" },
       modeNames: { light: "Light", dark: "Dark" },
       usedFor: { light: "Used in light mode", dark: "Used in dark mode" },
-      mismatch: m => `Zotero itself is set to ${m.current} appearance, so some icons, the reader and other windows will stay ${m.current}.`,
+      mismatch: m => `Zotero itself is set to ${m.current} appearance, so some icons, PDF pages and other windows will stay ${m.current}.`,
       matchMode: m => `Switch to ${m.wanted}`,
       notAuto: m => `Zotero's own appearance is set to ${m.current}, so this won't follow your system.`,
       useAuto: "Set to Automatic"

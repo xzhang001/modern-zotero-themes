@@ -1,0 +1,94 @@
+/* Reader UI (resource://zotero/reader/reader.html): toolbar, sidebar, annotation cards and popups.
+   The PDF/EPUB views are nested documents and are never touched, so page colors, reading themes and
+   annotation colors stay Zotero's. Injected after the reader's own sheet; the palette comes from the
+   same token block as the main window. Paint and shape only: no size or position changes. */
+@media (forced-colors: none) {
+  /* The reader's selection and focus colors are a fixed blue; route them through the theme accent. */
+  :root[data-mzt-theme] {
+    --accent-blue: var(--mzt-selected);
+    --accent-blue10: color-mix(in srgb, var(--mzt-accent) 12%, transparent);
+    --accent-blue30: color-mix(in srgb, var(--mzt-accent) 30%, transparent);
+    --accent-blue50: color-mix(in srgb, var(--mzt-accent) 50%, transparent);
+    --color-focus-border: var(--mzt-accent);
+    --mzt-radius: 7px;
+    --mzt-radius-small: 5px;
+  }
+  /* Hard-coded grays and blues in the reader's own sheet that ignore the color scheme. */
+  :root[data-mzt-theme] .toolbar {
+    color: var(--mzt-text);
+  }
+  :root[data-mzt-theme] :is(.editor .content:empty, .preview .tags:empty)::before {
+    color: var(--mzt-subtle);
+  }
+  :root[data-mzt-theme] #annotationsView .selector .authors .author:hover {
+    background: var(--mzt-hover);
+    border-color: var(--mzt-border);
+  }
+  :root[data-mzt-theme] #annotationsView .selector .authors .author:is(.selected, .active, :active) {
+    background: var(--mzt-selected);
+    color: var(--mzt-selectedText);
+  }
+  :root[data-mzt-theme] #annotationsView .selector :is(.colors .color, .tags .tag).selected {
+    background-color: var(--mzt-selected);
+    color: var(--mzt-selectedText);
+  }
+
+  :root[data-mzt-theme] .toolbar-button {
+    border-radius: var(--mzt-radius-small);
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+  :root[data-mzt-theme] .toolbar-button:not([disabled]):hover {
+    background-color: var(--mzt-hover);
+  }
+  /* Toggled buttons (active tool, open sidebar view) are tinted, not grayed. Tool icons keep their own
+     fill so the highlight/underline buttons still show the current annotation color. */
+  :root[data-mzt-theme] .toolbar-button:is(.active, :active) {
+    background-color: var(--accent-blue10);
+  }
+  :root[data-mzt-theme] #sidebarContainer .sidebar-toolbar .toolbar-button.active {
+    color: var(--mzt-accent);
+  }
+  :root[data-mzt-theme] .toolbar-text-input {
+    border: 1px solid var(--mzt-border);
+    border-radius: var(--mzt-radius-small);
+  }
+  :root[data-mzt-theme] .toolbar-text-input:focus {
+    border-color: var(--mzt-accent);
+    box-shadow: 0 0 0 1px var(--mzt-accent);
+  }
+
+  :root[data-mzt-theme] #annotationsView .annotations .annotation {
+    border-radius: var(--mzt-radius);
+  }
+  :root[data-mzt-theme] #annotationsView .annotations .annotation.selected {
+    background: color-mix(in srgb, var(--mzt-accent) 8%, var(--mzt-elevated));
+    outline: 2px solid var(--mzt-accent);
+  }
+  :root[data-mzt-theme] .thumbnails-view .thumbnail.selected .image {
+    outline: 2px solid var(--mzt-accent);
+  }
+  :root[data-mzt-theme] :is(.view-popup, .find-popup) {
+    box-shadow: 0 0 0 1px var(--mzt-border), 0 12px 32px -8px var(--mzt-shadow);
+  }
+
+  /* Modern layout: the reader is one card (see layout.css). Toolbar and sidebar read as parts of the
+     page rather than gray chrome; annotation cards lift slightly off the sidebar. */
+  :root[data-mzt-layout="modern"] {
+    --color-toolbar: var(--mzt-background);
+    --material-toolbar: var(--mzt-background);
+    --color-panedivider: var(--mzt-border);
+  }
+  :root[data-mzt-layout="modern"] #annotationsView .annotations .annotation {
+    background: var(--mzt-elevated);
+    outline-color: var(--mzt-border);
+    box-shadow: 0 1px 2px var(--mzt-shadow);
+  }
+  :root[data-mzt-layout="modern"] #annotationsView .annotations .annotation.selected {
+    outline-color: var(--mzt-accent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-mzt-theme] .toolbar-button {
+    transition: none;
+  }
+}
