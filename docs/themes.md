@@ -4,7 +4,7 @@
 
 `plugin/styles/modern.css` 负责控件轮廓、圆角、层次、表头字重、焦点、悬停和少量过渡。`plugin/themes.js` 负责配色，映射成 Zotero 的 CSS 变量和本插件的 `--mzt-*` 变量。各主题共用相同几何结构。
 
-`plugin/styles/layout.css` 是可切换的“现代”界面层，以 `:root[data-mzt-layout="modern"]` 为作用域：内容卡片、分隔线、标签页、搜索框、表头和详情面板的排版。经典模式不加载这一层的效果。它只调整非虚拟列表区域的外边距和对齐；聚焦选中行保留实色底，因为 Zotero 在那里把原生图标换成白色版本。
+`plugin/styles/layout.css` 是可切换的“现代”界面层，以 `:root[data-mzt-layout="modern"]` 为作用域：框架（标题栏、标签栏、左侧栏）统一为 `--mzt-canvas`，文献列表和详情面板各为一张卡片，卡片边框按底色加深（`--mzt-card-border`）以保证在低对比显示器上可见；另含标签页、搜索框、表头和详情面板的排版。经典模式不加载这一层的效果。它只调整非虚拟列表区域的外边距和对齐；聚焦选中行保留实色底，因为 Zotero 在那里把原生图标换成白色版本。
 
 主题不是单纯 Light/Dark 开关：Latte 是浅色主题，未来的 Mocha、Dracula 可以是独立深色主题。自动模式分别保存 `lightTheme` 和 `darkTheme`，固定模式保存 `theme`。
 

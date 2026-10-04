@@ -1,5 +1,5 @@
-/* Modern layout (Notion/Linear-style): one content card on a sidebar canvas, hairline dividers,
-   pill tabs and quieter headers. Switch to the "Classic" layout to keep only the colors.
+/* Modern layout (Notion/Linear-style): the window frame (title bar, tabs, sidebar) is one canvas;
+   the item list and the item pane float on it as two cards. Pill tabs and quieter headers. Switch to the "Classic" layout to keep only the colors.
    Spacing changes stay in non-virtualized chrome: never row height/position, column widths or DOM order. */
 @media (forced-colors: none) {
   :root[data-mzt-layout="modern"] {
@@ -7,6 +7,14 @@
     --mzt-card-radius: 12px;
     --mzt-control-radius: 8px;
     --mzt-icon-tint: var(--mzt-muted);
+    /* Card edges are drawn against the canvas, not the card, so they survive low-contrast displays. */
+    --mzt-card-border: color-mix(in srgb, var(--mzt-canvas) 82%, var(--mzt-text));
+  }
+
+  /* Frame: title/menu bar joins the tab bar and sidebar as one surface. */
+  :root[data-mzt-layout="modern"] :is(#titlebar, #toolbar-menubar, .menubar-container) {
+    background: var(--mzt-canvas);
+    border-bottom-color: transparent;
   }
 
   /* Canvas and content card */
@@ -23,25 +31,27 @@
   :root[data-mzt-layout="modern"] #zotero-collections-tree .virtualized-table:not(:focus-within) .row.selected {
     box-shadow: 0 0 0 1px var(--mzt-border), 0 1px 2px var(--mzt-shadow);
   }
+  /* Content: list and item pane are separate cards; the native splitter between them is the gap. */
   :root[data-mzt-layout="modern"] #zotero-layout-switcher {
     margin: calc(var(--mzt-gutter) / 2) var(--mzt-gutter) var(--mzt-gutter) 0;
-    border: 1px solid var(--mzt-border);
-    border-radius: var(--mzt-card-radius);
-    background: var(--mzt-background);
-    box-shadow: 0 1px 2px var(--mzt-shadow), 0 8px 24px -12px var(--mzt-shadow);
-    overflow: hidden;
-  }
-  /* Zotero paints the item pane with sidepane material; inside the card it should match the list. */
-  :root[data-mzt-layout="modern"] #zotero-layout-switcher {
+    background: transparent;
+    /* Zotero paints the item pane with sidepane material; on a card it should match the list. */
     --color-sidepane: var(--mzt-background);
     --material-sidepane: var(--mzt-background);
+  }
+  :root[data-mzt-layout="modern"] #zotero-layout-switcher > :is(#zotero-items-pane-container, #zotero-item-pane) {
+    border: 1px solid var(--mzt-card-border);
+    border-radius: var(--mzt-card-radius);
+    background: var(--mzt-background);
+    box-shadow: 0 1px 2px var(--mzt-shadow), 0 10px 28px -14px var(--mzt-shadow);
+    overflow: hidden;
   }
   :root[data-mzt-layout="modern"] #zotero-layout-switcher :is(#zotero-items-pane-container, #zotero-items-pane,
     #zotero-items-tree, #zotero-item-pane, #zotero-view-item-sidenav) {
     background: var(--mzt-background);
   }
 
-  /* Dividers: the sidebar gap needs no line; inside the card a centered hairline keeps the native hit area. */
+  /* Dividers: gaps between frame and cards need no line; splitters keep their native hit area. */
   :root[data-mzt-layout="modern"] #zotero-collections-splitter {
     background: transparent;
     border-color: transparent;
@@ -52,10 +62,15 @@
   }
   :root[data-mzt-layout="modern"] #zotero-items-splitter {
     border: none;
-    background: linear-gradient(var(--mzt-border), var(--mzt-border)) center / 1px 100% no-repeat;
+    background: transparent;
   }
-  :root[data-mzt-layout="modern"] #zotero-layout-switcher[orient="vertical"] #zotero-items-splitter {
-    background-size: 100% 1px;
+  /* Zotero's splitter takes no layout space (negative margins), so the gap is a margin on the item pane;
+     the splitter's hit area then sits inside the gap. */
+  :root[data-mzt-layout="modern"] #zotero-layout-switcher[orient="horizontal"] > #zotero-item-pane {
+    margin-inline-start: var(--mzt-gutter);
+  }
+  :root[data-mzt-layout="modern"] #zotero-layout-switcher[orient="vertical"] > #zotero-item-pane {
+    margin-block-start: var(--mzt-gutter);
   }
 
   /* Toolbars */
@@ -205,6 +220,6 @@
   }
   :root[data-mzt-layout="modern"] #tab-bar-container .tab.selected {
     background: var(--mzt-elevated);
-    box-shadow: 0 0 0 1px var(--mzt-border), 0 1px 2px var(--mzt-shadow);
+    box-shadow: 0 0 0 1px var(--mzt-card-border), 0 1px 2px var(--mzt-shadow);
   }
 }
