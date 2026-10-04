@@ -11,6 +11,12 @@
     // Zotero's General → Appearance setting (Zotero 7–10).
     const appearancePref = "browser.theme.toolbar-theme";
     const appearances = { dark: 0, light: 1, auto: 2 };
+    // Built-in views that close each library in the collection tree; the modern layout draws a divider
+    // above the first one. Marked from Zotero's row data because the virtualized list appends rows in
+    // scroll order, so DOM neighbours are not reliable.
+    const builtInRowTypes = new Set(["search", "publications", "duplicates", "unfiled", "retracted", "trash"]);
+    const sectionStartAttribute = "data-mzt-section-start";
+    const rowIDPrefix = "collection-tree-row-";
     const windows = new Map();
     const subscribers = new Set();
     let paneID;
@@ -37,6 +43,20 @@
         try { callback(); } catch (error) { Zotero.logError(error); }
       }
     }
+    function collectionRows(win) {
+      const tree = win.document.getElementById?.("zotero-collections-tree");
+      return tree ? Array.from(tree.querySelectorAll(`.row[id^="${rowIDPrefix}"]`)) : [];
+    }
+    function markCollectionSections(win) {
+      const view = win.ZoteroPane?.collectionsView;
+      if (!view) return;
+      const type = index => view.getRow(index)?.type;
+      for (const row of collectionRows(win)) {
+        const index = Number(row.id.slice(rowIDPrefix.length));
+        row.toggleAttribute(sectionStartAttribute,
+          index > 0 && builtInRowTypes.has(type(index)) && !builtInRowTypes.has(type(index - 1)));
+      }
+    }
     function attach(win) {
       if (!active || windows.has(win) || win.closed) return;
       const doc = win.document;
@@ -53,8 +73,12 @@
       const media = win.matchMedia("(prefers-color-scheme: dark)");
       const unload = () => detach(win);
       const previous = Object.fromEntries(rootAttributes.map(name => [name, root.getAttribute(name)]));
-      windows.set(win, { links, tokens, media, unload, previous });
+      const sections = new win.MutationObserver(() => markCollectionSections(win));
+      windows.set(win, { links, tokens, media, unload, previous, sections });
       root.append(...links, tokens);
+      const tree = doc.getElementById?.("zotero-collections-tree");
+      if (tree) sections.observe(tree, { childList: true, subtree: true });
+      markCollectionSections(win);
       media.addEventListener("change", update);
       win.addEventListener("unload", unload, { once: true });
       update();
@@ -64,6 +88,8 @@
       if (!state) return;
       state.media.removeEventListener("change", update);
       win.removeEventListener("unload", state.unload);
+      state.sections.disconnect();
+      for (const row of collectionRows(win)) row.removeAttribute(sectionStartAttribute);
       for (const link of state.links) link.remove();
       state.tokens.remove();
       const root = win.document.documentElement;

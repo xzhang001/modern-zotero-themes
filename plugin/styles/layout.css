@@ -139,14 +139,6 @@
     .row:is(:has(.cell-icon:is(.icon-library, .icon-feed-library, .icon-groups)), :has(.spacer-header)) .cell-icon {
     display: none;
   }
-  /* A hairline under each section label separates it from its contents. */
-  :root[data-mzt-layout="modern"] #zotero-collections-tree
-    .row:is(:has(.cell-icon:is(.icon-library, .icon-feed-library, .icon-groups)), :has(.spacer-header)) {
-    background-image: linear-gradient(var(--mzt-guide), var(--mzt-guide));
-    background-position: center bottom;
-    background-size: 100% 1px;
-    background-repeat: no-repeat;
-  }
   /* Top-level folders with subfolders act as group headings, as do group libraries under their header;
      deeper parents stay regular so long nested names keep their width. */
   :root[data-mzt-layout="modern"] #zotero-collections-tree
@@ -183,6 +175,14 @@
   }
   :root[data-mzt-layout="modern"] #zotero-collections-tree .virtualized-table:focus-within .row.selected .cell-indent {
     background-image: none;
+  }
+  /* Each library splits into the user's folders and the built-in views (saved searches through Trash);
+     runtime.js marks the first built-in row. */
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .row[data-mzt-section-start] {
+    background-image: linear-gradient(var(--mzt-guide), var(--mzt-guide));
+    background-position: center top;
+    background-size: calc(100% - 16px) 1px;
+    background-repeat: no-repeat;
   }
   /* Zotero's blank separator row before groups and feeds becomes a hairline. It carries no marker
      besides its fixed 8px height (collectionTree.jsx _separatorHeight). */

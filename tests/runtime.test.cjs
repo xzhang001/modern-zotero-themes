@@ -3,7 +3,30 @@ const assert = require('node:assert/strict');
 const createRuntime = require('../plugin/runtime.js');
 const themes = require('../plugin/themes.js');
 
-function fakeWindow(dark = false) {
+class FakeMutationObserver {
+  constructor(callback) { this.callback = callback; this.target = null; }
+  observe(target) { this.target = target; target.observers.add(this); }
+  disconnect() { this.target?.observers.delete(this); this.target = null; }
+}
+// Collection tree whose rendered rows (any DOM order, as after scrolling) map to Zotero row types.
+function fakeCollectionTree(types, rendered = types.map((_, index) => index)) {
+  const observers = new Set();
+  const rows = rendered.map(index => {
+    const attributes = new Set();
+    return {
+      id: 'collection-tree-row-' + index, attributes,
+      toggleAttribute(name, on) { if (on) attributes.add(name); else attributes.delete(name); },
+      removeAttribute(name) { attributes.delete(name); }
+    };
+  });
+  return {
+    observers, rows, view: { getRow: index => (index in types ? { type: types[index] } : undefined) },
+    element: { observers, querySelectorAll: () => rows },
+    marked: () => rows.filter(row => row.attributes.has('data-mzt-section-start')).map(row => row.id),
+    mutate() { for (const observer of observers) observer.callback(); }
+  };
+}
+function fakeWindow(dark = false, tree = null) {
   const children = [];
   const attributes = new Map();
   const events = new Map();
@@ -22,7 +45,10 @@ function fakeWindow(dark = false) {
   };
   return {
     children, attributes, mediaEvents, events, media,
+    MutationObserver: FakeMutationObserver,
+    ZoteroPane: tree && { collectionsView: tree.view },
     document: {
+      getElementById: id => (id === 'zotero-collections-tree' && tree ? tree.element : null),
       documentElement: root,
       createElementNS() { return { remove() { children.splice(children.indexOf(this), 1); } }; }
     },
@@ -172,4 +198,18 @@ test('empty fields default to hidden, accept only hide/show, and are restored on
   assert.throws(() => api.set('emptyFields', 'collapse'));
   s.runtime.stop();
   assert.equal(win.attributes.has('data-mzt-empty-fields'), false);
+});
+test('first built-in view of each library is marked as a section start, in any DOM order', async () => {
+  const types = ['library', 'recentlyRead', 'collection', 'collection', 'search', 'publications', 'duplicates',
+    'trash', 'separator', 'header', 'group', 'collection', 'duplicates', 'unfiled', 'trash'];
+  // Rows appended out of index order, as the virtualized list does after scrolling up.
+  const tree = fakeCollectionTree(types, [6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5]);
+  const s = setup([fakeWindow(false, tree)]); await s.runtime.start();
+  assert.deepEqual(tree.marked().sort(), ['collection-tree-row-12', 'collection-tree-row-4']);
+  types.splice(4, 1, 'collection');
+  tree.mutate();
+  assert.deepEqual(tree.marked().sort(), ['collection-tree-row-12', 'collection-tree-row-5']);
+  s.runtime.stop();
+  assert.deepEqual(tree.marked(), []);
+  assert.equal(tree.observers.size, 0);
 });
