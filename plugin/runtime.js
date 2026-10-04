@@ -273,7 +273,12 @@
       sheet.textContent = frameCSS.get(spec.kind);
       const frameWin = frameDoc.defaultView;
       const unload = () => detachFrame(win, frameDoc);
-      state.frames.set(frameDoc, { kind: spec.kind, sheet, tokens, frameWin, unload });
+      // A reader tab with its sheet draws its own card edge (reader.css); the <browser>'s border steps aside.
+      const host = spec.kind === "reader"
+        ? Array.from(win.document.querySelectorAll?.("browser.reader") || []).find(browser => browser.contentDocument === frameDoc)
+        : null;
+      host?.setAttribute("data-mzt-framed", "true");
+      state.frames.set(frameDoc, { kind: spec.kind, sheet, tokens, frameWin, unload, host });
       // After the page's own sheet, so equal-specificity rules resolve to the theme; the plugin sheet last
       // so its layout-specific overrides beat the shared tokens.
       parent.append(tokens, sheet);
@@ -290,6 +295,7 @@
       if (restore && frame.pageApplied) restorePage(frame);
       frame.progress?.remove();
       try {
+        frame.host?.removeAttribute("data-mzt-framed");
         frame.frameWin?.removeEventListener("unload", frame.unload);
         frame.sheet.remove();
         frame.tokens.remove();

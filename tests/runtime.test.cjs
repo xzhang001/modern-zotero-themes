@@ -354,7 +354,8 @@ test('reader tabs get the reader sheet and theme tokens, follow settings, and ar
   const win = fakeWindow();
   const early = fakeReaderDocument();
   // A reader tab already open before the plugin starts; one still on about:blank is picked up on load.
-  win.document.readerBrowsers.push({ contentDocument: early }, { contentDocument: fakeReaderDocument('about:blank') });
+  const earlyBrowser = Object.assign(fakeElement(), { contentDocument: early });
+  win.document.readerBrowsers.push(earlyBrowser, Object.assign(fakeElement(), { contentDocument: fakeReaderDocument('about:blank') }));
   const s = setup([win]); await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
   assert.deepEqual(early.head.children.map(node => node.id), ['mzt-reader-tokens', 'mzt-reader']);
   assert.equal(early.head.children[1].textContent, '/* reader */');
@@ -364,8 +365,12 @@ test('reader tabs get the reader sheet and theme tokens, follow settings, and ar
   // Zotero's own appearance, which reader page views are pinned to, not the plugin theme's mode.
   assert.equal(early.attributes.get('data-mzt-zotero-scheme'), 'light');
   assert.equal(win.attributes.get('data-mzt-zotero-scheme'), 'light');
+  // The reader draws its own card edge, so its <browser> is marked to drop the border.
+  assert.equal(earlyBrowser.attributes.get('data-mzt-framed'), 'true');
 
   const opened = fakeReaderDocument();
+  const openedBrowser = Object.assign(fakeElement(), { contentDocument: opened });
+  win.document.readerBrowsers.push(openedBrowser);
   win.events.get('DOMContentLoaded')({ target: opened });
   win.events.get('DOMContentLoaded')({ target: opened });
   assert.equal(opened.head.children.length, 2);
@@ -389,6 +394,7 @@ test('reader tabs get the reader sheet and theme tokens, follow settings, and ar
   // Closing a tab drops its document; settings changes afterwards don't touch it.
   opened.events.get('unload')();
   assert.equal(opened.head.children.length, 0);
+  assert.equal(openedBrowser.attributes.has('data-mzt-framed'), false);
   api.set('layout', 'modern');
   assert.equal(opened.attributes.has('data-mzt-layout'), false);
   assert.equal(early.attributes.get('data-mzt-layout'), 'modern');
@@ -396,6 +402,7 @@ test('reader tabs get the reader sheet and theme tokens, follow settings, and ar
   s.runtime.stop();
   assert.equal(early.head.children.length, 0);
   assert.equal(early.attributes.size, 0);
+  assert.equal(earlyBrowser.attributes.size, 0);
   assert.equal(early.events.size, 0);
   assert.equal(win.events.size, 0);
 });
@@ -480,7 +487,7 @@ test('disabling restores Zotero\'s reading page; closed tabs and readers without
 test('a reader opened before the plugin starts gets its PDF view styled too', async () => {
   const win = fakeWindow();
   const view = fakeReaderDocument('resource://zotero/reader/pdf/web/viewer.html');
-  win.document.readerBrowsers.push({ contentDocument: fakeReaderDocument(undefined, [view]) });
+  win.document.readerBrowsers.push(Object.assign(fakeElement(), { contentDocument: fakeReaderDocument(undefined, [view]) }));
   const s = setup([win]); await s.runtime.start();
   assert.equal(view.head.children.at(-1).id, 'mzt-viewer');
   assert.equal(view.attributes.get('data-mzt-layout'), 'modern');

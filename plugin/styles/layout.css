@@ -312,6 +312,13 @@
     border-radius: var(--mzt-card-radius);
     box-shadow: 0 1px 2px var(--mzt-shadow), 0 10px 28px -14px var(--mzt-shadow);
   }
+  /* Once the reader has its sheet, it draws the card edge itself (reader.css), so the sidebar and the view
+     can meet the bottom edge in two rounded corners. The <browser> keeps only the soft shadow: the tight
+     one can't follow the notch between the corners and would show as a straight line under it. */
+  :root[data-mzt-layout="modern"] #tabs-deck browser.reader[data-mzt-framed] {
+    border: none;
+    box-shadow: 0 10px 28px -14px var(--mzt-shadow);
+  }
   /* The context splitter takes no space (negative margins) and sits in the gap left by the reader's margin. */
   :root[data-mzt-layout="modern"] #zotero-context-splitter {
     border: none;

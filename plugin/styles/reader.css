@@ -186,14 +186,61 @@
     color: var(--mzt-subtle);
   }
 
+  /* Card edge: drawn here instead of on the <browser> (layout.css), so the sidebar and the view are two
+     panels that each end in a rounded corner where they meet the bottom edge, rather than a divider
+     running into a straight one. The toolbar, the sidebar and the view each outline their own part with
+     an overlay that takes no space; the notch between the two corners shows the canvas. Outer corners
+     match the <browser>'s 12px clip. */
+  :root[data-mzt-layout="modern"] {
+    --mzt-frame: color-mix(in srgb, var(--mzt-canvas) 82%, var(--mzt-text));
+    --mzt-frame-radius: 12px;
+    --mzt-seam-radius: 16px;
+    background: var(--mzt-canvas);
+  }
+  :root[data-mzt-layout="modern"] :is(.toolbar, #sidebarContainer, #split-view)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--mzt-frame);
+    pointer-events: none;
+  }
+  :root[data-mzt-layout="modern"] .toolbar::after {
+    z-index: 1;
+    border-bottom: none;
+    border-start-start-radius: var(--mzt-frame-radius);
+    border-start-end-radius: var(--mzt-frame-radius);
+  }
   /* Sidebar: on the canvas, like the main window's collection pane, so it and the PDF backdrop are one
-     surface the pages float on; a faint guide replaces the pane border. View switcher as a segmented
-     control, filled search field. */
+     surface the pages float on. Its own border gives way to the outline, which covers the same column.
+     View switcher as a segmented control, filled search field. */
   :root[data-mzt-layout="modern"] :is(#sidebarContainer, #sidebarContent) {
     background-color: var(--mzt-canvas);
   }
   :root[data-mzt-layout="modern"] #sidebarContainer {
-    border-inline-end: 1px solid var(--mzt-guide);
+    border-inline-end-color: transparent;
+  }
+  :root[data-mzt-layout="modern"] #sidebarContainer::after {
+    z-index: 1;
+    inset-inline-end: -1px;
+    border-top: none;
+    border-end-start-radius: var(--mzt-frame-radius);
+    border-end-end-radius: var(--mzt-seam-radius);
+  }
+  /* The view clips its frames to its corners. With the sidebar open it starts 1px early, under the
+     sidebar's edge, so the two panels share one line down to where their corners part. */
+  :root[data-mzt-layout="modern"] #split-view {
+    overflow: hidden;
+    border-end-start-radius: var(--mzt-frame-radius);
+    border-end-end-radius: var(--mzt-frame-radius);
+  }
+  :root[data-mzt-layout="modern"] body.sidebar-open #split-view {
+    inset-inline-start: calc(var(--sidebar-width) - 1px);
+    border-end-start-radius: var(--mzt-seam-radius);
+  }
+  :root[data-mzt-layout="modern"] #split-view::after {
+    z-index: 4;
+    border-top: none;
+    border-radius: inherit;
   }
   :root[data-mzt-layout="modern"] #sidebarContainer .sidebar-toolbar .start {
     gap: 2px;
