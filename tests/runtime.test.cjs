@@ -87,18 +87,21 @@ function fakeWindow(dark = false, tree = null) {
   };
 }
 // A reader tab's document (resource://zotero/reader/reader.html) as seen from the main window.
-function fakeReaderDocument(uri = 'resource://zotero/reader/reader.html') {
+let nextContextID = 1;
+function fakeReaderDocument(uri = 'resource://zotero/reader/reader.html', frames = []) {
   const head = [];
   const attributes = new Map();
   const events = new Map();
   return {
     head: { append(...nodes) { head.push(...nodes); }, children: head },
     attributes, events, documentURI: uri,
+    querySelectorAll: selector => (selector === 'iframe' ? frames.map(contentDocument => ({ contentDocument })) : []),
     documentElement: {
       setAttribute: (k, v) => attributes.set(k, v), removeAttribute: k => attributes.delete(k),
       getAttribute: k => attributes.get(k) ?? null
     },
     defaultView: {
+      browsingContext: { id: nextContextID++ },
       addEventListener: (name, cb) => events.set(name, cb),
       removeEventListener: (name, cb) => { if (events.get(name) === cb) events.delete(name); }
     },
@@ -107,6 +110,19 @@ function fakeReaderDocument(uri = 'resource://zotero/reader/reader.html') {
     }
   };
 }
+// Zotero's ReaderTab for a reader document, with the internal reader's theme state.
+function fakeReaderInstance(doc) {
+  const calls = [];
+  const internal = {
+    _state: { lightTheme: null, darkTheme: { id: 'dark' } },
+    _updateState(update) { calls.push(['update', update]); Object.assign(this._state, update); },
+    setLightTheme(id) { calls.push(['light', id]); this._state.lightTheme = id ? { id } : null; },
+    setDarkTheme(id) { calls.push(['dark', id]); this._state.darkTheme = id ? { id } : null; }
+  };
+  return { calls, internal, _iframe: { browsingContext: { id: doc.defaultView.browsingContext.id } },
+    _iframeWindow: {}, _initPromise: Promise.resolve(), _internalReader: internal };
+}
+const settle = () => new Promise(resolve => setImmediate(resolve));
 function setup(windows = [fakeWindow()]) {
   const prefs = new Map();
   const observers = new Map();
@@ -127,16 +143,20 @@ function setup(windows = [fakeWindow()]) {
     getMainWindows: () => windows, logError: error => { throw error; },
     File: { async getContentsAsync(channel, charset) {
       assert.equal(charset, 'UTF-8');
-      assert.equal(channel.uri, 'jar:file:///plugin.xpi!/styles/reader.css');
-      return '/* reader */';
+      const file = channel.uri.match(/^jar:file:\/\/\/plugin\.xpi!\/styles\/(reader|viewer)\.css$/)?.[1];
+      if (!file) throw new Error('Unexpected URL ' + channel.uri);
+      return `/* ${file} */`;
     } },
+    Reader: { _readers: [] },
+    // Zotero's own reading theme prefs, which the plugin only reads.
+    Prefs: { get: key => ({ 'reader.lightTheme': false, 'reader.darkTheme': 'dark' })[key] },
     PreferencePanes: {
       async register(options) { panes.set('pane', options); return 'pane'; },
       unregister(id) { panes.delete(id); }
     }
   };
   return { windows, prefs, observers, panes, Zotero, runtime: createRuntime({
-    Zotero, Services, Ci, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', version: '1.2.3', themes, collectionIcons
+    Zotero, Services, Ci, Cu: { cloneInto: value => structuredClone(value) }, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', version: '1.2.3', themes, collectionIcons
   }) };
 }
 test('startup and repeated attach load exactly one set of styles per window', async () => {
@@ -345,10 +365,14 @@ test('reader tabs get the reader sheet and theme tokens, follow settings, and ar
   win.events.get('DOMContentLoaded')({ target: opened });
   win.events.get('DOMContentLoaded')({ target: opened });
   assert.equal(opened.head.children.length, 2);
-  // Other documents loading in the window (e.g. the PDF view inside the reader) are left alone.
+  // The PDF view inside a reader gets its own sheet; other documents are left alone.
   const view = fakeReaderDocument('resource://zotero/reader/pdf/web/viewer.html');
   win.events.get('DOMContentLoaded')({ target: view });
-  assert.equal(view.head.children.length, 0);
+  assert.deepEqual(view.head.children.map(node => [node.id, node.textContent.slice(0, 12)]),
+    [['mzt-viewer-tokens', '@media (forc'], ['mzt-viewer', '/* viewer */']]);
+  const other = fakeReaderDocument('resource://zotero/note-editor/note-editor.html');
+  win.events.get('DOMContentLoaded')({ target: other });
+  assert.equal(other.head.children.length, 0);
 
   api.set('theme', 'modern-dark'); api.set('mode', 'fixed'); api.set('layout', 'classic');
   for (const doc of [early, opened]) {
@@ -381,6 +405,68 @@ test('a reader sheet that fails to load leaves reader tabs alone but the plugin 
   win.events.get('DOMContentLoaded')({ target: reader });
   assert.equal(reader.head.children.length, 0);
   assert.equal(win.attributes.get('data-mzt-theme'), 'modern-light');
-  assert.equal(errors.length, 1);
+  assert.equal(errors.length, 2);
   s.runtime.stop();
+});
+test('reading page follows the theme, can be fixed or original, and hands back to Zotero', async () => {
+  const win = fakeWindow();
+  const s = setup([win]); await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
+  const doc = fakeReaderDocument();
+  const reader = fakeReaderInstance(doc);
+  s.Zotero.Reader._readers.push(reader);
+  win.events.get('DOMContentLoaded')({ target: doc });
+  await settle();
+  const page = { id: 'mzt-modern-light', label: 'Modern Light', background: '#ffffff', foreground: '#24252b' };
+  assert.deepEqual(reader.internal._state.lightTheme, page);
+  assert.deepEqual(reader.internal._state.darkTheme, page);
+
+  // Unrelated setting changes don't redraw the page.
+  const updates = () => reader.calls.filter(([kind]) => kind === 'update').length;
+  api.set('layout', 'classic'); await settle();
+  assert.equal(updates(), 1);
+
+  api.set('theme', 'catppuccin-latte'); api.set('mode', 'fixed'); await settle();
+  assert.equal(reader.internal._state.lightTheme.id, 'mzt-catppuccin-latte');
+  api.set('pageTheme', 'catppuccin-frappe'); await settle();
+  assert.deepEqual(reader.internal._state.darkTheme,
+    { id: 'mzt-catppuccin-frappe', label: 'Catppuccin Frappé', background: '#303446', foreground: '#c6d0f5' });
+  api.set('pageTheme', 'original'); await settle();
+  assert.equal(reader.internal._state.lightTheme, null);
+  assert.equal(reader.internal._state.darkTheme, null);
+
+  // Zotero's reading theme prefs come back; they were never written.
+  api.set('pageTheme', 'zotero'); await settle();
+  assert.deepEqual(reader.calls.slice(-2), [['light', false], ['dark', 'dark']]);
+  assert.equal(reader.internal._state.darkTheme.id, 'dark');
+
+  for (const value of ['sepia', '', '__proto__']) assert.throws(() => api.set('pageTheme', value));
+  s.runtime.stop();
+});
+test('disabling restores Zotero\'s reading page; closed tabs and readers without themes are skipped', async () => {
+  const win = fakeWindow();
+  const s = setup([win]); await s.runtime.start();
+  const open = fakeReaderDocument(), closed = fakeReaderDocument(), legacy = fakeReaderDocument();
+  const openReader = fakeReaderInstance(open), closedReader = fakeReaderInstance(closed), legacyReader = fakeReaderInstance(legacy);
+  // Zotero 7.0 has no reading themes.
+  delete legacyReader.internal.setLightTheme;
+  s.Zotero.Reader._readers.push(openReader, closedReader, legacyReader);
+  for (const doc of [open, closed, legacy]) win.events.get('DOMContentLoaded')({ target: doc });
+  await settle();
+  assert.equal(legacyReader.calls.length, 0);
+  closed.events.get('unload')();
+  const closedCalls = closedReader.calls.length;
+  s.runtime.stop();
+  assert.deepEqual(openReader.calls.slice(-2), [['light', false], ['dark', 'dark']]);
+  assert.equal(closedReader.calls.length, closedCalls);
+  assert.equal(legacyReader.calls.length, 0);
+});
+test('a reader opened before the plugin starts gets its PDF view styled too', async () => {
+  const win = fakeWindow();
+  const view = fakeReaderDocument('resource://zotero/reader/pdf/web/viewer.html');
+  win.document.readerBrowsers.push({ contentDocument: fakeReaderDocument(undefined, [view]) });
+  const s = setup([win]); await s.runtime.start();
+  assert.equal(view.head.children.at(-1).id, 'mzt-viewer');
+  assert.equal(view.attributes.get('data-mzt-layout'), 'modern');
+  s.runtime.stop();
+  assert.equal(view.head.children.length, 0);
 });

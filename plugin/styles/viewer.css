@@ -1,0 +1,32 @@
+/* PDF view (resource://zotero/reader/pdf/web/viewer.html, a frame inside the reader): the surface around
+   the pages, the paper edge and the scrollbar. The page canvas itself is Zotero's (its colors come from
+   the reading theme set on the reader), and page size, margins and gaps are untouched because PDF.js
+   computes zoom and scroll positions from them. Injected after the viewer's own sheet. */
+@media (forced-colors: none) {
+  /* Zotero hard-codes a light or dark gray here regardless of the interface theme. */
+  :root[data-mzt-theme] body,
+  :root[data-mzt-theme] body #viewerContainer {
+    background-color: var(--mzt-sidebar);
+  }
+  :root[data-mzt-theme] body #viewerContainer {
+    scrollbar-color: var(--color-scrollbar) var(--color-scrollbar-background);
+  }
+  /* The edge is a shadow ring rather than a border so it takes no layout space. */
+  :root[data-mzt-theme] .pdfViewer .page {
+    box-shadow: 0 0 0 1px var(--mzt-border), 0 1px 3px var(--mzt-shadow);
+  }
+
+  /* Modern layout: pages sit on the canvas like the main window's cards, with soft corners and a lifted
+     shadow. */
+  :root[data-mzt-layout="modern"] body,
+  :root[data-mzt-layout="modern"] body #viewerContainer {
+    background-color: var(--mzt-canvas);
+  }
+  :root[data-mzt-layout="modern"] .pdfViewer .page {
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px var(--mzt-card-border), 0 1px 2px var(--mzt-shadow), 0 12px 32px -16px var(--mzt-shadow);
+  }
+  :root[data-mzt-layout="modern"] {
+    --mzt-card-border: color-mix(in srgb, var(--mzt-canvas) 82%, var(--mzt-text));
+  }
+}

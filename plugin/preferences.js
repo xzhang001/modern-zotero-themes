@@ -9,6 +9,10 @@ window.MZTPreferences = {
     const copy = zh ? {
       heading: "让阅读更专注。",
       themes: "主题", interface: "界面", fixed: "固定", system: "跟随系统",
+      page: "阅读页面", pageFollow: "跟随主题", pageOriginal: "原始", pageOriginalMeta: "PDF 原本的颜色",
+      pageZotero: "Zotero 设置", pageZoteroMeta: "阅读器 Aa 菜单",
+      pageHint: "PDF/EPUB 页面的底色和文字颜色。在阅读器的 Aa 菜单里临时换主题，下次打开文献或更改这里时会恢复为此处的选择。",
+      pageZoteroHint: "页面颜色交给 Zotero：由阅读器工具栏的 Aa 菜单决定。",
       layout: "界面风格",
       layoutModern: "现代", layoutClassic: "经典",
       emptyFields: "空字段", emptyHide: "隐藏", emptyShow: "显示",
@@ -23,6 +27,9 @@ window.MZTPreferences = {
       useAuto: "改为自动"
     } : {
       saved: "✓ Saved", inactive: "The theme plugin is disabled",
+      pageOriginalMeta: "The PDF's own colors", pageZoteroMeta: "Reader's Aa menu",
+      pageHint: "Background and text color of PDF/EPUB pages. A theme picked in the reader's Aa menu lasts until you reopen the item or change this setting.",
+      pageZoteroHint: "Zotero decides: pages use the theme chosen in the reader's Aa menu.",
       modes: { light: "light", dark: "dark" },
       modeNames: { light: "Light", dark: "Dark" },
       usedFor: { light: "Used in light mode", dark: "Used in dark mode" },
@@ -51,19 +58,15 @@ window.MZTPreferences = {
       statusTimer = setTimeout(() => status.classList.remove("mzt-visible"), 2000);
     };
 
-    // Two-way choices are segmented controls: native <select> popups can't be styled.
-    const segments = new Map();
-    for (const group of root.querySelectorAll(".mzt-seg")) {
-      const key = group.dataset.key;
-      const buttons = Array.from(group.querySelectorAll("button"));
-      segments.set(key, { group, buttons });
+    // A radio group of buttons saving `key`: click selects; arrows move and select, Home/End jump.
+    const radioGroup = (group, key) => {
       group.addEventListener("click", event => {
         const button = event.target.closest("button");
         if (button && !button.disabled && button.getAttribute("aria-checked") !== "true") save([key, button.dataset.value]);
       });
-      // Radio-group keys: arrows move and select, Home/End jump.
       group.addEventListener("keydown", event => {
-        const index = buttons.indexOf(event.target);
+        const buttons = Array.from(group.querySelectorAll("button"));
+        const index = buttons.indexOf(event.target.closest("button"));
         if (index < 0) return;
         const rtl = getComputedStyle(group).direction === "rtl";
         const step = { ArrowDown: 1, ArrowUp: -1, ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1 }[event.key];
@@ -76,6 +79,12 @@ window.MZTPreferences = {
         next.focus();
         next.click();
       });
+    };
+    // Two-way choices are segmented controls: native <select> popups can't be styled.
+    const segments = new Map();
+    for (const group of root.querySelectorAll(".mzt-seg")) {
+      segments.set(group.dataset.key, { group, buttons: Array.from(group.querySelectorAll("button")) });
+      radioGroup(group, group.dataset.key);
     }
 
     const cards = root.querySelector("#mzt-theme-cards");
@@ -103,6 +112,35 @@ window.MZTPreferences = {
         ? [theme.mode + "Theme", theme.id] : ["theme", theme.id]));
       cards.append(card);
     }
+
+    // Reading page tiles: a miniature page in each option's background and text colors.
+    const pageOptions = root.querySelector("#mzt-page-options");
+    const original = { background: "#ffffff", foreground: "#1f1f1f" };
+    const pageTile = (value, name, meta, page) => {
+      const tile = make("button", "mzt-page-option");
+      tile.type = "button";
+      tile.dataset.value = value;
+      tile.setAttribute("role", "radio");
+      const swatch = make("span", "mzt-page-swatch");
+      swatch.setAttribute("aria-hidden", "true");
+      if (page) {
+        swatch.style.setProperty("--mzt-page-bg", page.background);
+        swatch.style.setProperty("--mzt-page-fg", page.foreground);
+        for (let i = 0; i < 4; i++) swatch.append(make("i"));
+      }
+      else swatch.append(make("b", null, "Aa"));
+      const label = make("span", "mzt-theme-label");
+      label.append(make("span", "mzt-theme-name", name), make("span", "mzt-theme-meta", meta));
+      tile.append(swatch, label);
+      pageOptions.append(tile);
+      return tile;
+    };
+    const followTile = pageTile("follow", copy.pageFollow || "Follow theme", "", api.themes[0].page);
+    pageTile("original", copy.pageOriginal || "Original", copy.pageOriginalMeta, original);
+    for (const theme of api.themes) pageTile(theme.id, theme.name, copy.modeNames[theme.mode], theme.page);
+    pageTile("zotero", copy.pageZotero || "Zotero setting", copy.pageZoteroMeta, null);
+    radioGroup(pageOptions, "pageTheme");
+    const pageHint = root.querySelector("#mzt-page-hint");
 
     const notice = root.querySelector("#mzt-appearance-notice");
     const noticeText = root.querySelector("#mzt-appearance-message");
@@ -148,6 +186,20 @@ window.MZTPreferences = {
           if (key === "emptyFields" || key === "folderIcons") button.disabled = !available || !modern;
         }
       }
+
+      // "Follow theme" previews the page of the theme currently in use.
+      const activeID = system ? settings[media.matches ? "darkTheme" : "lightTheme"] : settings.theme;
+      const activeTheme = api.themes.find(t => t.id === activeID) || api.themes[0];
+      const followSwatch = followTile.querySelector(".mzt-page-swatch");
+      followSwatch.style.setProperty("--mzt-page-bg", activeTheme.page.background);
+      followSwatch.style.setProperty("--mzt-page-fg", activeTheme.page.foreground);
+      followTile.querySelector(".mzt-theme-meta").textContent = activeTheme.name;
+      const pageChoice = Array.from(pageOptions.children).find(t => t.dataset.value === settings.pageTheme) || followTile;
+      for (const tile of pageOptions.children) {
+        tile.setAttribute("aria-checked", String(tile === pageChoice));
+        tile.tabIndex = tile === pageChoice ? 0 : -1;
+      }
+      pageHint.textContent = pageChoice.dataset.value === "zotero" ? copy.pageZoteroHint : copy.pageHint;
 
       for (const card of cards.children) {
         const { theme, mode } = card.dataset;

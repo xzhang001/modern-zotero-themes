@@ -10,7 +10,9 @@
         hover: "#ededf1", selected: "#6554c0", selectedText: "#ffffff",
         inactiveSelected: "#e7e7ec", accent: "#6554c0", onAccent: "#ffffff",
         error: "#b42338", errorBackground: "#fff0f1", shadow: "#18182414"
-      }
+      },
+      // Reading page (Zotero reader theme): background and text the PDF/EPUB page is redrawn with.
+      page: { background: "#ffffff", foreground: "#24252b" }
     },
     {
       id: "modern-dark", name: "Modern Dark", mode: "dark", author: "Modern Zotero Themes",
@@ -20,7 +22,9 @@
         hover: "#2c2c33", selected: "#6450a8", selectedText: "#ffffff",
         inactiveSelected: "#303037", accent: "#b3a0ff", onAccent: "#221a3b",
         error: "#ffa0ac", errorBackground: "#48252f", shadow: "#00000040"
-      }
+      },
+      // Softer than pure white on black, and a step above the dark canvas so the page still reads as paper.
+      page: { background: "#232328", foreground: "#d9d9e0" }
     },
     {
       id: "catppuccin-latte", name: "Catppuccin Latte", mode: "light", author: "Catppuccin",
@@ -30,7 +34,8 @@
         hover: "#dce0e8", selected: "#8839ef", selectedText: "#ffffff",
         inactiveSelected: "#dce0e8", accent: "#8839ef", onAccent: "#ffffff",
         error: "#d20f39", errorBackground: "#fbecef", shadow: "#4c4f6914"
-      }
+      },
+      page: { background: "#eff1f5", foreground: "#4c4f69" }
     },
     {
       // Focused selection is a deepened mauve: Zotero swaps in white icons there, which pale mauve can't carry.
@@ -41,7 +46,8 @@
         hover: "#3a3e51", selected: "#7f5aa8", selectedText: "#ffffff",
         inactiveSelected: "#414559", accent: "#ca9ee6", onAccent: "#232634",
         error: "#e78284", errorBackground: "#3b3040", shadow: "#00000040"
-      }
+      },
+      page: { background: "#303446", foreground: "#c6d0f5" }
     }
   ];
   const required = Object.keys(themes[0].colors);
@@ -56,11 +62,15 @@
         throw new Error(`Invalid or missing color: ${key}`);
       }
     }
+    for (const key of ["background", "foreground"]) {
+      if (!/^#[0-9a-f]{6}$/i.test(theme.page?.[key] || "")) throw new Error(`Invalid or missing page color: ${key}`);
+    }
     return theme;
   }
   themes.forEach(theme => {
     validate(theme);
     Object.freeze(theme.colors);
+    Object.freeze(theme.page);
     Object.freeze(theme);
   });
   Object.freeze(themes);
@@ -104,7 +114,12 @@
     return `@media (forced-colors: none) { ${selector} {\ncolor-scheme: ${theme.mode};\n`
       + Object.entries(map).map(([k, v]) => `--${k}: ${v};`).join("\n") + "\n} }";
   }
-  const api = Object.freeze({ themes, get, resolve, validate, css });
+  // The theme's reading page in the shape Zotero's reader expects for a reading theme.
+  function readerTheme(theme) {
+    validate(theme);
+    return { id: "mzt-" + theme.id, label: theme.name, background: theme.page.background, foreground: theme.page.foreground };
+  }
+  const api = Object.freeze({ themes, get, resolve, validate, css, readerTheme });
   scope.MZTThemes = api;
   if (typeof module !== "undefined") module.exports = api;
 })(this);

@@ -59,3 +59,11 @@ test('modern layout canvas steps further below the sidebar on dark themes', () =
     assert.ok(themes.css(theme).includes(`--mzt-canvas: color-mix(in srgb, ${theme.colors.sidebar} ${amount}%, #000);`), theme.name);
   }
 });
+test('every theme has a readable reading page and exposes it as a Zotero reader theme', () => {
+  for (const theme of themes.themes) {
+    const { background, foreground } = theme.page;
+    assert.ok(contrast(foreground, background) >= 7, `${theme.name}: page ${contrast(foreground, background)}`);
+    assert.deepEqual(themes.readerTheme(theme), { id: 'mzt-' + theme.id, label: theme.name, background, foreground });
+  }
+  assert.throws(() => themes.validate({ ...themes.themes[0], page: { background: '#fff', foreground: '#000000' } }));
+});

@@ -1,14 +1,16 @@
 (function (scope) {
   "use strict";
-  scope.MZTCreateRuntime = function ({ Zotero, Services, Ci, rootURI, id, version, themes, collectionIcons }) {
+  scope.MZTCreateRuntime = function ({ Zotero, Services, Ci, Cu, rootURI, id, version, themes, collectionIcons }) {
     // Gecko caches stylesheets by URL, and an upgraded XPI keeps the same jar: URL, so without a
     // per-startup query the old CSS stays in effect until Zotero restarts.
     const assetQuery = `?v=${encodeURIComponent(version || "dev")}.${Date.now()}`;
     const prefix = "extensions.modernZoteroThemes.";
-    const defaults = { mode: "system", theme: "modern-light", lightTheme: "modern-light", darkTheme: "modern-dark", layout: "modern", emptyFields: "hide", folderIcons: "color" };
+    const defaults = { mode: "system", theme: "modern-light", lightTheme: "modern-light", darkTheme: "modern-dark", layout: "modern", emptyFields: "hide", folderIcons: "color", pageTheme: "follow" };
     const layouts = ["modern", "classic"];
     const emptyFieldModes = ["hide", "show"];
     const folderIconModes = ["color", "mono"];
+    // Reading page: the theme's own page, Zotero's unthemed page, Zotero's reader setting (Aa menu), or a theme ID.
+    const pageModes = ["follow", "original", "zotero"];
     const stylesheets = { "mzt-components": "styles/modern.css", "mzt-layout": "styles/layout.css",
       "mzt-collection-icons-sheet": "styles/collection-icons.css" };
     // Custom collection icons: JSON map of Zotero libraryKey ("<libraryID>/<key>") to a validated entry.
@@ -29,11 +31,15 @@
     const sectionShiftProperty = "--mzt-section-shift";
     const sectionTotalProperty = "--mzt-section-shift-total";
     const rowIDPrefix = "collection-tree-row-";
-    // Reader tabs load this page in a <browser> inside the main window. Its stylesheet can't be linked
-    // from the plugin (the page's principal can't load jar:/file: URLs), so the text is read once at startup.
-    const readerURL = "resource://zotero/reader/reader.html";
-    const readerAttributes = ["data-mzt-theme", "data-mzt-layout"];
-    let readerCSS = null;
+    // Reader tabs load reader.html in a <browser> inside the main window, and the PDF view loads viewer.html
+    // in a frame inside that. Their stylesheets can't be linked from the plugin (these pages' principal
+    // can't load jar:/file: URLs), so the text is read once at startup and injected.
+    const frameKinds = {
+      "resource://zotero/reader/reader.html": { kind: "reader", file: "styles/reader.css" },
+      "resource://zotero/reader/pdf/web/viewer.html": { kind: "viewer", file: "styles/viewer.css" }
+    };
+    const frameAttributes = ["data-mzt-theme", "data-mzt-layout"];
+    const frameCSS = new Map();
     const windows = new Map();
     const subscribers = new Set();
     let paneID;
@@ -57,7 +63,8 @@
         win.document.documentElement.setAttribute("data-mzt-folder-icons",
           folderIconModes.includes(config.folderIcons) ? config.folderIcons : defaults.folderIcons);
         markCollectionSections(win);
-        for (const readerDoc of Array.from(state.readers.keys())) paintReader(win, readerDoc);
+        state.page = pageFor(config, theme);
+        for (const frameDoc of Array.from(state.frames.keys())) paintFrame(win, frameDoc);
       }
       for (const callback of subscribers) {
         try { callback(); } catch (error) { Zotero.logError(error); }
@@ -166,48 +173,99 @@
         Ci.nsILoadInfo.SEC_ALLOW_CROSS_ORIGIN_SEC_CONTEXT_IS_NULL, Ci.nsIContentPolicy.TYPE_OTHER);
       return Zotero.File.getContentsAsync(channel, "UTF-8");
     }
-    function paintReader(win, readerDoc) {
-      const reader = windows.get(win)?.readers.get(readerDoc);
-      if (!reader) return;
+    // undefined leaves the page to Zotero's reader setting; null is Zotero's unthemed page.
+    function pageFor(config, theme) {
+      if (config.pageTheme === "zotero") return undefined;
+      if (config.pageTheme === "original") return null;
+      return themes.readerTheme(themes.themes.find(t => t.id === config.pageTheme) || theme);
+    }
+    function paintFrame(win, frameDoc) {
+      const state = windows.get(win);
+      const frame = state?.frames.get(frameDoc);
+      if (!frame) return;
       try {
-        reader.tokens.textContent = windows.get(win).tokens.textContent;
+        frame.tokens.textContent = state.tokens.textContent;
         const source = win.document.documentElement;
-        for (const name of readerAttributes) readerDoc.documentElement.setAttribute(name, source.getAttribute(name));
+        for (const name of frameAttributes) frameDoc.documentElement.setAttribute(name, source.getAttribute(name));
       }
       catch (error) {
         // The tab closed without an unload reaching us; the document is gone.
-        windows.get(win).readers.delete(readerDoc);
+        state.frames.delete(frameDoc);
+        return;
       }
+      if (frame.kind === "reader") applyPage(win, frameDoc).catch(error => Zotero.logError(error));
     }
-    function attachReader(win, readerDoc) {
-      const state = windows.get(win);
-      if (!state || readerCSS === null || readerDoc?.documentURI !== readerURL || state.readers.has(readerDoc)) return;
-      const parent = readerDoc.head || readerDoc.documentElement;
-      if (!parent) return;
-      const sheet = readerDoc.createElement("style");
-      sheet.id = "mzt-reader";
-      sheet.textContent = readerCSS;
-      const tokens = readerDoc.createElement("style");
-      tokens.id = "mzt-reader-tokens";
-      const readerWin = readerDoc.defaultView;
-      const unload = () => detachReader(win, readerDoc);
-      state.readers.set(readerDoc, { sheet, tokens, readerWin, unload });
-      // After the reader's own sheet, so equal-specificity rules resolve to the theme; the reader sheet
-      // last so its layout-specific overrides beat the shared tokens.
-      parent.append(tokens, sheet);
-      readerWin?.addEventListener("unload", unload, { once: true });
-      paintReader(win, readerDoc);
+    // The page is drawn by Zotero's reader from its light/dark reading theme. Setting them on the reader's
+    // state (not Zotero's prefs or its synced custom themes) keeps the user's own reader settings intact;
+    // picking a theme in the reader's Aa menu still works until the plugin's page setting changes again.
+    async function applyPage(win, frameDoc) {
+      const frame = windows.get(win)?.frames.get(frameDoc);
+      if (!frame) return;
+      const page = windows.get(win).page;
+      const key = page === undefined ? "zotero" : JSON.stringify(page);
+      if (frame.pageKey === key) return;
+      // Matched by browsing context ID: document wrappers seen from this sandbox and from Zotero differ.
+      const contextID = frame.frameWin?.browsingContext?.id;
+      frame.instance ||= contextID !== undefined
+        && Zotero.Reader?._readers?.find(reader => reader._iframe?.browsingContext?.id === contextID);
+      if (!frame.instance) return;
+      frame.pageKey = key;
+      try { await frame.instance._initPromise; }
+      catch (error) { return; }
+      if (windows.get(win)?.frames.get(frameDoc) !== frame || frame.pageKey !== key) return;
+      const reader = frame.instance._internalReader;
+      // Zotero versions without reading themes have neither.
+      if (typeof reader?._updateState !== "function" || typeof reader.setLightTheme !== "function") return;
+      if (page === undefined) {
+        if (frame.pageApplied) restorePage(frame);
+        return;
+      }
+      // The whole update object must live in the reader's scope, or its code sees an opaque wrapper.
+      reader._updateState(Cu.cloneInto({ lightTheme: page, darkTheme: page }, frame.instance._iframeWindow));
+      frame.pageApplied = true;
     }
-    function detachReader(win, readerDoc) {
-      const state = windows.get(win);
-      const reader = state?.readers.get(readerDoc);
-      if (!reader) return;
-      state.readers.delete(readerDoc);
+    function restorePage(frame) {
+      frame.pageApplied = false;
       try {
-        reader.readerWin?.removeEventListener("unload", reader.unload);
-        reader.sheet.remove();
-        reader.tokens.remove();
-        for (const name of readerAttributes) readerDoc.documentElement.removeAttribute(name);
+        const reader = frame.instance._internalReader;
+        reader.setLightTheme(Zotero.Prefs.get("reader.lightTheme"));
+        reader.setDarkTheme(Zotero.Prefs.get("reader.darkTheme"));
+      }
+      catch (error) { /* Reader already closed. */ }
+    }
+    function attachFrame(win, frameDoc) {
+      const state = windows.get(win);
+      const spec = frameKinds[frameDoc?.documentURI];
+      if (!state || !spec || !frameCSS.has(spec.kind) || state.frames.has(frameDoc)) return;
+      const parent = frameDoc.head || frameDoc.documentElement;
+      if (!parent) return;
+      const tokens = frameDoc.createElement("style");
+      tokens.id = "mzt-" + spec.kind + "-tokens";
+      const sheet = frameDoc.createElement("style");
+      sheet.id = "mzt-" + spec.kind;
+      sheet.textContent = frameCSS.get(spec.kind);
+      const frameWin = frameDoc.defaultView;
+      const unload = () => detachFrame(win, frameDoc);
+      state.frames.set(frameDoc, { kind: spec.kind, sheet, tokens, frameWin, unload });
+      // After the page's own sheet, so equal-specificity rules resolve to the theme; the plugin sheet last
+      // so its layout-specific overrides beat the shared tokens.
+      parent.append(tokens, sheet);
+      frameWin?.addEventListener("unload", unload, { once: true });
+      paintFrame(win, frameDoc);
+      // PDF views already open inside a reader that was open before the plugin started.
+      for (const frame of frameDoc.querySelectorAll?.("iframe") || []) attachFrame(win, frame.contentDocument);
+    }
+    function detachFrame(win, frameDoc, { restore = false } = {}) {
+      const state = windows.get(win);
+      const frame = state?.frames.get(frameDoc);
+      if (!frame) return;
+      state.frames.delete(frameDoc);
+      if (restore && frame.pageApplied) restorePage(frame);
+      try {
+        frame.frameWin?.removeEventListener("unload", frame.unload);
+        frame.sheet.remove();
+        frame.tokens.remove();
+        for (const name of frameAttributes) frameDoc.documentElement.removeAttribute(name);
       }
       catch (error) { /* Already unloaded. */ }
     }
@@ -231,9 +289,10 @@
       const previous = Object.fromEntries(rootAttributes.map(name => [name, root.getAttribute(name)]));
       const sections = new win.MutationObserver(() => markCollectionSections(win));
       const menu = addIconMenu(win);
-      // DOMContentLoaded from reader tabs bubbles up to the main window, like Zotero's own listener relies on.
-      const frameLoaded = event => attachReader(win, event.target);
-      windows.set(win, { links, tokens, iconStyles, media, unload, previous, sections, menu, frameLoaded, readers: new Map() });
+      // DOMContentLoaded from reader tabs (and frames inside them) reaches the main window, as Zotero's own
+      // reader listener relies on.
+      const frameLoaded = event => attachFrame(win, event.target);
+      windows.set(win, { links, tokens, iconStyles, media, unload, previous, sections, menu, frameLoaded, frames: new Map() });
       root.append(...links, tokens, iconStyles);
       const tree = doc.getElementById?.("zotero-collections-tree");
       if (tree) sections.observe(tree, { childList: true, subtree: true });
@@ -243,7 +302,7 @@
       win.addEventListener("DOMContentLoaded", frameLoaded, true);
       update();
       // Reader tabs that were already open when the plugin started.
-      for (const browser of doc.querySelectorAll?.("browser.reader") || []) attachReader(win, browser.contentDocument);
+      for (const browser of doc.querySelectorAll?.("browser.reader") || []) attachFrame(win, browser.contentDocument);
     }
     function detach(win) {
       const state = windows.get(win);
@@ -251,7 +310,7 @@
       state.media.removeEventListener("change", update);
       win.removeEventListener("unload", state.unload);
       win.removeEventListener("DOMContentLoaded", state.frameLoaded, true);
-      for (const readerDoc of Array.from(state.readers.keys())) detachReader(win, readerDoc);
+      for (const frameDoc of Array.from(state.frames.keys())) detachFrame(win, frameDoc, { restore: true });
       state.sections.disconnect();
       for (const row of collectionRows(win)) {
         row.removeAttribute(sectionStartAttribute);
@@ -289,6 +348,9 @@
         }
         else if (key === "folderIcons") {
           if (!folderIconModes.includes(value)) throw new Error("Invalid folder icon mode");
+        }
+        else if (key === "pageTheme") {
+          if (!pageModes.includes(value) && !themes.themes.some(t => t.id === value)) throw new Error("Invalid page theme");
         }
         else {
           const theme = themes.themes.find(t => t.id === value);
@@ -330,9 +392,11 @@
         Zotero.ModernZoteroThemes = api;
         Services.prefs.addObserver(prefix, observer);
         Services.prefs.addObserver(appearancePref, observer);
-        // Without it reader tabs just keep Zotero's colors; the rest of the plugin still starts.
-        const loadingReaderCSS = (async () => readResource(rootURI + "styles/reader.css"))()
-          .catch(error => { Zotero.logError(error); return null; });
+        // Without them reader tabs just keep Zotero's look; the rest of the plugin still starts.
+        const loadingFrameCSS = Promise.all(Object.values(frameKinds).map(spec =>
+          (async () => readResource(rootURI + spec.file))()
+            .then(css => typeof css === "string" && frameCSS.set(spec.kind, css))
+            .catch(error => Zotero.logError(error))));
         const registeredPane = await Zotero.PreferencePanes.register({
           pluginID: id, label: "Modern Themes", src: rootURI + "preferences.xhtml",
           scripts: [rootURI + "preferences.js"], stylesheets: [rootURI + "styles/preferences.css" + assetQuery]
@@ -342,9 +406,8 @@
           return;
         }
         paneID = registeredPane;
-        const css = await loadingReaderCSS;
+        await loadingFrameCSS;
         if (!active) return;
-        readerCSS = typeof css === "string" ? css : null;
         for (const win of Zotero.getMainWindows()) attach(win);
       },
       stop() {
@@ -353,7 +416,7 @@
         Services.prefs.removeObserver(prefix, observer);
         Services.prefs.removeObserver(appearancePref, observer);
         for (const win of Array.from(windows.keys())) detach(win);
-        readerCSS = null;
+        frameCSS.clear();
         if (Zotero.ModernZoteroThemes === api) delete Zotero.ModernZoteroThemes;
         // Let open settings panes release callbacks and disable their controls.
         for (const callback of subscribers) {
