@@ -68,7 +68,14 @@ function fakeWindow(dark = false, tree = null) {
     MutationObserver: FakeMutationObserver,
     ZoteroPane: tree && { collectionsView: tree.view },
     document: {
-      getElementById: id => (id === 'zotero-collections-tree' && tree ? tree.element : null),
+      getElementById: id => (id === 'zotero-collections-tree' && tree ? tree.element
+        : id === 'zotero-collectionmenu' && tree?.menu ? tree.menu : null),
+      createXULElement: tag => {
+        const node = { localName: tag, attributes: new Map(), listeners: new Map(), hidden: false,
+          setAttribute(k, v) { this.attributes.set(k, v); }, addEventListener(k, cb) { this.listeners.set(k, cb); },
+          remove() { tree.menu.children.splice(tree.menu.children.indexOf(this), 1); } };
+        return node;
+      },
       documentElement: root,
       createElementNS() { return { remove() { children.splice(children.indexOf(this), 1); } }; }
     },
@@ -275,4 +282,19 @@ test('corrupt or foreign collection icon prefs are ignored', async () => {
   assert.equal(s.Zotero.ModernZoteroThemes.collectionIcon('1/ABCD2345'), null);
   assert.deepEqual(s.Zotero.ModernZoteroThemes.collectionIcon('1/WXYZ6789'), { icon: 'star' });
   s.runtime.stop();
+});
+test('"Set Icon…" goes after all of Zotero\'s collection menu entries and is removed on disable', async () => {
+  // Zotero's buildCollectionContextMenu() maps its options to menu children by index.
+  const tree = fakeCollectionTree(['library', 'collection']);
+  const native = ['sync', 'newCollection', 'editSelectedCollection', 'moveCollection'].map(id => ({ id }));
+  const listeners = new Map();
+  tree.menu = { children: [...native], append(...nodes) { this.children.push(...nodes); },
+    addEventListener: (k, cb) => listeners.set(k, cb), removeEventListener: k => listeners.delete(k) };
+  const s = setup([fakeWindow(false, tree)]); await s.runtime.start();
+  assert.deepEqual(tree.menu.children.slice(0, native.length), native);
+  assert.deepEqual(tree.menu.children.slice(native.length).map(node => node.localName), ['menuseparator', 'menuitem']);
+  assert.equal(tree.menu.children.at(-1).id, 'mzt-set-collection-icon');
+  s.runtime.stop();
+  assert.deepEqual(tree.menu.children, native);
+  assert.equal(listeners.size, 0);
 });

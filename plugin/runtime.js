@@ -119,14 +119,18 @@
       const item = doc.createXULElement("menuitem");
       item.id = menuItemID;
       item.setAttribute("label", t.menu);
-      const anchor = menu.querySelector(".zotero-menuitem-edit-collection");
-      if (anchor) anchor.after(item);
-      else menu.append(item);
+      const separator = doc.createXULElement("menuseparator");
+      // Must stay after Zotero's own entries: buildCollectionContextMenu() maps its options to
+      // menu.childNodes by index, so anything inserted in between shifts and breaks the whole menu.
+      menu.append(separator, item);
       const selected = () => {
         const treeRow = win.ZoteroPane?.getCollectionTreeRow?.();
         return treeRow?.type === "collection" && libraryKeyPattern.test(treeRow.ref?.libraryKey) ? treeRow : null;
       };
-      const showing = event => { if (event.target === menu) item.hidden = !selected(); };
+      const showing = event => {
+        if (event.target !== menu) return;
+        item.hidden = separator.hidden = !selected();
+      };
       const command = () => {
         const treeRow = selected();
         if (!treeRow) return;
@@ -144,6 +148,7 @@
         remove() {
           menu.removeEventListener("popupshowing", showing);
           item.remove();
+          separator.remove();
         }
       };
     }
