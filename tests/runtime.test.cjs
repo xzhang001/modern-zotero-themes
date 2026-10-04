@@ -13,15 +13,21 @@ function fakeCollectionTree(types, rendered = types.map((_, index) => index)) {
   const observers = new Set();
   const rows = rendered.map(index => {
     const attributes = new Set();
+    const style = new Map();
     return {
       id: 'collection-tree-row-' + index, attributes,
+      style: { setProperty: (k, v) => style.set(k, v), removeProperty: k => style.delete(k), get: k => style.get(k) },
       toggleAttribute(name, on) { if (on) attributes.add(name); else attributes.delete(name); },
       removeAttribute(name) { attributes.delete(name); }
     };
   });
+  const treeStyle = new Map();
   return {
-    observers, rows, view: { getRow: index => (index in types ? { type: types[index] } : undefined) },
-    element: { observers, querySelectorAll: () => rows },
+    observers, rows, treeStyle,
+    view: { getRow: index => (index in types ? { type: types[index] } : undefined), get rowCount() { return types.length; } },
+    element: { observers, querySelectorAll: () => rows,
+      style: { setProperty: (k, v) => treeStyle.set(k, v), removeProperty: k => treeStyle.delete(k) } },
+    shift: index => rows.find(row => row.id === 'collection-tree-row-' + index).style.get('--mzt-section-shift'),
     marked: () => rows.filter(row => row.attributes.has('data-mzt-section-start')).map(row => row.id),
     mutate() { for (const observer of observers) observer.callback(); }
   };
@@ -206,10 +212,15 @@ test('first built-in view of each library is marked as a section start, in any D
   const tree = fakeCollectionTree(types, [6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5]);
   const s = setup([fakeWindow(false, tree)]); await s.runtime.start();
   assert.deepEqual(tree.marked().sort(), ['collection-tree-row-12', 'collection-tree-row-4']);
+  // Rows move down by one gap per section start at or before them; the scroll area grows by the total.
+  assert.deepEqual([3, 4, 11, 12, 14].map(tree.shift), [undefined, 1, 1, 2, 2]);
+  assert.equal(tree.treeStyle.get('--mzt-section-shift-total'), 2);
   types.splice(4, 1, 'collection');
   tree.mutate();
   assert.deepEqual(tree.marked().sort(), ['collection-tree-row-12', 'collection-tree-row-5']);
   s.runtime.stop();
   assert.deepEqual(tree.marked(), []);
+  assert.deepEqual([4, 12].map(tree.shift), [undefined, undefined]);
+  assert.equal(tree.treeStyle.has('--mzt-section-shift-total'), false);
   assert.equal(tree.observers.size, 0);
 });

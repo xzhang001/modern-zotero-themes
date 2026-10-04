@@ -11,11 +11,14 @@
     // Zotero's General → Appearance setting (Zotero 7–10).
     const appearancePref = "browser.theme.toolbar-theme";
     const appearances = { dark: 0, light: 1, auto: 2 };
-    // Built-in views that close each library in the collection tree; the modern layout draws a divider
-    // above the first one. Marked from Zotero's row data because the virtualized list appends rows in
-    // scroll order, so DOM neighbours are not reliable.
+    // Built-in views that close each library in the collection tree. The modern layout opens a gap with a
+    // divider above the first one by shifting that row and every row after it (rows are absolutely
+    // positioned by Zotero, so no real space can be inserted). Computed from Zotero's row data because
+    // the virtualized list appends rows in scroll order, so DOM neighbours are not reliable.
     const builtInRowTypes = new Set(["search", "publications", "duplicates", "unfiled", "retracted", "trash"]);
     const sectionStartAttribute = "data-mzt-section-start";
+    const sectionShiftProperty = "--mzt-section-shift";
+    const sectionTotalProperty = "--mzt-section-shift-total";
     const rowIDPrefix = "collection-tree-row-";
     const windows = new Map();
     const subscribers = new Set();
@@ -49,12 +52,22 @@
     }
     function markCollectionSections(win) {
       const view = win.ZoteroPane?.collectionsView;
-      if (!view) return;
-      const type = index => view.getRow(index)?.type;
+      const tree = win.document.getElementById?.("zotero-collections-tree");
+      if (!view || !tree) return;
+      const builtIn = index => builtInRowTypes.has(view.getRow(index)?.type);
+      // shifts[i]: section starts at or before row i
+      const shifts = [];
+      for (let i = 0, shift = 0; i < view.rowCount; i++) {
+        if (i > 0 && builtIn(i) && !builtIn(i - 1)) shift++;
+        shifts.push(shift);
+      }
+      tree.style.setProperty(sectionTotalProperty, shifts.length ? shifts[shifts.length - 1] : 0);
       for (const row of collectionRows(win)) {
         const index = Number(row.id.slice(rowIDPrefix.length));
-        row.toggleAttribute(sectionStartAttribute,
-          index > 0 && builtInRowTypes.has(type(index)) && !builtInRowTypes.has(type(index - 1)));
+        const shift = shifts[index] ?? 0;
+        row.toggleAttribute(sectionStartAttribute, index > 0 && shift > shifts[index - 1]);
+        if (shift) row.style.setProperty(sectionShiftProperty, shift);
+        else row.style.removeProperty(sectionShiftProperty);
       }
     }
     function attach(win) {
@@ -89,7 +102,11 @@
       state.media.removeEventListener("change", update);
       win.removeEventListener("unload", state.unload);
       state.sections.disconnect();
-      for (const row of collectionRows(win)) row.removeAttribute(sectionStartAttribute);
+      for (const row of collectionRows(win)) {
+        row.removeAttribute(sectionStartAttribute);
+        row.style.removeProperty(sectionShiftProperty);
+      }
+      win.document.getElementById?.("zotero-collections-tree")?.style.removeProperty(sectionTotalProperty);
       for (const link of state.links) link.remove();
       state.tokens.remove();
       const root = win.document.documentElement;

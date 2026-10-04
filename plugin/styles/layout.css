@@ -176,13 +176,27 @@
   :root[data-mzt-layout="modern"] #zotero-collections-tree .virtualized-table:focus-within .row.selected .cell-indent {
     background-image: none;
   }
-  /* Each library splits into the user's folders and the built-in views (saved searches through Trash);
-     runtime.js marks the first built-in row. */
-  :root[data-mzt-layout="modern"] #zotero-collections-tree .row[data-mzt-section-start] {
-    background-image: linear-gradient(var(--mzt-guide), var(--mzt-guide));
-    background-position: center top;
-    background-size: calc(100% - 16px) 1px;
-    background-repeat: no-repeat;
+  /* Each library splits into the user's folders and the built-in views (saved searches through Trash).
+     runtime.js gives every row the number of section starts at or before it (--mzt-section-shift);
+     rows move down by that many gaps, the divider sits centered in the gap above the first built-in
+     row, and the scroll area grows by the total so the last rows stay reachable. */
+  :root[data-mzt-layout="modern"] #zotero-collections-tree {
+    --mzt-section-gap: 12px;
+  }
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .row {
+    translate: 0 calc(var(--mzt-section-shift, 0) * var(--mzt-section-gap));
+  }
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .row[data-mzt-section-start]::before {
+    content: "";
+    position: absolute;
+    inset-inline: 8px;
+    top: calc(var(--mzt-section-gap) / -2);
+    height: 1px;
+    background: var(--mzt-guide);
+    pointer-events: none;
+  }
+  :root[data-mzt-layout="modern"] #zotero-collections-tree .virtualized-table-body > * {
+    margin-block-end: calc(var(--mzt-section-shift-total, 0) * var(--mzt-section-gap));
   }
   /* Zotero's blank separator row before groups and feeds becomes a hairline. It carries no marker
      besides its fixed 8px height (collectionTree.jsx _separatorHeight). */
