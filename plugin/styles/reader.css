@@ -12,8 +12,20 @@
     --color-focus-border: var(--mzt-accent);
     --mzt-radius: 7px;
     --mzt-radius-small: 5px;
-    /* Sidebar lists scroll inside this document, which never sets scrollbar colors (the main window does). */
-    scrollbar-color: var(--color-scrollbar) var(--color-scrollbar-background);
+    /* Sidebar lists scroll inside this document, which never sets scrollbar colors. The thumb is the text
+       color at partial strength rather than the border color, which nearly vanishes on tinted surfaces;
+       Gecko darkens it further on hover and drag. */
+    --mzt-scrollbar-thumb: color-mix(in srgb, var(--mzt-text) 55%, transparent);
+    scrollbar-color: var(--mzt-scrollbar-thumb) transparent;
+  }
+  /* The page views (PDF, EPUB, snapshot) take their light/dark preference from the frame element's
+     color-scheme. Pin it to Zotero's own appearance, so Zotero picks the light or dark reading theme as it
+     would without the plugin: switching between a light and a dark plugin theme leaves the page alone. */
+  :root[data-mzt-zotero-scheme="light"] #split-view iframe {
+    color-scheme: light;
+  }
+  :root[data-mzt-zotero-scheme="dark"] #split-view iframe {
+    color-scheme: dark;
   }
   /* Hard-coded grays and blues in the reader's own sheet that ignore the color scheme. */
   :root[data-mzt-theme] .toolbar {

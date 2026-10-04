@@ -5,7 +5,7 @@
     // per-startup query the old CSS stays in effect until Zotero restarts.
     const assetQuery = `?v=${encodeURIComponent(version || "dev")}.${Date.now()}`;
     const prefix = "extensions.modernZoteroThemes.";
-    const defaults = { mode: "system", theme: "modern-light", lightTheme: "modern-light", darkTheme: "modern-dark", layout: "modern", emptyFields: "hide", folderIcons: "color", pageTheme: "follow" };
+    const defaults = { mode: "system", theme: "modern-light", lightTheme: "modern-light", darkTheme: "modern-dark", layout: "modern", emptyFields: "hide", folderIcons: "color", pageTheme: "zotero" };
     const layouts = ["modern", "classic"];
     const emptyFieldModes = ["hide", "show"];
     const folderIconModes = ["color", "mono"];
@@ -18,7 +18,8 @@
     const iconsPref = prefix + "collectionIcons";
     const libraryKeyPattern = /^\d+\/[23456789ABCDEFGHIJKLMNPQRSTUVWXYZ]{8}$/;
     const menuItemID = "mzt-set-collection-icon";
-    const rootAttributes = ["data-mzt-theme", "data-mzt-layout", "data-mzt-empty-fields", "data-mzt-folder-icons"];
+    const rootAttributes = ["data-mzt-theme", "data-mzt-layout", "data-mzt-empty-fields", "data-mzt-folder-icons",
+      "data-mzt-zotero-scheme"];
     // Zotero's General → Appearance setting (Zotero 7–10).
     const appearancePref = "browser.theme.toolbar-theme";
     const appearances = { dark: 0, light: 1, auto: 2 };
@@ -38,7 +39,9 @@
       "resource://zotero/reader/reader.html": { kind: "reader", file: "styles/reader.css" },
       "resource://zotero/reader/pdf/web/viewer.html": { kind: "viewer", file: "styles/viewer.css" }
     };
-    const frameAttributes = ["data-mzt-theme", "data-mzt-layout"];
+    // data-mzt-zotero-scheme is Zotero's own light/dark appearance (the main window's prefers-color-scheme,
+    // which the plugin's color-scheme doesn't change), not the plugin theme's mode.
+    const frameAttributes = ["data-mzt-theme", "data-mzt-layout", "data-mzt-zotero-scheme"];
     const frameCSS = new Map();
     const windows = new Map();
     const subscribers = new Set();
@@ -58,6 +61,7 @@
         state.iconStyles.textContent = collectionIcons.css(theme.mode);
         win.document.documentElement.setAttribute("data-mzt-theme", theme.id);
         win.document.documentElement.setAttribute("data-mzt-layout", layout);
+        win.document.documentElement.setAttribute("data-mzt-zotero-scheme", state.media.matches ? "dark" : "light");
         win.document.documentElement.setAttribute("data-mzt-empty-fields",
           emptyFieldModes.includes(config.emptyFields) ? config.emptyFields : defaults.emptyFields);
         win.document.documentElement.setAttribute("data-mzt-folder-icons",
@@ -173,11 +177,13 @@
         Ci.nsILoadInfo.SEC_ALLOW_CROSS_ORIGIN_SEC_CONTEXT_IS_NULL, Ci.nsIContentPolicy.TYPE_OTHER);
       return Zotero.File.getContentsAsync(channel, "UTF-8");
     }
-    // undefined leaves the page to Zotero's reader setting; null is Zotero's unthemed page.
+    // undefined leaves the page to Zotero's reader setting (the default, also for unknown stored values);
+    // null is Zotero's unthemed page.
     function pageFor(config, theme) {
-      if (config.pageTheme === "zotero") return undefined;
       if (config.pageTheme === "original") return null;
-      return themes.readerTheme(themes.themes.find(t => t.id === config.pageTheme) || theme);
+      if (config.pageTheme === "follow") return themes.readerTheme(theme);
+      const fixed = themes.themes.find(t => t.id === config.pageTheme);
+      return fixed ? themes.readerTheme(fixed) : undefined;
     }
     function paintFrame(win, frameDoc) {
       const state = windows.get(win);
@@ -186,7 +192,10 @@
       try {
         frame.tokens.textContent = state.tokens.textContent;
         const source = win.document.documentElement;
-        for (const name of frameAttributes) frameDoc.documentElement.setAttribute(name, source.getAttribute(name));
+        const values = { "data-mzt-theme": source.getAttribute("data-mzt-theme"),
+          "data-mzt-layout": source.getAttribute("data-mzt-layout"),
+          "data-mzt-zotero-scheme": state.media.matches ? "dark" : "light" };
+        for (const name of frameAttributes) frameDoc.documentElement.setAttribute(name, values[name]);
       }
       catch (error) {
         // The tab closed without an unload reaching us; the document is gone.

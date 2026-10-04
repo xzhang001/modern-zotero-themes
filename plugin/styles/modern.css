@@ -26,6 +26,17 @@
     border-color: var(--mzt-border);
   }
 
+  /* Reader tabs decide between Zotero's light and dark reading theme from their own prefers-color-scheme,
+     which comes from this element's color-scheme. Pin it to Zotero's appearance (the plugin theme's
+     color-scheme would otherwise flip the page when switching between a light and a dark theme); the
+     reader UI still takes the plugin palette from the tokens injected into it. */
+  :root[data-mzt-zotero-scheme="light"] browser.reader {
+    color-scheme: light;
+  }
+  :root[data-mzt-zotero-scheme="dark"] browser.reader {
+    color-scheme: dark;
+  }
+
   /* Preserve native icon masks, disabled handling, hit targets and drag behavior. */
   :root[data-mzt-theme] #zotero-pane :is(toolbarbutton, .toolbar-button) {
     border-radius: var(--mzt-radius-small);

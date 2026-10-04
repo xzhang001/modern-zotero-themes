@@ -194,7 +194,8 @@ window.MZTPreferences = {
       followSwatch.style.setProperty("--mzt-page-bg", activeTheme.page.background);
       followSwatch.style.setProperty("--mzt-page-fg", activeTheme.page.foreground);
       followTile.querySelector(".mzt-theme-meta").textContent = activeTheme.name;
-      const pageChoice = Array.from(pageOptions.children).find(t => t.dataset.value === settings.pageTheme) || followTile;
+      const pageChoice = Array.from(pageOptions.children).find(t => t.dataset.value === settings.pageTheme)
+        || pageOptions.querySelector('[data-value="zotero"]');
       for (const tile of pageOptions.children) {
         tile.setAttribute("aria-checked", String(tile === pageChoice));
         tile.tabIndex = tile === pageChoice ? 0 : -1;

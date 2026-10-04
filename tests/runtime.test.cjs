@@ -360,6 +360,9 @@ test('reader tabs get the reader sheet and theme tokens, follow settings, and ar
   assert.match(early.head.children[0].textContent, /--mzt-accent: #6554c0/);
   assert.equal(early.attributes.get('data-mzt-theme'), 'modern-light');
   assert.equal(early.attributes.get('data-mzt-layout'), 'modern');
+  // Zotero's own appearance, which reader page views are pinned to, not the plugin theme's mode.
+  assert.equal(early.attributes.get('data-mzt-zotero-scheme'), 'light');
+  assert.equal(win.attributes.get('data-mzt-zotero-scheme'), 'light');
 
   const opened = fakeReaderDocument();
   win.events.get('DOMContentLoaded')({ target: opened });
@@ -377,6 +380,7 @@ test('reader tabs get the reader sheet and theme tokens, follow settings, and ar
   api.set('theme', 'modern-dark'); api.set('mode', 'fixed'); api.set('layout', 'classic');
   for (const doc of [early, opened]) {
     assert.equal(doc.attributes.get('data-mzt-theme'), 'modern-dark');
+    assert.equal(doc.attributes.get('data-mzt-zotero-scheme'), 'light');
     assert.equal(doc.attributes.get('data-mzt-layout'), 'classic');
     assert.match(doc.head.children[0].textContent, /color-scheme: dark/);
   }
@@ -408,7 +412,7 @@ test('a reader sheet that fails to load leaves reader tabs alone but the plugin 
   assert.equal(errors.length, 2);
   s.runtime.stop();
 });
-test('reading page follows the theme, can be fixed or original, and hands back to Zotero', async () => {
+test('reading page is Zotero\'s by default and can follow the theme, be fixed or original', async () => {
   const win = fakeWindow();
   const s = setup([win]); await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
   const doc = fakeReaderDocument();
@@ -416,6 +420,12 @@ test('reading page follows the theme, can be fixed or original, and hands back t
   s.Zotero.Reader._readers.push(reader);
   win.events.get('DOMContentLoaded')({ target: doc });
   await settle();
+  // By default theme changes leave the page alone.
+  assert.equal(api.settings().pageTheme, 'zotero');
+  api.set('theme', 'catppuccin-frappe'); api.set('mode', 'fixed'); await settle();
+  assert.deepEqual(reader.calls, []);
+  api.set('theme', 'modern-light');
+  api.set('pageTheme', 'follow'); await settle();
   const page = { id: 'mzt-modern-light', label: 'Modern Light', background: '#ffffff', foreground: '#24252b' };
   assert.deepEqual(reader.internal._state.lightTheme, page);
   assert.deepEqual(reader.internal._state.darkTheme, page);
@@ -425,7 +435,7 @@ test('reading page follows the theme, can be fixed or original, and hands back t
   api.set('layout', 'classic'); await settle();
   assert.equal(updates(), 1);
 
-  api.set('theme', 'catppuccin-latte'); api.set('mode', 'fixed'); await settle();
+  api.set('theme', 'catppuccin-latte'); await settle();
   assert.equal(reader.internal._state.lightTheme.id, 'mzt-catppuccin-latte');
   api.set('pageTheme', 'catppuccin-frappe'); await settle();
   assert.deepEqual(reader.internal._state.darkTheme,
@@ -440,11 +450,17 @@ test('reading page follows the theme, can be fixed or original, and hands back t
   assert.equal(reader.internal._state.darkTheme.id, 'dark');
 
   for (const value of ['sepia', '', '__proto__']) assert.throws(() => api.set('pageTheme', value));
+  // A stored value this version doesn't know (e.g. a removed theme) also leaves the page to Zotero.
+  api.set('pageTheme', 'original'); await settle();
+  s.prefs.set('extensions.modernZoteroThemes.pageTheme', 'removed-theme');
+  api.set('layout', 'modern'); await settle();
+  assert.deepEqual(reader.calls.slice(-2), [['light', false], ['dark', 'dark']]);
   s.runtime.stop();
 });
 test('disabling restores Zotero\'s reading page; closed tabs and readers without themes are skipped', async () => {
   const win = fakeWindow();
   const s = setup([win]); await s.runtime.start();
+  s.Zotero.ModernZoteroThemes.set('pageTheme', 'follow');
   const open = fakeReaderDocument(), closed = fakeReaderDocument(), legacy = fakeReaderDocument();
   const openReader = fakeReaderInstance(open), closedReader = fakeReaderInstance(closed), legacyReader = fakeReaderInstance(legacy);
   // Zotero 7.0 has no reading themes.
