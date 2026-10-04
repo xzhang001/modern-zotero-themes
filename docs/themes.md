@@ -6,7 +6,7 @@
 
 `plugin/styles/layout.css` 是可切换的“现代”界面层，以 `:root[data-mzt-layout="modern"]` 为作用域：框架（标题栏、标签栏、左侧栏）统一为 `--mzt-canvas`，文献列表和详情面板各为一张卡片，卡片边框按底色加深（`--mzt-card-border`）以保证在低对比显示器上可见；另含标签页、搜索框、表头和详情面板的排版。经典模式不加载这一层的效果。它只调整非虚拟列表区域的外边距和对齐；聚焦选中行保留实色底，因为 Zotero 在那里把原生图标换成白色版本。
 
-主题不是单纯 Light/Dark 开关：Latte 是浅色主题，Frappé 是深色主题，未来的 Mocha、Dracula 也可以作为独立主题加入。自动模式分别保存 `lightTheme` 和 `darkTheme`，固定模式保存 `theme`。
+主题不是单纯 Light/Dark 开关：Latte、Paper、Solarized Light 是浅色主题，Frappé、Nord 是深色主题，未来的 Mocha、Dracula 也可以作为独立主题加入。自动模式分别保存 `lightTheme` 和 `darkTheme`，固定模式保存 `theme`。
 
 ## 新增主题
 
@@ -22,7 +22,7 @@
 | error / errorBackground | 验证失败状态 |
 | shadow | 微弱投影 |
 
-普通正文、辅助说明、选中态和强调色文字对比度至少 4.5:1，由测试检查。subtle 仅用于弱装饰/禁用信息，不作为重要正文颜色。
+普通正文、辅助说明、选中态和强调色文字对比度至少 4.5:1，由测试检查。移植外部色板时，原色达不到要求就加深或提亮，并在主题定义旁注明（例如 Solarized 的正文色 base00 在 base3 上不足 4.5:1，改用 base02）。subtle 仅用于弱装饰/禁用信息，不作为重要正文颜色。
 
 Zotero 的部分选中图标直接使用白色 SVG，因此首版使用足够深的聚焦选中底色；不能仅把它换成浅粉紫而忽略图标。颜色标签和批注变量保持原值。
 

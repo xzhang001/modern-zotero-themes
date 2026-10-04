@@ -48,6 +48,43 @@
         error: "#e78284", errorBackground: "#3b3040", shadow: "#00000040"
       },
       page: { background: "#303446", foreground: "#c6d0f5" }
+    },
+    {
+      // Warm paper for long reading sessions; the page is a shade deeper than the cards so it reads as a sheet.
+      id: "paper", name: "Paper", mode: "light", author: "Modern Zotero Themes",
+      colors: {
+        background: "#fbf7ef", sidebar: "#f2ebdd", toolbar: "#f7f1e5", elevated: "#fffcf6",
+        text: "#3b2f25", muted: "#6b5a49", subtle: "#857261", border: "#e5dac7",
+        hover: "#eee5d4", selected: "#9a5b2e", selectedText: "#ffffff",
+        inactiveSelected: "#e9dfcc", accent: "#9a5b2e", onAccent: "#ffffff",
+        error: "#b3261e", errorBackground: "#fbe9e4", shadow: "#3b2f2514"
+      },
+      page: { background: "#f6efe1", foreground: "#3b2f25" }
+    },
+    {
+      // Solarized's body tone (base00) is under 4.5:1 on base3, so text uses base02 and muted a darkened base01;
+      // blue is deepened for white selected text and icons.
+      id: "solarized-light", name: "Solarized Light", mode: "light", author: "Ethan Schoonover",
+      colors: {
+        background: "#fdf6e3", sidebar: "#eee8d5", toolbar: "#f5efdc", elevated: "#fdf6e3",
+        text: "#073642", muted: "#4f6369", subtle: "#6c7f84", border: "#e0d9c3",
+        hover: "#e9e2cc", selected: "#1f6fa8", selectedText: "#ffffff",
+        inactiveSelected: "#e6dfc8", accent: "#1f6fa8", onAccent: "#ffffff",
+        error: "#b8261f", errorBackground: "#f9e6d8", shadow: "#586e7514"
+      },
+      page: { background: "#fdf6e3", foreground: "#3b4f55" }
+    },
+    {
+      // Polar Night surfaces with Frost accents; selection is a deepened nord10, error a lightened nord11.
+      id: "nord", name: "Nord", mode: "dark", author: "Arctic Ice Studio",
+      colors: {
+        background: "#2e3440", sidebar: "#2a2f3a", toolbar: "#2a2f3a", elevated: "#3b4252",
+        text: "#eceff4", muted: "#b9c1ce", subtle: "#949eb0", border: "#3b4252",
+        hover: "#353b48", selected: "#4c6a92", selectedText: "#ffffff",
+        inactiveSelected: "#3b4252", accent: "#88c0d0", onAccent: "#2e3440",
+        error: "#e0868e", errorBackground: "#3e2d34", shadow: "#00000040"
+      },
+      page: { background: "#2e3440", foreground: "#d8dee9" }
     }
   ];
   const required = Object.keys(themes[0].colors);

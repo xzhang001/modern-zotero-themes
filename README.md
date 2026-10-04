@@ -2,11 +2,11 @@
 
 面向 Zotero 的现代视觉主题插件，保留原有三栏、工具位置和文献管理操作。
 
-**当前为 0.11.2 开发预览版。** 已按 Zotero 7.0、8.0、9.0、10.0.5 源码检查接口，主要开发目标为 10.0.5；尚未完成 Windows/macOS 原生客户端验收。安装版本范围是测试入口，不等于已验证全部版本兼容。
+**当前为 0.12.0 开发预览版。** 已按 Zotero 7.0、8.0、9.0、10.0.5 源码检查接口，主要开发目标为 10.0.5；尚未完成 Windows/macOS 原生客户端验收。安装版本范围是测试入口，不等于已验证全部版本兼容。
 
 ## 已实现
 
-- Modern Light、Modern Dark、Catppuccin Latte（浅色）、Catppuccin Frappé（深色）。
+- Modern Light、Modern Dark、Catppuccin Latte（浅色）、Catppuccin Frappé（深色）、Paper（暖色纸张，浅色）、Solarized Light（浅色）、Nord（深色）。
 - 统一工具按钮、搜索框、选中态、列表表头、详情分组、标签页的视觉样式。
 - 现代界面风格（默认）：标题栏、标签栏和左侧栏连成同一块深一档的底色；文献列表和详情面板是浮在上面的两张圆角卡片，中间的空隙即可拖动的分隔条；胶囊标签页、填充式搜索框；列表中作者等次要列文字变淡；详情面板加大留白与行距，字段标签左对齐，分区图标单色。可在设置中切换为“经典（仅换色）”。
 - 左侧分类树（现代风格）：文库名和“群组文库/订阅”显示为小号大写的分区标题；群组文库名加粗；每个文库内，自己的文件夹与已保存搜索、我的出版物、重复条目、未分类、回收站之间留出间距并以细线分组；有子文件夹的顶层文件夹加粗；每层嵌套有缩进竖线；“最近阅读”、重复条目、未分类、回收站等系统项变淡；群组和订阅前的分隔显示为细线。文件夹图标可在设置中改为单色。
@@ -27,7 +27,7 @@ Zotero 原生图标和设置窗口跟随 Zotero 自身的外观设置（设置 �
 
 ## 安装
 
-1. 下载/复制 `dist/modern-zotero-themes-0.11.2.xpi`。
+1. 下载/复制 `dist/modern-zotero-themes-0.12.0.xpi`。
 2. Zotero → 工具 → 插件，选择“从文件安装插件”，打开 XPI。
 3. 打开 Zotero 设置 → **Modern Themes**，选择主题卡片，或配置跟随系统的主题组合。
 4. 若要恢复原样，在插件管理器中停用 Modern Zotero Themes。
@@ -56,4 +56,4 @@ npm run preview
 
 ## 来源
 
-文件夹图标来自 [Lucide](https://lucide.dev)（ISC 许可）。Catppuccin Latte 与 Frappé 使用 [Catppuccin 官方色板](https://catppuccin.com/palette/)，选中/错误等交互状态为本插件映射；许可包含在 [THIRD_PARTY_NOTICES.md](plugin/THIRD_PARTY_NOTICES.md)。插件并非 Zotero 或 Catppuccin 官方发布。
+文件夹图标来自 [Lucide](https://lucide.dev)（ISC 许可）。Catppuccin Latte 与 Frappé 使用 [Catppuccin 官方色板](https://catppuccin.com/palette/)，Solarized Light 使用 [Solarized](https://ethanschoonover.com/solarized/) 色板，Nord 使用 [Nord](https://www.nordtheme.com/) 色板；选中/错误等交互状态为本插件映射，Solarized 正文和 Nord 选中/错误色为满足对比度要求加深或提亮；许可包含在 [THIRD_PARTY_NOTICES.md](plugin/THIRD_PARTY_NOTICES.md)。插件并非 Zotero、Catppuccin、Solarized 或 Nord 官方发布。
