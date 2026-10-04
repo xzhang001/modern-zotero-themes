@@ -1,47 +1,49 @@
 # Modern Zotero Themes
 
-面向 Zotero 的现代视觉主题插件，保留原有三栏、工具位置和文献管理操作。
+**English** | [简体中文](README.zh-CN.md)
 
-**当前为 0.14.0 开发预览版。** 已按 Zotero 7.0、8.0、9.0、10.0.5 源码检查接口，主要开发目标为 10.0.5；尚未完成 Windows/macOS 原生客户端验收。安装版本范围是测试入口，不等于已验证全部版本兼容。
+A modern visual theme plugin for Zotero that keeps Zotero's three panes, toolbar positions and library workflow exactly where they are.
 
-## 已实现
+**This is a 0.14.0 development preview.** Its interfaces have been checked against the Zotero 7.0, 8.0, 9.0 and 10.0.5 sources, with 10.0.5 as the main development target; native acceptance testing on Windows and macOS is not finished yet. The installable version range is an entry point for testing, not a claim of verified compatibility with every version.
 
-- Modern Light、Modern Dark、Catppuccin Latte（浅色）、Catppuccin Frappé（深色）、Paper（暖色纸张，浅色）、Solarized Light（浅色）、Nord（深色）。
-- 统一工具按钮、搜索框、选中态、列表表头、详情分组、标签页的视觉样式。
-- 现代界面风格（默认）：标题栏、标签栏和左侧栏连成同一块深一档的底色；文献列表和详情面板是浮在上面的两张圆角卡片，中间的空隙即可拖动的分隔条；胶囊标签页、填充式搜索框；列表中作者等次要列文字变淡；详情面板加大留白与行距，字段标签左对齐，分区图标单色。可在设置中切换为“经典（仅换色）”。
-- 左侧分类树（现代风格）：文库名和“群组文库/订阅”显示为小号大写的分区标题；群组文库名加粗；每个文库内，自己的文件夹与已保存搜索、我的出版物、重复条目、未分类、回收站之间留出间距并以细线分组；有子文件夹的顶层文件夹加粗；每层嵌套有缩进竖线；“最近阅读”、重复条目、未分类、回收站等系统项变淡；群组和订阅前的分隔显示为细线。文件夹图标可在设置中改为单色。
-- 自定义文件夹图标：在文件夹上右键 →“设置图标…”（位于菜单末尾），从 105 个分组的线条图标（阅读与写作、科研、数据与技术、人与地点、状态与标记，可选 16 种颜色）或任意 emoji 中选择，点击即时生效，可恢复默认。只保存在本机的 Zotero 配置中，不修改文件夹名或文库数据，也不会同步到其他设备。
-- 阅读界面（打开 PDF/EPUB 的标签页）：工具栏、左侧缩略图/批注/大纲栏、批注卡片、查找和外观弹窗使用当前主题配色，选中与激活状态改用主题强调色。现代风格下阅读器与右侧条目信息栏是两张圆角卡片，信息栏与主界面详情面板的排版一致（字段标签左对齐、空字段隐藏）；工具栏图标默认单色，批注工具收进一个分段控件、当前工具浮起显示；侧栏视图切换为分段控件；大纲字号加大、整行圆角悬停，当前章节以强调色底标出，子章节变淡并带缩进竖线；缩略图和批注卡片带细边框与柔和阴影。批注颜色不改动。
-- 阅读页面：每个主题配有一套阅读页（页面底色与文字颜色，例如 Latte 为 `#eff1f5` 底、`#4c4f69` 字），默认为“Zotero 设置”（页面颜色仍由阅读器 Aa 菜单决定，换主题不影响页面）；可在设置中改为“跟随主题”、任一主题的阅读页，或“原始”（PDF 本来的颜色）。页面颜色通过 Zotero 阅读器自身的阅读主题机制重绘，图片与批注高亮按 Zotero 的方式处理。插件只改当前打开的阅读器，不写入 Zotero 的阅读主题设置或会同步的自定义主题；在 Aa 菜单里临时换主题，下次打开文献或更改此设置时恢复为插件的选择；停用插件后恢复 Zotero 自己的设置。
-- 阅读进度条（PDF）：PDF 栏顶部一条 2px 的强调色细线，按滚动位置实时显示读到哪里（缩放、目录跳转、拖动滚动条都会更新），分屏时两个视图各一条；悬停变粗并显示“第 12 / 22 页 · 54%”，点击或拖动可跳转。EPUB 使用 Zotero 自带的进度条。可在设置 → 界面中关闭，默认显示。
-- 页面周围：Zotero 写死的灰色背景改为主题色（现代风格为画布色，经典风格为侧栏色），页面带主题色细边和阴影（现代风格另有小圆角与浮起阴影），PDF 滚动条使用主题色；页面尺寸、页距和缩放计算不变。
-- 笔记编辑器：主界面右侧和阅读器右侧栏中的笔记编辑区、工具栏和格式菜单使用当前主题配色，正文、链接、引用竖线、表格线、公式源码和滚动条换成主题色。只改颜色，字号与排版不变；不改动笔记内容，笔记里设置的文字颜色、背景色和批注高亮色保持原样。
-- 空字段（现代风格）：默认隐藏没有内容的字段，点进信息区任意字段编辑时全部显示；可在设置中改为始终显示。
-- 设置页：主题卡片带界面缩略图；“阅读页面”以小页面色块选择；“固定 / 跟随系统”分段切换，跟随系统时直接点卡片分别指定浅色和深色主题；界面选项为分组列表，均用分段按钮而非下拉菜单。
-- 设置即时保存，应用到已打开及新打开的主窗口。
-- 禁用时移除样式、监听器和设置入口；重新启用时保留用户主题选择。
-- 尊重减少动态效果和系统强制颜色模式。
+## Features
 
-不修改条目数据、标签与批注颜色，不改变虚拟列表的行高、列宽或单元格内边距；列表行距沿用 Zotero 自身的界面密度设置（视图 → 密度）。覆盖主窗口及其中的阅读器标签页（含页面底色）和笔记编辑器；独立阅读窗口（在新窗口中打开 PDF）、独立笔记窗口（在新窗口中编辑笔记）及系统弹窗不覆盖。
+- Themes: Modern Light, Modern Dark, Catppuccin Latte (light), Catppuccin Frappé (dark), Paper (warm paper tones, light), Solarized Light (light) and Nord (dark).
+- A consistent look for toolbar buttons, the search field, selection, list headers, item pane sections and tabs.
+- Modern layout (default): the title bar, tab bar and left pane share one slightly deeper canvas; the item list and the item pane float on it as two rounded cards, and the gap between them is the draggable splitter. Pill-shaped tabs, a filled search field, dimmed secondary columns such as Creator, and a roomier item pane with left-aligned field labels and monochrome section icons. Switch to "Classic" (colors only) in the settings.
+- Collection tree (modern layout): library names and "Group Libraries" / "Feeds" become small uppercase section headings, and group library names are bold. Within each library, your own collections are set apart from saved searches, My Publications, Duplicate Items, Unfiled Items and Trash by a gap and a hairline. Top-level collections with subcollections are bold, every nesting level gets an indent guide, built-in rows such as Recently Read, Duplicate Items, Unfiled Items and Trash are dimmed, and the separators before groups and feeds are hairlines. Folder icons can be made monochrome in the settings.
+- Custom collection icons: right-click a collection → "Set Icon…" (at the end of the menu) and pick from 105 line icons in groups (Reading & writing, Science, Data & tech, People & places, Status & marks; 16 colors) or any emoji. Changes apply instantly and can be reset to the default. Icons are stored only in this computer's Zotero settings: collection names and library data are not changed, and icons do not sync to other devices.
+- Reader (PDF/EPUB tabs): the toolbar, the thumbnails / annotations / outline sidebar, annotation cards, and the find and appearance popups use the current theme, with selected and active states in the theme's accent color. In the modern layout the reader and the item pane beside it are two rounded cards, and that item pane is laid out like the main window's (left-aligned field labels, empty fields hidden). Toolbar icons are monochrome by default; the annotation tools sit in one segmented control with the current tool raised; the sidebar views switch with a segmented control; the outline gets larger text, full-row rounded hover, the current section highlighted in the accent color, and dimmed subsections with indent guides; thumbnails and annotation cards get a thin border and a soft shadow. Annotation colors are never changed.
+- Reading page: every theme comes with a reading page (page background and text color; Latte, for example, uses `#eff1f5` with `#4c4f69` text). The default is "Zotero setting": page colors stay with the reader's Aa menu, and switching themes leaves pages alone. In the settings you can choose "Follow theme", any theme's reading page, or "Original" (the PDF's own colors). Pages are redrawn through Zotero's own reading theme mechanism, which handles images and annotation highlights its usual way. The plugin only changes the open readers: it never writes Zotero's reading theme settings or its synced custom themes. A theme picked in the Aa menu lasts until you reopen the item or change this setting, and disabling the plugin restores Zotero's own setting.
+- Reading progress bar (PDF): a 2px accent line along the top of the PDF view shows how far you have read, following the scroll position live (zooming, outline jumps and scrollbar drags all update it), with one line per view in split view. Hover to thicken it and see "Page 12 of 22 · 54%"; click or drag to jump. EPUB uses Zotero's built-in progress bar. On by default; turn it off in Settings → Interface.
+- Around the page: Zotero's hard-coded gray background becomes a theme color (the canvas in the modern layout, the sidebar color in the classic one), pages get a thin themed edge and shadow (plus small rounded corners and a lifted shadow in the modern layout), and PDF scrollbars use theme colors. Page size, page gaps and zoom calculations are unchanged.
+- Note editor: the note editing area, its toolbar and its format menus in the item pane and in the reader's side pane use the current theme, with body text, links, the quote bar, table lines, formula source and scrollbars in theme colors. Colors only: font sizes and layout stay the same, the note content is never modified, and text colors, background colors and annotation highlight colors set in a note keep their original colors.
+- Empty fields (modern layout): fields without a value are hidden by default and all of them appear as soon as you click into any field of the Info section to edit; you can choose to always show them in the settings.
+- Settings page: theme cards with interface thumbnails; reading pages picked from small page swatches; a "Fixed / Match system" segmented switch, where in "Match system" you click cards to pick the light and the dark theme separately; interface options as a grouped list, all with segmented buttons instead of dropdowns.
+- Settings save instantly and apply to open and newly opened main windows.
+- Disabling removes the styles, listeners and the settings page; re-enabling keeps your theme choices.
+- Respects reduced-motion and the system's forced-colors (high contrast) mode.
 
-Zotero 原生图标和设置窗口跟随 Zotero 自身的外观设置（设置 → 常规 → 外观），自动明暗模式也通过它判断深浅色。两者不一致时，设置面板会提示：固定主题与 Zotero 外观深浅不同，或选择跟随系统但 Zotero 外观不是“自动”。提示中的按钮可一键修改 Zotero 外观；插件不会自行修改。
+Item data, tags and annotation colors are never modified, and the virtualized lists keep their row heights, column widths and cell padding; list row spacing follows Zotero's own density setting (View → Density). The main window is covered, along with the reader tabs (including page colors) and the note editors in it. Separate reader windows (a PDF opened in a new window), separate note windows (a note edited in a separate window) and system dialogs are not.
 
-## 安装
+Zotero's native icons and its settings window follow Zotero's own appearance setting (Settings → General → Appearance), and automatic light/dark switching also reads it. When the two disagree, the settings page tells you: a fixed theme whose light/dark mode differs from Zotero's appearance, or "Match system" while Zotero's appearance is not "Automatic". The button in the notice changes Zotero's appearance in one click; the plugin never changes it on its own.
 
-1. 从 [Releases](https://github.com/xzhang001/modern-zotero-themes/releases) 下载最新的 `modern-zotero-themes-<版本>.xpi`。
-2. Zotero → 工具 → 插件，选择“从文件安装插件”，打开 XPI。
-3. 打开 Zotero 设置 → **Modern Themes**，选择主题卡片，或配置跟随系统的主题组合。
-4. 若要恢复原样，在插件管理器中停用 Modern Zotero Themes。
+## Installation
 
-之后的新版本由 Zotero 自动更新（约每天检查一次），也可在插件管理器的齿轮菜单中“检查更新”。
+1. Download the latest `modern-zotero-themes-<version>.xpi` from [Releases](https://github.com/xzhang001/modern-zotero-themes/releases).
+2. In Zotero, open Tools → Plugins, click the gear icon, choose "Install Plugin From File…" and select the XPI.
+3. Open Zotero Settings → **Modern Themes** and pick a theme card, or set up a light/dark pair that follows the system.
+4. To go back to Zotero's original look, disable Modern Zotero Themes in the plugin manager.
 
-**从 0.13.0 及更早版本升级**：0.14.0 起插件 ID 改为 `modern-zotero-themes@xzhang001.github.io`，旧版不会自动更新到新版。请先在插件管理器中移除旧版，再安装新版；主题选择、文件夹图标等设置保存在 Zotero 配置中，会保留。不移除旧版时，两个版本会同时运行。
+Zotero updates the plugin automatically from then on (it checks about once a day); you can also use "Check for Updates" in the plugin manager's gear menu.
 
-建议首次使用在独立测试配置中验收。原生检查项目见 [兼容性检查表](docs/compatibility.md)。
+**Upgrading from 0.13.0 or earlier**: starting with 0.14.0 the plugin ID is `modern-zotero-themes@xzhang001.github.io`, so older versions will not update to it automatically. Remove the old version in the plugin manager first, then install the new one. Your theme choice, collection icons and other settings live in Zotero's preferences and are kept. If the old version is not removed, both versions run at the same time.
 
-## 开发
+Trying it in a separate Zotero profile first is recommended. The native test items are listed in the [compatibility checklist](docs/compatibility.md).
 
-无 npm 第三方依赖；需要 Node.js 18+ 和 Python 3.10+。
+## Development
+
+No third-party npm dependencies; requires Node.js 18+ and Python 3.10+.
 
 ```sh
 npm test
@@ -49,27 +51,27 @@ npm run build
 npm run preview
 ```
 
-预览地址：`http://localhost:5173/preview/`。浏览器预览使用与插件相同的配色、组件样式、设置面板，但使用 HTML 模拟 Zotero 布局，仅供设计审阅，不能代替 Gecko/XUL 实测。
+The preview runs at `http://localhost:5173/preview/`. It uses the plugin's colors, component styles and settings page, but mocks Zotero's layout in HTML: it is for design review only and does not replace testing in Gecko/XUL.
 
-构建产物为可复现 ZIP 格式 XPI。仅 `plugin/` 内容和 `LICENSE` 进入安装包，预览及测试不会打包。
+The build output is a reproducible ZIP-format XPI. Only the contents of `plugin/` and `LICENSE` go into the package; the preview and the tests are not packaged.
 
-`npm run build` 同时把当前版本写入 `updates.json`（Zotero 从 `update_url` 读取的更新清单：下载地址、sha256、兼容版本），其他版本的条目保留。发布一个版本：
+`npm run build` also writes the current version into `updates.json` (the update manifest Zotero reads from `update_url`: download link, sha256 and compatible versions), keeping the entries for other versions. To release a version:
 
-1. 修改 `plugin/manifest.json` 与 `package.json` 中的版本号，运行 `npm test` 和 `npm run build`。
-2. 提交代码与 `updates.json`，打标签 `v<版本>`，先只推送标签（`git push origin v<版本>`）。
-3. 在 GitHub 上为该标签创建 Release，上传 `dist/modern-zotero-themes-<版本>.xpi`。XPI 可复现，同一提交构建出的文件与 `updates.json` 中的 sha256 一致。
-4. 推送 `main`。`update_url` 读取的是 `main` 上的 `updates.json`，推送后已安装的用户开始收到更新；放在最后，是为了不让清单指向尚未上传的 XPI。
+1. Bump the version in `plugin/manifest.json` and `package.json`, then run `npm test` and `npm run build`.
+2. Commit the code and `updates.json`, tag it `v<version>`, and push only the tag (`git push origin v<version>`).
+3. Create a GitHub release for the tag and upload `dist/modern-zotero-themes-<version>.xpi`. The XPI is reproducible, so a file built from the same commit matches the sha256 in `updates.json`.
+4. Push `main`. `update_url` reads `updates.json` on `main`, so installed copies start updating once it is pushed; this comes last so the manifest never points at an XPI that has not been uploaded yet.
 
-## 扩展主题
+## Adding themes
 
-主题定义在 `plugin/themes.js`，每个主题包含 `id`、`name`、`author`、`mode` 和语义颜色 `colors`。新增定义后，设置卡片和明暗下拉框会自动列出它。参见 [主题设计约定](docs/themes.md)。
+Themes are defined in `plugin/themes.js`. Each one has an `id`, `name`, `author`, `mode` and semantic `colors`. A new definition shows up automatically as a theme card and in the light/dark choices. See the [theme design conventions](docs/themes.md).
 
-当前主题定义随插件内置，不支持直接导入 VS Code 主题或外部执行脚本。配置文件导入是后续扩展点。
+Themes are currently built into the plugin; importing VS Code themes or running external scripts is not supported. Importing theme files is a possible future extension.
 
-## 许可
+## License
 
-[MIT](LICENSE)。第三方色板与图标的许可见下文。
+[MIT](LICENSE). Licenses for third-party palettes and icons are listed below.
 
-## 来源
+## Credits
 
-文件夹图标来自 [Lucide](https://lucide.dev)（ISC 许可）。Catppuccin Latte 与 Frappé 使用 [Catppuccin 官方色板](https://catppuccin.com/palette/)，Solarized Light 使用 [Solarized](https://ethanschoonover.com/solarized/) 色板，Nord 使用 [Nord](https://www.nordtheme.com/) 色板；选中/错误等交互状态为本插件映射，Solarized 正文和 Nord 选中/错误色为满足对比度要求加深或提亮；许可包含在 [THIRD_PARTY_NOTICES.md](plugin/THIRD_PARTY_NOTICES.md)。插件并非 Zotero、Catppuccin、Solarized 或 Nord 官方发布。
+Folder icons come from [Lucide](https://lucide.dev) (ISC license). Catppuccin Latte and Frappé use the [official Catppuccin palette](https://catppuccin.com/palette/), Solarized Light uses the [Solarized](https://ethanschoonover.com/solarized/) palette, and Nord uses the [Nord](https://www.nordtheme.com/) palette. Interaction states such as selection and errors are mapped by this plugin, and Solarized's body text and Nord's selection and error colors are darkened or lightened to meet the contrast requirements. The licenses are included in [THIRD_PARTY_NOTICES.md](plugin/THIRD_PARTY_NOTICES.md). This plugin is not an official release of Zotero, Catppuccin, Solarized or Nord.

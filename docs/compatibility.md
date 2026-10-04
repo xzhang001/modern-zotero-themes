@@ -1,42 +1,42 @@
-# 兼容性与验收记录
+# Compatibility and acceptance record
 
-## 当前证据
+## Current evidence
 
-开发基线：Zotero 10.0.5。目标平台：Windows、macOS。
+Development baseline: Zotero 10.0.5. Target platforms: Windows, macOS.
 
-| 项目 | 状态 |
+| Item | Status |
 | --- | --- |
-| 7.0 / 8.0 / 9.0 / 10.0.5 配色、主窗口、列表及插件源码检查 | 已完成 |
-| 主题解析、配色对比度、无效配置回退 | Node 自动检查 |
-| 启动/停用、新窗口、监听器清理、主题持久化 | 模拟 Zotero 接口检查 |
-| 浏览器三主题与实际设置面板交互 | 浏览器预览检查 |
-| Windows Zotero 10.0.5 | 待原生验收 |
-| macOS Zotero 10.0.5 | 待原生验收 |
-| Zotero 7 / 8 / 9 实际运行 | 待原生验收 |
+| Source review of colors, main window, lists and plugin APIs for 7.0 / 8.0 / 9.0 / 10.0.5 | Done |
+| Theme resolution, color contrast, fallback for invalid settings | Automated (Node) |
+| Startup/disable, new windows, listener cleanup, theme persistence | Checked against mocked Zotero APIs |
+| Three themes and real settings page interaction in the browser | Checked in the browser preview |
+| Windows, Zotero 10.0.5 | Native acceptance pending |
+| macOS, Zotero 10.0.5 | Native acceptance pending |
+| Zotero 7 / 8 / 9 at runtime | Native acceptance pending |
 
-manifest 的 7.0–10.0.* 表示开发预览版可安装范围，并非全版本兼容认证。发布稳定版前按下表记录具体小版本、平台和结果。
+The manifest's 7.0–10.0.* range is the installable range of the development preview, not a certification of compatibility with every version. Before a stable release, record the exact minor version, platform and result for the items below.
 
-## 原生验收
+## Native acceptance
 
-每个平台先使用 10.0.5 的独立配置，再对 7/8/9 的目标小版本重复检查。
+On each platform, start with a separate 10.0.5 profile, then repeat for the target minor versions of 7/8/9.
 
-1. 安装/禁用/启用/重启：样式应用一次，停用恢复原样，无残留设置入口。
-2. 设置面板三个主题即时切换；关闭重开后保留；自动模式在 Zotero 自身设为自动时跟随系统。打开面板不显示“已保存”；固定主题与 Zotero 外观深浅不同、或跟随系统但 Zotero 外观非自动时出现提示，点击按钮后 Zotero 外观改变、提示消失。
-3. 空字段隐藏时可通过点击任意字段显示全部字段并完成编辑，保存后有值的字段保留显示。对比主题启用前后列表行高、列宽、滚动位置和列头对齐不变；现代布局下内容卡片只缩进 8px，经典布局下面板尺寸与原生一致。堆叠布局、窄窗口下卡片和分隔线正常。
-4. 单选、多选、失焦选中、键盘焦点、拖放、匹配高亮、未读、禁用状态可辨认。
-5. 大型文献库滚动正常，无错位、跳行或明显性能下降。
-6. 左右侧栏折叠、拖动分隔条、堆叠布局、标签页拖动均正常。
-7. Zotero 10 多文献库选择和固定分组表头不透底、不错位。
-8. 详情字段编辑、搜索、原生图标、中文/英文、RTL、125%/150%/200% 缩放。
-9. 颜色标签、PDF 批注保留含义；其他插件的按钮及详情面板没有被破坏。
-10. 系统高对比模式和减少动态效果设置生效。
-11. 文件夹右键菜单中 Zotero 原生各项的名称、子菜单和功能与未安装插件时一致，“设置图标…”位于末尾且只在普通文件夹上显示；选择图标、颜色、emoji 后左侧栏即时更新，聚焦选中时图标为白色；“恢复默认图标”还原 Zotero 图标；停用插件后图标恢复原样。
-12. 打开 PDF 与 EPUB：阅读器工具栏（含批注工具分段控件与当前工具）、左侧栏三个视图（分段切换、大纲当前章节与展开折叠、缩略图选中页）、批注卡片（含选中态）、查找/外观/选区/批注弹窗使用主题配色；批注颜色与未安装插件时一致。现代风格下阅读器和右侧信息栏为两张卡片，拖动两者之间的分隔条、折叠信息栏、堆叠布局均正常；先打开 PDF 再启用插件、停用插件后，已打开的阅读标签页同步生效或恢复原样。
-13. 阅读页面：默认为“Zotero 设置”，切换主题时页面颜色不变；改为“跟随主题”后，切换主题、跟随系统明暗切换时页面颜色随之改变；设置页逐一选择各主题阅读页、“原始”和“Zotero 设置”，已打开的 PDF 与 EPUB 即时更新；选“Zotero 设置”或停用插件后恢复 Aa 菜单中的选择，且 Zotero 设置中的阅读主题与同步的自定义主题未被改动。页面周围背景、页面细边/阴影、PDF 滚动条随主题变化；适合宽度/适合页面缩放、跳转位置与未安装插件时一致；含图片的 PDF 图片显示正常。
-14. 阅读进度条：打开 PDF 时 PDF 栏顶部显示进度线，滚动、缩放、目录与批注跳转、拖动滚动条时实时更新；悬停显示页码与百分比，点击、拖动跳转到对应位置且页码框同步；分屏时两个视图各自显示；开关侧栏后与 PDF 栏对齐；横向滚动模式按横向位置计算；EPUB 不重复显示；设置中隐藏后即时移除，停用插件后移除。
-15. 笔记编辑器：主界面选中笔记、阅读器右侧栏打开笔记时，编辑区底色、正文、链接、引用竖线、表格线和工具栏、格式菜单、查找替换栏使用主题配色，切换主题即时更新；含公式、表格、图片、引文和“从批注添加笔记”生成的笔记显示正常，笔记中设置的文字颜色、背景色以及“显示批注颜色”后的高亮色与未安装插件时一致；编辑、撤销、拖入批注不受影响；先打开笔记再启用插件、停用插件后，已打开的笔记同步生效或恢复原样。
+1. Install / disable / enable / restart: styles are applied once, disabling restores the original look, and no settings entry is left behind.
+2. The settings page switches between the three themes instantly; the choice survives closing and reopening; automatic mode follows the system when Zotero itself is set to Automatic. Opening the page does not show "Saved". A notice appears when a fixed theme's light/dark mode differs from Zotero's appearance, or when matching the system while Zotero's appearance is not Automatic; clicking its button changes Zotero's appearance and the notice disappears.
+3. With empty fields hidden, clicking any field shows all fields and editing works; fields that have a value after saving stay visible. Compared with the plugin disabled, list row heights, column widths, scroll position and column header alignment are unchanged; in the modern layout the content cards are inset by only 8px, and in the classic layout pane sizes match native. Cards and splitters look right in the stacked layout and in narrow windows.
+4. Single selection, multiple selection, unfocused selection, keyboard focus, drag and drop, match highlighting, unread and disabled states are all distinguishable.
+5. Scrolling a large library works without misplaced rows, skipped rows or noticeable slowdowns.
+6. Collapsing the left and right panes, dragging splitters, the stacked layout and dragging tabs all work.
+7. In Zotero 10, multi-library selection and the sticky group headers are opaque and correctly placed.
+8. Item field editing, search, native icons, Chinese/English, RTL, and 125%/150%/200% scaling.
+9. Colored tags and PDF annotations keep their meaning; other plugins' buttons and item pane sections are not broken.
+10. The system's high contrast and reduced-motion settings take effect.
+11. In the collection context menu, Zotero's own items keep the same names, submenus and behavior as without the plugin; "Set Icon…" comes last and only appears on regular collections. Choosing an icon, color or emoji updates the collection tree instantly, and the icon turns white on a focused selection; "Restore default" brings back Zotero's icon; disabling the plugin restores the original icons.
+12. Open a PDF and an EPUB: the reader toolbar (including the annotation tool segmented control and the current tool), the three sidebar views (segmented switch, outline current section and expand/collapse, selected thumbnail), annotation cards (including the selected state), and the find / appearance / selection / annotation popups use theme colors; annotation colors are the same as without the plugin. In the modern layout the reader and the item pane are two cards, and dragging the splitter between them, collapsing the item pane and the stacked layout all work. Reader tabs opened before enabling the plugin pick up the theme, and disabling the plugin restores them.
+13. Reading page: the default is "Zotero setting", and switching themes leaves page colors unchanged. With "Follow theme", page colors change when switching themes and when the system switches between light and dark. Selecting each theme's reading page, "Original" and "Zotero setting" in the settings updates open PDFs and EPUBs instantly. Choosing "Zotero setting" or disabling the plugin restores the choice from the Aa menu, and the reading theme in Zotero's settings and the synced custom themes are untouched. The background around pages, the page edge/shadow and the PDF scrollbar follow the theme; fit-width/fit-page zoom and jump positions match the behavior without the plugin; images in PDFs display correctly.
+14. Reading progress bar: opening a PDF shows the progress line along the top of the PDF view, updating live on scroll, zoom, outline and annotation jumps and scrollbar drags. Hovering shows the page and percentage; clicking or dragging jumps to that position and the page number field follows. Each view in split view has its own line; it stays aligned with the PDF view when the sidebar opens or closes; horizontal scrolling mode measures the horizontal position; EPUB does not get a second bar. Hiding it in the settings removes it instantly, and disabling the plugin removes it.
+15. Note editor: when a note is selected in the main window or opened in the reader's side pane, the editing area background, body text, links, the quote bar, table lines, the toolbar, format menus and the find and replace bar use theme colors and update instantly when switching themes. Notes with formulas, tables, images, citations, and notes created with "Add Note from Annotations" display correctly; text colors and background colors set in a note, and highlight colors after "Show Annotation Colors", are the same as without the plugin. Editing, undo and dragging annotations in are unaffected. Notes opened before enabling the plugin pick up the theme, and disabling the plugin restores them.
 
-## 检查过的上游资料
+## Upstream references checked
 
 - https://www.zotero.org/support/dev/zotero_7_for_developers
 - https://www.zotero.org/support/dev/zotero_8_for_developers
@@ -46,4 +46,4 @@ manifest 的 7.0–10.0.* 表示开发预览版可安装范围，并非全版本
 - https://github.com/zotero/zotero/blob/10.0.5/chrome/content/zotero/xpcom/preferencePanes.js
 - https://github.com/zotero/zotero/blob/10.0.5/scss/components/_virtualized-table.scss
 
-7→8 的模块系统变化通过避免导入版本相关模块来减少影响；不调用条目/集合数据 API。8/9/10 同平台仍存在 DOM 与样式差异，不能只根据 Firefox 版本推断兼容。
+The 7→8 module system change is mitigated by not importing version-specific modules; no item or collection data APIs are called. DOM and style differences remain between 8, 9 and 10 on the same platform, so compatibility cannot be inferred from the Firefox version alone.

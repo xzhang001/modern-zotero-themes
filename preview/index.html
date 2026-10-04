@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -13,55 +13,55 @@
 <body>
   <header class="preview-header">
     <div class="brand"><span class="brand-mark">m<span>z</span></span><div><strong>Modern Zotero</strong><span class="preview-label">THEMES / DESIGN STUDY 01</span></div></div>
-    <div class="preview-controls"><label for="theme-picker">主题</label><select id="theme-picker"></select><button id="open-settings">主题设置 <span>↗</span></button></div>
+    <div class="preview-controls"><label for="theme-picker">Theme</label><select id="theme-picker"></select><button id="open-settings">Theme settings <span>↗</span></button></div>
   </header>
   <main class="app-shell">
     <div class="window-bar"><div class="traffic-lights" aria-hidden="true"><i></i><i></i><i></i></div><span>Zotero</span><span class="window-note">My Library</span></div>
-    <div id="tab-bar-container"><div class="tab selected">▤ <span>我的文献库</span></div><div class="tab">▧ <span>Attention Is All You Need</span><span class="tab-close">×</span></div><span class="tab-spacer"></span><span class="sync-status">✓ 已同步</span></div>
+    <div id="tab-bar-container"><div class="tab selected">▤ <span>My Library</span></div><div class="tab">▧ <span>Attention Is All You Need</span><span class="tab-close">×</span></div><span class="tab-spacer"></span><span class="sync-status">✓ Synced</span></div>
     <div id="zotero-pane">
       <div id="zotero-collections-pane">
-        <div class="zotero-toolbar"><button class="toolbar-button" title="新建分类">＋</button><span class="toolbar-spacer"></span><span class="library-heading">文献库</span><button class="toolbar-button" title="更多操作">···</button></div>
+        <div class="zotero-toolbar"><button class="toolbar-button" title="New Collection">＋</button><span class="toolbar-spacer"></span><span class="library-heading">Library</span><button class="toolbar-button" title="More actions">···</button></div>
         <div id="zotero-collections-tree" tabindex="0" class="virtualized-table">
-          <div class="row library-root"><span class="tree-icon">▾</span><span data-icon="library"></span><span>我的文献库</span><span class="count">128</span></div>
-          <div class="row collection"><span data-icon="folder"></span><span>全部文献</span><span class="count">128</span></div>
-          <div class="row collection selected"><span data-icon="folder"></span><span>机器学习</span><span class="count">12</span></div>
-          <div class="row collection"><span data-icon="folder"></span><span>人机交互</span><span class="count">24</span></div>
-          <div class="row collection"><span data-icon="folder"></span><span>设计系统</span><span class="count">18</span></div>
-          <div class="row collection"><span data-icon="folder"></span><span>待阅读</span><span class="count">9</span></div>
+          <div class="row library-root"><span class="tree-icon">▾</span><span data-icon="library"></span><span>My Library</span><span class="count">128</span></div>
+          <div class="row collection"><span data-icon="folder"></span><span>All Items</span><span class="count">128</span></div>
+          <div class="row collection selected"><span data-icon="folder"></span><span>Machine Learning</span><span class="count">12</span></div>
+          <div class="row collection"><span data-icon="folder"></span><span>HCI</span><span class="count">24</span></div>
+          <div class="row collection"><span data-icon="folder"></span><span>Design Systems</span><span class="count">18</span></div>
+          <div class="row collection"><span data-icon="folder"></span><span>To Read</span><span class="count">9</span></div>
           <div class="tree-separator"></div>
-          <div class="row"><span data-icon="document"></span><span>我的出版物</span></div>
-          <div class="row"><span data-icon="layers"></span><span>重复条目</span></div>
-          <div class="row"><span data-icon="archive"></span><span>未分类条目</span></div>
-          <div class="row"><span data-icon="trash"></span><span>回收站</span></div>
+          <div class="row"><span data-icon="document"></span><span>My Publications</span></div>
+          <div class="row"><span data-icon="layers"></span><span>Duplicate Items</span></div>
+          <div class="row"><span data-icon="archive"></span><span>Unfiled Items</span></div>
+          <div class="row"><span data-icon="trash"></span><span>Trash</span></div>
         </div>
-        <div id="zotero-tag-selector-container"><div class="tags-heading">标签 <span>⌄</span></div><div class="tags"><span><i class="tag-purple"></i>deep learning</span><span><i class="tag-blue"></i>transformer</span><span>attention</span><span>language model</span><span>neural network</span><span>to read</span></div><div class="tag-search" data-icon="search">筛选标签</div></div>
+        <div id="zotero-tag-selector-container"><div class="tags-heading">Tags <span>⌄</span></div><div class="tags"><span><i class="tag-purple"></i>deep learning</span><span><i class="tag-blue"></i>transformer</span><span>attention</span><span>language model</span><span>neural network</span><span>to read</span></div><div class="tag-search" data-icon="search">Filter Tags</div></div>
       </div>
       <div class="preview-splitter" id="zotero-collections-splitter"></div>
       <div id="zotero-items-pane">
-        <div class="zotero-toolbar"><button class="toolbar-button" title="新建条目" data-icon="document"></button><button class="toolbar-button" title="通过标识符添加" data-icon="wand"></button><button class="toolbar-button" title="添加附件" data-icon="clip"></button><span class="toolbar-spacer"></span><quick-search-textbox><span data-icon="search"></span><input id="library-search" aria-label="搜索文献" placeholder="搜索文献"/><span class="search-shortcut">⌘ K</span></quick-search-textbox></div>
+        <div class="zotero-toolbar"><button class="toolbar-button" title="New Item" data-icon="document"></button><button class="toolbar-button" title="Add Item by Identifier" data-icon="wand"></button><button class="toolbar-button" title="Add Attachment" data-icon="clip"></button><span class="toolbar-spacer"></span><quick-search-textbox><span data-icon="search"></span><input id="library-search" aria-label="Search library" placeholder="All Fields &amp; Tags"/><span class="search-shortcut">⌘ K</span></quick-search-textbox></div>
         <div id="zotero-items-tree" tabindex="0" class="virtualized-table">
-          <div class="virtualized-table-header"><span class="cell title-cell">标题 <span>⌃</span></span><span class="cell author-cell">创建者</span><span class="cell year-cell">年份</span></div>
+          <div class="virtualized-table-header"><span class="cell title-cell">Title <span>⌃</span></span><span class="cell author-cell">Creator</span><span class="cell year-cell">Year</span></div>
           <div class="virtualized-table-body" id="paper-rows"></div>
         </div>
-        <div class="items-footer"><span id="item-count">12 个条目</span><span>1 个已选中</span></div>
+        <div class="items-footer"><span id="item-count">12 items</span><span>1 selected</span></div>
       </div>
       <div class="preview-splitter" id="zotero-items-splitter"></div>
       <div id="zotero-item-pane">
-        <div class="zotero-toolbar detail-toolbar"><span>条目详情</span><button class="toolbar-button" title="更多条目操作">···</button></div>
+        <div class="zotero-toolbar detail-toolbar"><span>Item details</span><button class="toolbar-button" title="More item actions">···</button></div>
         <div class="detail-body">
-          <div class="item-type"><span data-icon="document"></span>会议论文</div>
+          <div class="item-type"><span data-icon="document"></span>Conference Paper</div>
           <h1 id="paper-title">Attention Is All You Need</h1>
-          <collapsible-section open><div class="head"><span class="title">⌄　信息</span><span>···</span></div><div class="section-body"><dl><dt>标题</dt><dd id="detail-title">Attention Is All You Need</dd><dt>作者</dt><dd id="detail-author">Vaswani, Ashish</dd><dt></dt><dd>Shazeer, Noam</dd><dt></dt><dd>Parmar, Niki <span class="muted">及其他 5 人</span></dd><dt>日期</dt><dd id="detail-year">2017</dd><dt>会议名称</dt><dd>Advances in Neural Information Processing Systems</dd><dt>页码</dt><dd>5998–6008</dd><dt>语言</dt><dd>en</dd><dt>DOI</dt><dd><a href="https://doi.org/10.48550/arXiv.1706.03762" target="_blank" rel="noreferrer">10.48550/arXiv.1706.03762 ↗</a></dd></dl></div></collapsible-section>
-          <collapsible-section open><div class="head"><span class="title">⌄　摘要</span></div><div class="section-body abstract">The dominant sequence transduction models are based on complex recurrent or convolutional neural networks. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms.</div></collapsible-section>
-          <collapsible-section open><div class="head"><span class="title">⌄　附件</span><span>1　＋</span></div><div class="attachment"><span class="pdf-badge">PDF</span><div>Full Text PDF<small>2.1 MB</small></div><span>↗</span></div></collapsible-section>
-          <collapsible-section><div class="head"><span class="title">›　笔记</span><span>＋</span></div></collapsible-section>
-          <collapsible-section><div class="head"><span class="title">›　标签</span><span>3</span></div></collapsible-section>
+          <collapsible-section open><div class="head"><span class="title">⌄　Info</span><span>···</span></div><div class="section-body"><dl><dt>Title</dt><dd id="detail-title">Attention Is All You Need</dd><dt>Author</dt><dd id="detail-author">Vaswani, Ashish</dd><dt></dt><dd>Shazeer, Noam</dd><dt></dt><dd>Parmar, Niki <span class="muted">and 5 more</span></dd><dt>Date</dt><dd id="detail-year">2017</dd><dt>Conference Name</dt><dd>Advances in Neural Information Processing Systems</dd><dt>Pages</dt><dd>5998–6008</dd><dt>Language</dt><dd>en</dd><dt>DOI</dt><dd><a href="https://doi.org/10.48550/arXiv.1706.03762" target="_blank" rel="noreferrer">10.48550/arXiv.1706.03762 ↗</a></dd></dl></div></collapsible-section>
+          <collapsible-section open><div class="head"><span class="title">⌄　Abstract</span></div><div class="section-body abstract">The dominant sequence transduction models are based on complex recurrent or convolutional neural networks. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms.</div></collapsible-section>
+          <collapsible-section open><div class="head"><span class="title">⌄　Attachments</span><span>1　＋</span></div><div class="attachment"><span class="pdf-badge">PDF</span><div>Full Text PDF<small>2.1 MB</small></div><span>↗</span></div></collapsible-section>
+          <collapsible-section><div class="head"><span class="title">›　Notes</span><span>＋</span></div></collapsible-section>
+          <collapsible-section><div class="head"><span class="title">›　Tags</span><span>3</span></div></collapsible-section>
         </div>
       </div>
     </div>
   </main>
-  <footer class="preview-footer"><span><i></i> 同一布局，三种表达。</span><span>浏览器设计预览 · 示例数据 · 不代表 Zotero 原生实测</span></footer>
-  <dialog id="settings-dialog"><button id="close-settings" aria-label="关闭设置">×</button><div id="settings-content"></div></dialog>
+  <footer class="preview-footer"><span><i></i> One layout, many expressions.</span><span>Browser design preview · sample data · not a native Zotero test</span></footer>
+  <dialog id="settings-dialog"><button id="close-settings" aria-label="Close settings">×</button><div id="settings-content"></div></dialog>
   <script src="../plugin/themes.js"></script>
   <script src="preview.js"></script>
   <script src="../plugin/preferences.js"></script>

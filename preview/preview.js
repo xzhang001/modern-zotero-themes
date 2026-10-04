@@ -42,7 +42,7 @@ function renderPapers(query = '') {
     });
     body.append(row);
   });
-  document.getElementById('item-count').textContent = `${body.children.length} 个条目`;
+  document.getElementById('item-count').textContent = `${body.children.length} items`;
 }
 renderPapers();
 document.getElementById('library-search').addEventListener('input', event => renderPapers(event.target.value));
@@ -63,7 +63,7 @@ function updateTheme() {
   localStorage.setItem('mzt-preview-settings', JSON.stringify(config));
   callbacks.forEach(cb => cb());
 }
-window.Zotero = { locale: 'zh-CN', ModernZoteroThemes: {
+window.Zotero = { locale: 'en-US', ModernZoteroThemes: {
   themes: MZTThemes.themes, settings: () => ({ ...config }),
   set: (key, value) => { config[key] = value; updateTheme(); },
   // A browser can't switch its own prefers-color-scheme, so this only records the choice.
