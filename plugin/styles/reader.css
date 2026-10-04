@@ -186,7 +186,15 @@
     color: var(--mzt-subtle);
   }
 
-  /* Sidebar: view switcher as a segmented control, filled search field. */
+  /* Sidebar: on the canvas, like the main window's collection pane, so it and the PDF backdrop are one
+     surface the pages float on; a faint guide replaces the pane border. View switcher as a segmented
+     control, filled search field. */
+  :root[data-mzt-layout="modern"] :is(#sidebarContainer, #sidebarContent) {
+    background-color: var(--mzt-canvas);
+  }
+  :root[data-mzt-layout="modern"] #sidebarContainer {
+    border-inline-end: 1px solid var(--mzt-guide);
+  }
   :root[data-mzt-layout="modern"] #sidebarContainer .sidebar-toolbar .start {
     gap: 2px;
     padding: 2px;

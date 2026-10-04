@@ -6,6 +6,7 @@
     --mzt-gutter: 6px;
     /* Tab pills already sit ~5px above the bar edge, so the card needs less space on top. */
     --mzt-gutter-top: 4px;
+    --mzt-gutter-bottom: 8px;
     --mzt-card-radius: 12px;
     --mzt-control-radius: 8px;
     --mzt-icon-tint: var(--mzt-muted);
@@ -37,7 +38,7 @@
   }
   /* Content: list and item pane are separate cards; the native splitter between them is the gap. */
   :root[data-mzt-layout="modern"] #zotero-layout-switcher {
-    margin: var(--mzt-gutter-top) var(--mzt-gutter) var(--mzt-gutter) 0;
+    margin: var(--mzt-gutter-top) var(--mzt-gutter) var(--mzt-gutter-bottom) 0;
     background: transparent;
     /* Zotero paints the item pane with sidepane material; on a card it should match the list. */
     --color-sidepane: var(--mzt-background);
@@ -306,7 +307,7 @@
     background: var(--mzt-canvas);
   }
   :root[data-mzt-layout="modern"] #tabs-deck browser.reader {
-    margin: var(--mzt-gutter-top) var(--mzt-gutter) var(--mzt-gutter);
+    margin: var(--mzt-gutter-top) var(--mzt-gutter) var(--mzt-gutter-bottom);
     border: 1px solid var(--mzt-card-border);
     border-radius: var(--mzt-card-radius);
     box-shadow: 0 1px 2px var(--mzt-shadow), 0 10px 28px -14px var(--mzt-shadow);
@@ -317,7 +318,7 @@
     background: transparent;
   }
   :root[data-mzt-layout="modern"] #zotero-context-pane.standard {
-    margin: var(--mzt-gutter-top) var(--mzt-gutter) var(--mzt-gutter) 0;
+    margin: var(--mzt-gutter-top) var(--mzt-gutter) var(--mzt-gutter-bottom) 0;
     border: 1px solid var(--mzt-card-border);
     border-radius: var(--mzt-card-radius);
     background: var(--mzt-background);
