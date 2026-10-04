@@ -1,6 +1,6 @@
 (function (scope) {
   "use strict";
-  scope.MZTCreateRuntime = function ({ Zotero, Services, rootURI, id, version, themes, collectionIcons }) {
+  scope.MZTCreateRuntime = function ({ Zotero, Services, Ci, rootURI, id, version, themes, collectionIcons }) {
     // Gecko caches stylesheets by URL, and an upgraded XPI keeps the same jar: URL, so without a
     // per-startup query the old CSS stays in effect until Zotero restarts.
     const assetQuery = `?v=${encodeURIComponent(version || "dev")}.${Date.now()}`;
@@ -157,6 +157,14 @@
           separator.remove();
         }
       };
+    }
+    // Not Zotero.File.getContentsFromURLAsync: it goes through Zotero.HTTP, which fails to parse jar: URLs
+    // containing "@", and an installed XPI is named after the add-on ID. A channel reads them fine.
+    function readResource(url) {
+      const channel = Services.io.newChannelFromURI(Services.io.newURI(url), null,
+        Services.scriptSecurityManager.getSystemPrincipal(), null,
+        Ci.nsILoadInfo.SEC_ALLOW_CROSS_ORIGIN_SEC_CONTEXT_IS_NULL, Ci.nsIContentPolicy.TYPE_OTHER);
+      return Zotero.File.getContentsAsync(channel, "UTF-8");
     }
     function paintReader(win, readerDoc) {
       const reader = windows.get(win)?.readers.get(readerDoc);
@@ -323,7 +331,7 @@
         Services.prefs.addObserver(prefix, observer);
         Services.prefs.addObserver(appearancePref, observer);
         // Without it reader tabs just keep Zotero's colors; the rest of the plugin still starts.
-        const loadingReaderCSS = (async () => Zotero.File.getContentsFromURLAsync(rootURI + "styles/reader.css" + assetQuery))()
+        const loadingReaderCSS = (async () => readResource(rootURI + "styles/reader.css"))()
           .catch(error => { Zotero.logError(error); return null; });
         const registeredPane = await Zotero.PreferencePanes.register({
           pluginID: id, label: "Modern Themes", src: rootURI + "preferences.xhtml",

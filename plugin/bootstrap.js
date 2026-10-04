@@ -7,7 +7,7 @@ async function startup({ id, version, rootURI }) {
   Services.scriptloader.loadSubScript(rootURI + "collection-icons.js", scope);
   Services.scriptloader.loadSubScript(rootURI + "runtime.js", scope);
   modernThemes = scope.MZTCreateRuntime({
-    Zotero, Services, rootURI, id, version, themes: scope.MZTThemes, collectionIcons: scope.MZTCollectionIcons
+    Zotero, Services, Ci, rootURI, id, version, themes: scope.MZTThemes, collectionIcons: scope.MZTCollectionIcons
   });
   try {
     await modernThemes.start();

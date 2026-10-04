@@ -119,11 +119,15 @@ function setup(windows = [fakeWindow()]) {
     setIntPref(key, value) { prefs.set(key, value); notify(key); },
     addObserver(branch, o) { observers.set(branch, o); },
     removeObserver(branch, o) { if (observers.get(branch) === o) observers.delete(branch); }
-  } };
+  },
+  io: { newURI: spec => ({ spec }), newChannelFromURI: uri => ({ uri: uri.spec }) },
+  scriptSecurityManager: { getSystemPrincipal: () => ({}) } };
+  const Ci = { nsILoadInfo: { SEC_ALLOW_CROSS_ORIGIN_SEC_CONTEXT_IS_NULL: 32 }, nsIContentPolicy: { TYPE_OTHER: 1 } };
   const Zotero = {
     getMainWindows: () => windows, logError: error => { throw error; },
-    File: { async getContentsFromURLAsync(url) {
-      if (!/^jar:file:\/\/\/plugin\.xpi!\/styles\/reader\.css\?v=/.test(url)) throw new Error('Unexpected URL ' + url);
+    File: { async getContentsAsync(channel, charset) {
+      assert.equal(charset, 'UTF-8');
+      assert.equal(channel.uri, 'jar:file:///plugin.xpi!/styles/reader.css');
       return '/* reader */';
     } },
     PreferencePanes: {
@@ -132,7 +136,7 @@ function setup(windows = [fakeWindow()]) {
     }
   };
   return { windows, prefs, observers, panes, Zotero, runtime: createRuntime({
-    Zotero, Services, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', version: '1.2.3', themes, collectionIcons
+    Zotero, Services, Ci, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', version: '1.2.3', themes, collectionIcons
   }) };
 }
 test('startup and repeated attach load exactly one set of styles per window', async () => {
@@ -371,7 +375,7 @@ test('a reader sheet that fails to load leaves reader tabs alone but the plugin 
   const s = setup([win]);
   const errors = [];
   s.Zotero.logError = error => errors.push(error);
-  s.Zotero.File.getContentsFromURLAsync = () => { throw new Error('missing'); };
+  s.Zotero.File.getContentsAsync = () => { throw new Error('missing'); };
   await s.runtime.start();
   const reader = fakeReaderDocument();
   win.events.get('DOMContentLoaded')({ target: reader });
