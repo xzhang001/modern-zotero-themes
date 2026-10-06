@@ -10,7 +10,7 @@ Development baseline: Zotero 10.0.5. Target platforms: Windows, macOS.
 | Theme resolution, color contrast, fallback for invalid settings | Automated (Node) |
 | Startup/disable, new windows, listener cleanup, theme persistence | Checked against mocked Zotero APIs |
 | Three themes and real settings page interaction in the browser | Checked in the browser preview |
-| Windows, Zotero 10.0.5 | Native acceptance pending |
+| Windows, Zotero 10 | Native acceptance passed (2026-10-06) |
 | macOS, Zotero 10.0.5 | Native acceptance pending |
 | Linux, Zotero 7.0.32 / 8.0.4 / 9.0.6 / 10.0.5, light and dark | Automated runtime checks pass (headless, packed XPI); see below |
 | Zotero 7 / 8 / 9 on Windows and macOS | Native acceptance pending |
