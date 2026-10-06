@@ -87,7 +87,7 @@ npm run preview  # 设计预览：http://localhost:5173/preview/
 
 发布一个版本：
 
-1. 修改 `plugin/manifest.json` 和 `package.json` 中的版本号，运行 `npm test` 和 `npm run build`。
+1. 修改 `plugin/manifest.json` 和 `package.json` 中的版本号，先运行 `npm run build` 再运行 `npm test`（测试会检查构建写入 `updates.json` 的新版本条目）。
 2. 提交，打标签 `v<版本>`，只推送标签。
 3. 在 GitHub 上为该标签创建 Release，上传 `dist/` 中的 XPI。
 4. 推送 `main`。已安装的插件从 `main` 读取 `updates.json`，所以这一步放在最后。

@@ -87,7 +87,7 @@ The preview mocks Zotero in HTML for design review. It doesn't replace testing i
 
 To release a version:
 
-1. Bump the version in `plugin/manifest.json` and `package.json`, then run `npm test` and `npm run build`.
+1. Bump the version in `plugin/manifest.json` and `package.json`, then run `npm run build` and `npm test` (the tests check the new entry the build writes to `updates.json`).
 2. Commit, tag `v<version>` and push only the tag.
 3. Create a GitHub release for the tag and upload the XPI from `dist/`.
 4. Push `main`. Installed copies read `updates.json` from `main`, so this step comes last.
