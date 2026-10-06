@@ -1,3 +1,38 @@
+# Build output and dependencies
 dist/
+node_modules/
+
+# Environment files (keep shareable templates)
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+
+# Python environments and caches
 __pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Test output, caches, and logs
+coverage/
+.nyc_output/
+.cache/
+*.log
+
+# Local editor settings and temporary files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating system metadata
 .DS_Store
+._*
+Thumbs.db
+Desktop.ini
