@@ -10,7 +10,9 @@ Modern themes for Zotero 7–10. Zotero's three panes, toolbars and workflow sta
 
 ### Themes
 
-![The seven built-in themes](docs/images/en/themes.webp)
+![Some of the built-in themes](docs/images/en/themes.webp)
+
+The image shows some of the built-in themes; the settings list them all, and more will be added.
 
 ### Modern layout
 
@@ -99,6 +101,6 @@ Themes are defined in `plugin/themes.js`, and a new one shows up in the settings
 [MIT](LICENSE).
 
 - Folder icons come from [Lucide](https://lucide.dev) (ISC license).
-- [Catppuccin](https://catppuccin.com/palette/), [Solarized](https://ethanschoonover.com/solarized/) and [Nord](https://www.nordtheme.com/) use their official palettes; a few colors are adjusted for contrast.
+- [Catppuccin](https://catppuccin.com/palette/), [Solarized](https://ethanschoonover.com/solarized/), [Nord](https://www.nordtheme.com/), [Rosé Pine](https://rosepinetheme.com/palette/) and [Everforest](https://github.com/sainnhe/everforest) use their official palettes; a few colors are adjusted for contrast.
 - Third-party licenses are in [THIRD_PARTY_NOTICES.md](plugin/THIRD_PARTY_NOTICES.md).
-- This plugin is not affiliated with Zotero, Catppuccin, Solarized or Nord.
+- This plugin is not affiliated with Zotero, Catppuccin, Solarized, Nord, Rosé Pine or Everforest.

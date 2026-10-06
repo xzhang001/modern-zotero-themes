@@ -6,7 +6,7 @@
 
 `plugin/styles/layout.css` is the switchable "Modern" layout layer, scoped to `:root[data-mzt-layout="modern"]`. The frame (title bar, tab bar, left pane) uses `--mzt-canvas`, and the item list and item pane are each a card whose border is a darkened step of the background (`--mzt-card-border`) so it stays visible on low-contrast displays. It also styles tabs, the search field, list headers and the item pane. None of this applies in the classic layout. It only adjusts margins and alignment outside the virtualized lists; focused selected rows keep a solid background because Zotero swaps native icons for white versions there.
 
-Themes are not a plain light/dark switch: Latte, Paper and Solarized Light are light themes, Frappé and Nord are dark themes, and Mocha or Dracula could be added later as themes of their own. The user picks one theme (`theme`), which stays the same whatever the system's light or dark mode.
+Themes are not a plain light/dark switch: Latte, Paper, Solarized Light, Sage and Rosé Pine Dawn are light themes, Frappé, Nord and Everforest Dark are dark themes, and Mocha or Dracula could be added later as themes of their own. The user picks one theme (`theme`), which stays the same whatever the system's light or dark mode.
 
 ## Adding a theme
 

@@ -85,6 +85,44 @@
         error: "#e0868e", errorBackground: "#3e2d34", shadow: "#00000040"
       },
       page: { background: "#2e3440", foreground: "#d8dee9" }
+    },
+    {
+      // Eye-care green as in Kindle's green page and WeChat Read; the page is the classic #c7edcc.
+      id: "sage", name: "Sage", mode: "light", author: "Modern Zotero Themes",
+      colors: {
+        background: "#f1f6ec", sidebar: "#e4eedd", toolbar: "#eaf2e4", elevated: "#f8fbf5",
+        text: "#1f3326", muted: "#4a5e4f", subtle: "#6a7d6d", border: "#cfdcc7",
+        hover: "#dde9d5", selected: "#3b7550", selectedText: "#ffffff",
+        inactiveSelected: "#d6e4cd", accent: "#3b7550", onAccent: "#ffffff",
+        error: "#b3261e", errorBackground: "#fbe9e4", shadow: "#1f332614"
+      },
+      page: { background: "#c7edcc", foreground: "#1f3326" }
+    },
+    {
+      // Pine is the accent because iris can't carry white text; muted is a darkened subtle, error a darkened love,
+      // and the page text a darkened text so the page reaches 7:1.
+      id: "rose-pine-dawn", name: "Rosé Pine Dawn", mode: "light", author: "Rosé Pine",
+      colors: {
+        background: "#faf4ed", sidebar: "#f2e9e1", toolbar: "#f4ede8", elevated: "#fffaf3",
+        text: "#575279", muted: "#625e7e", subtle: "#797593", border: "#dfdad9",
+        hover: "#ebe3db", selected: "#286983", selectedText: "#ffffff",
+        inactiveSelected: "#e6ddd5", accent: "#286983", onAccent: "#ffffff",
+        error: "#9a4560", errorBackground: "#f8e8ea", shadow: "#57527914"
+      },
+      page: { background: "#faf4ed", foreground: "#4a4568" }
+    },
+    {
+      // Everforest Dark Medium. grey2 and grey1 are lightened for muted and subtle, red lightened on a darker
+      // bg_red for errors, and selection is a deepened green for white text and icons.
+      id: "everforest-dark", name: "Everforest Dark", mode: "dark", author: "sainnhe",
+      colors: {
+        background: "#2d353b", sidebar: "#232a2e", toolbar: "#232a2e", elevated: "#3d484d",
+        text: "#d3c6aa", muted: "#a7b2a9", subtle: "#909c93", border: "#3d484d",
+        hover: "#343f44", selected: "#4b6a4a", selectedText: "#ffffff",
+        inactiveSelected: "#3d484d", accent: "#a7c080", onAccent: "#2d353b",
+        error: "#ec8f90", errorBackground: "#40333a", shadow: "#00000040"
+      },
+      page: { background: "#2d353b", foreground: "#d3c6aa" }
     }
   ];
   const required = Object.keys(themes[0].colors);

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Modern Zotero Themes",
   "version": "0.15.0",
-  "description": "A modern visual layer with Light, Dark, Catppuccin Latte and Frappé, Paper, Solarized Light and Nord themes.",
+  "description": "A modern visual layer with Light, Dark, Catppuccin, Paper, Solarized, Nord, Sage, Rosé Pine and Everforest themes.",
   "icons": {
     "48": "icons/icon.svg",
     "96": "icons/icon.svg"

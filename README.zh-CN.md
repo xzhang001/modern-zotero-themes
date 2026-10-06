@@ -10,7 +10,9 @@
 
 ### 主题
 
-![七个内置主题](docs/images/zh-CN/themes.webp)
+![部分内置主题](docs/images/zh-CN/themes.webp)
+
+图中为部分内置主题，完整列表见设置页，后续还会加入更多主题。
 
 ### 现代界面风格
 
@@ -99,6 +101,6 @@ npm run preview  # 设计预览：http://localhost:5173/preview/
 [MIT](LICENSE)。
 
 - 文件夹图标来自 [Lucide](https://lucide.dev)（ISC 许可）。
-- [Catppuccin](https://catppuccin.com/palette/)、[Solarized](https://ethanschoonover.com/solarized/) 和 [Nord](https://www.nordtheme.com/) 使用官方色板，个别颜色为满足对比度做了调整。
+- [Catppuccin](https://catppuccin.com/palette/)、[Solarized](https://ethanschoonover.com/solarized/)、[Nord](https://www.nordtheme.com/)、[Rosé Pine](https://rosepinetheme.com/palette/) 和 [Everforest](https://github.com/sainnhe/everforest) 使用官方色板，个别颜色为满足对比度做了调整。
 - 第三方许可见 [THIRD_PARTY_NOTICES.md](plugin/THIRD_PARTY_NOTICES.md)。
-- 本插件并非 Zotero、Catppuccin、Solarized 或 Nord 官方发布。
+- 本插件并非 Zotero、Catppuccin、Solarized、Nord、Rosé Pine 或 Everforest 官方发布。
