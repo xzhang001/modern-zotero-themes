@@ -21,6 +21,11 @@
     background: var(--mzt-toolbar);
     box-shadow: inset 0 -1px var(--mzt-border);
   }
+  /* The menu bar sits on the theme's background; Zotero 7 still draws its labels in the system menu color
+     (black on Linux), so they would vanish on dark themes. Open and hovered menus keep the native highlight. */
+  :root[data-mzt-theme] #main-menubar > menu:not([_moz-menuactive="true"], [open="true"]) {
+    color: var(--mzt-text);
+  }
   :root[data-mzt-theme] :is(#zotero-collections-splitter, #zotero-items-splitter, #zotero-tags-splitter) {
     background-color: var(--mzt-border);
     border-color: var(--mzt-border);

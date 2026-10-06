@@ -332,7 +332,8 @@
       iconStyles.id = "mzt-collection-icons";
       const media = win.matchMedia("(prefers-color-scheme: dark)");
       const unload = () => detach(win);
-      const previous = Object.fromEntries(rootAttributes.map(name => [name, root.getAttribute(name)]));
+      // hasAttribute: on XUL elements Zotero 7 (Gecko 115) returns "" rather than null for a missing attribute.
+      const previous = Object.fromEntries(rootAttributes.map(name => [name, root.hasAttribute(name) ? root.getAttribute(name) : null]));
       const sections = new win.MutationObserver(() => markCollectionSections(win));
       const menu = addIconMenu(win);
       // DOMContentLoaded from reader tabs (and frames inside them) reaches the main window, as Zotero's own

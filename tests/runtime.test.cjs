@@ -54,6 +54,7 @@ function fakeWindow(dark = false, tree = null) {
   const root = {
     append(...nodes) { children.push(...nodes); },
     getAttribute(key) { return attributes.get(key) ?? null; },
+    hasAttribute(key) { return attributes.has(key); },
     setAttribute(key, value) { attributes.set(key, value); },
     removeAttribute(key) { attributes.delete(key); }
   };
@@ -228,6 +229,16 @@ test('disable cleans up styles, attributes, observers, listeners, settings API',
   assert.equal(win.mediaEvents.size, 0); assert.equal(win.events.size, 0);
   assert.equal(s.observers.size, 0); assert.equal(s.panes.size, 0);
   assert.equal(s.Zotero.ModernZoteroThemes, undefined); assert.equal(notified, true);
+});
+test('disable removes attributes that were missing, even where getAttribute returns "" for them (Zotero 7)', async () => {
+  const s = setup(); const win = s.windows[0];
+  const root = win.document.documentElement;
+  const getAttribute = root.getAttribute;
+  root.getAttribute = key => getAttribute(key) ?? '';
+  await s.runtime.start();
+  s.runtime.stop();
+  assert.equal(win.attributes.has('data-mzt-theme'), false);
+  assert.equal(win.attributes.has('data-mzt-layout'), false);
 });
 test('closed windows detach and re-enable preserves saved settings', async () => {
   const s = setup(); await s.runtime.start();

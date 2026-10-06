@@ -5,7 +5,7 @@
         {
           "version": "0.15.0",
           "update_link": "https://github.com/xzhang001/modern-zotero-themes/releases/download/v0.15.0/modern-zotero-themes-0.15.0.xpi",
-          "update_hash": "sha256:16b88447bc7eb472092732d2bd022612dce2902b0e0a052a9e3426ff0988f3d0",
+          "update_hash": "sha256:5e5a66b9f64aead13b73ad542f916da1a2a85c6ac2b4165558990d99739321c3",
           "update_info_url": "https://github.com/xzhang001/modern-zotero-themes/releases/tag/v0.15.0",
           "applications": {
             "zotero": {
