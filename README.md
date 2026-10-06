@@ -63,6 +63,14 @@ Zotero keeps the plugin up to date automatically. To return to Zotero's original
 
 The native test items are listed in the [compatibility checklist](docs/compatibility.md).
 
+### Zotero 7
+
+Zotero 8 or later is recommended. On Zotero 7, these features are not available:
+
+- Hiding empty fields.
+- Section headings and dimmed built-in rows in the collection tree.
+- Reading page colors, because Zotero 7's reader has no reading themes.
+
 ## Development
 
 Requires Node.js 18+ and Python 3.10+; there are no npm dependencies.

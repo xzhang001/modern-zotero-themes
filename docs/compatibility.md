@@ -12,9 +12,18 @@ Development baseline: Zotero 10.0.5. Target platforms: Windows, macOS.
 | Three themes and real settings page interaction in the browser | Checked in the browser preview |
 | Windows, Zotero 10.0.5 | Native acceptance pending |
 | macOS, Zotero 10.0.5 | Native acceptance pending |
-| Zotero 7 / 8 / 9 at runtime | Native acceptance pending |
+| Linux, Zotero 7.0.32 / 8.0.4 / 9.0.6 / 10.0.5, light and dark | Automated runtime checks pass (headless, packed XPI); see below |
+| Zotero 7 / 8 / 9 on Windows and macOS | Native acceptance pending |
 
 The manifest's 7.0–10.0.* range is the installable range of the development preview, not a certification of compatibility with every version. Before a stable release, record the exact minor version, platform and result for the items below.
+
+## Known differences between versions
+
+Found with the automated runtime checks on Linux (2026-10-06). 8.0.5 has no Linux build, so 8.0.4 was used.
+
+- Zotero 7 (Gecko 115) has no `:has()`, so the rules for hiding empty fields, collection tree section headings, bold group names and dimmed built-in rows are dropped. Everything else is themed.
+- Zotero 7's reader has no light/dark reading themes, so the Reading page setting has no effect there.
+- Collection tree indent guides (`.cell-indent`) and sticky section headers in the item list exist only in Zotero 10.
 
 ## Native acceptance
 
