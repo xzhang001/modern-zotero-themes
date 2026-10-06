@@ -13,6 +13,18 @@
               "strict_max_version": "10.0.*"
             }
           }
+        },
+        {
+          "version": "0.16.0",
+          "update_link": "https://github.com/xzhang001/modern-zotero-themes/releases/download/v0.16.0/modern-zotero-themes-0.16.0.xpi",
+          "update_hash": "sha256:2f88b04a6dd90903c801e8ff8bb3d951dfbc77eebb6652c5c4bf7591b3fc7815",
+          "update_info_url": "https://github.com/xzhang001/modern-zotero-themes/releases/tag/v0.16.0",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "7.0",
+              "strict_max_version": "10.0.*"
+            }
+          }
         }
       ]
     }
