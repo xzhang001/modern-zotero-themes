@@ -1,6 +1,6 @@
 (function (scope) {
   "use strict";
-  scope.MZTCreateRuntime = function ({ Zotero, Services, Ci, Cu, rootURI, id, version, themes, collectionIcons, readingProgress }) {
+  scope.MZTCreateRuntime = function ({ Zotero, Services, Ci, Cu, rootURI, id, version, themes, collectionIcons, readingProgress, paneImage }) {
     // Gecko caches stylesheets by URL, and an upgraded XPI keeps the same jar: URL, so without a
     // per-startup query the old CSS stays in effect until Zotero restarts.
     const assetQuery = `?v=${encodeURIComponent(version || "dev")}.${Date.now()}`;
@@ -438,7 +438,7 @@
             .then(css => typeof css === "string" && frameCSS.set(spec.kind, css))
             .catch(error => Zotero.logError(error))));
         const registeredPane = await Zotero.PreferencePanes.register({
-          pluginID: id, label: "Modern Themes", src: rootURI + "preferences.xhtml",
+          pluginID: id, label: "Modern Themes", src: rootURI + "preferences.xhtml", image: paneImage,
           scripts: [rootURI + "preferences.js"], stylesheets: [rootURI + "styles/preferences.css" + assetQuery]
         });
         if (!active) {

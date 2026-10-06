@@ -170,7 +170,6 @@
 #mzt-preferences .mzt-page-swatch b {
   margin: auto; font: 600 17px/1 Georgia, serif; color: var(--fill-secondary);
 }
-#mzt-preferences .mzt-hint { margin: 10px 2px 0; font-size: 12px; line-height: 1.5; color: var(--fill-secondary); }
 
 /* Appearance notice */
 #mzt-appearance-notice {

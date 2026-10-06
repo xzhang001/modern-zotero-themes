@@ -11,8 +11,6 @@ window.MZTPreferences = {
       colors: "颜色", themes: "主题", interface: "界面",
       page: "阅读页面", pageFollow: "跟随主题", pageOriginal: "原始", pageOriginalMeta: "PDF 原本的颜色",
       pageZotero: "Zotero 设置", pageZoteroMeta: "阅读器 Aa 菜单",
-      pageHint: "PDF/EPUB 页面的底色和文字颜色。在阅读器的 Aa 菜单里临时换主题，下次打开文献或更改这里时会恢复为此处的选择。",
-      pageZoteroHint: "页面颜色交给 Zotero：由阅读器工具栏的 Aa 菜单决定。",
       layout: "界面风格",
       layoutModern: "现代", layoutClassic: "经典",
       emptyFields: "空字段", emptyHide: "隐藏", emptyShow: "显示",
@@ -26,8 +24,6 @@ window.MZTPreferences = {
     } : {
       saved: "✓ Saved", inactive: "The theme plugin is disabled",
       pageOriginalMeta: "The PDF's own colors", pageZoteroMeta: "Reader's Aa menu",
-      pageHint: "Background and text color of PDF/EPUB pages. A theme picked in the reader's Aa menu lasts until you reopen the item or change this setting.",
-      pageZoteroHint: "Zotero decides: pages use the theme chosen in the reader's Aa menu.",
       modes: { light: "light", dark: "dark" },
       modeNames: { light: "Light", dark: "Dark" },
       mismatch: m => `Zotero itself is set to ${m.current} appearance, so some icons, PDF pages and other windows will stay ${m.current}.`,
@@ -158,7 +154,6 @@ window.MZTPreferences = {
     for (const theme of api.themes) pageTile(theme.id, theme.name, copy.modeNames[theme.mode], theme.page);
     pageTile("zotero", copy.pageZotero || "Zotero setting", copy.pageZoteroMeta, null);
     radioGroup(pageOptions, "pageTheme");
-    const pageHint = root.querySelector("#mzt-page-hint");
 
     const notice = root.querySelector("#mzt-appearance-notice");
     const noticeText = root.querySelector("#mzt-appearance-message");
@@ -208,7 +203,6 @@ window.MZTPreferences = {
         tile.setAttribute("aria-checked", String(tile === pageChoice));
         tile.tabIndex = tile === pageChoice ? 0 : -1;
       }
-      pageHint.textContent = pageChoice.dataset.value === "zotero" ? copy.pageZoteroHint : copy.pageHint;
 
       for (const card of cards.children) {
         card.setAttribute("aria-checked", String(card.dataset.value === activeTheme.id));

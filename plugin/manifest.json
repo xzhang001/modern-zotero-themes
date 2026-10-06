@@ -3,6 +3,10 @@
   "name": "Modern Zotero Themes",
   "version": "0.15.0",
   "description": "A modern visual layer with Light, Dark, Catppuccin Latte and Frappé, Paper, Solarized Light and Nord themes.",
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
   "applications": {
     "zotero": {
       "id": "modern-zotero-themes@xzhang001.github.io",

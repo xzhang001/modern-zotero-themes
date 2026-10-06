@@ -160,7 +160,7 @@ function setup(windows = [fakeWindow()], { readingProgress } = {}) {
   };
   return { windows, prefs, observers, panes, Zotero, runtime: createRuntime({
     Zotero, Services, Ci, Cu: { cloneInto: value => structuredClone(value) }, rootURI: 'jar:file:///plugin.xpi!/', id: 'test', version: '1.2.3', themes, collectionIcons,
-    readingProgress
+    readingProgress, paneImage: 'chrome://modern-zotero-themes/content/icons/palette.svg'
   }) };
 }
 test('startup and repeated attach load exactly one set of styles per window', async () => {
@@ -173,6 +173,7 @@ test('startup and repeated attach load exactly one set of styles per window', as
   assert.match(modern, /^jar:file:\/\/\/plugin\.xpi!\/styles\/modern\.css\?v=1\.2\.3\.\d+$/);
   assert.match(layout, /^jar:file:\/\/\/plugin\.xpi!\/styles\/layout\.css\?v=1\.2\.3\.\d+$/);
   assert.match(s.panes.get('pane').stylesheets[0], /styles\/preferences\.css\?v=1\.2\.3\.\d+$/);
+  assert.equal(s.panes.get('pane').image, 'chrome://modern-zotero-themes/content/icons/palette.svg');
   assert.equal(s.windows[0].attributes.get('data-mzt-theme'), 'modern-light');
   assert.equal(s.windows[0].attributes.get('data-mzt-layout'), 'modern');
   assert.equal(s.panes.size, 1);
