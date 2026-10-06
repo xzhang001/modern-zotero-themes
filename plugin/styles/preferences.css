@@ -35,10 +35,6 @@
   outline-offset: 2px;
 }
 
-/* Header */
-#mzt-preferences .mzt-hero { margin: 8px 0 24px; }
-#mzt-preferences h2 { margin: 0; font-size: 22px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.25; }
-
 /* Sections */
 #mzt-preferences .mzt-section { margin-bottom: 28px; }
 #mzt-preferences .mzt-section-head {

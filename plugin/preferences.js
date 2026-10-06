@@ -3,11 +3,12 @@ window.MZTPreferences = {
     const root = document.getElementById("mzt-preferences");
     if (!root || root.dataset.ready) return;
     root.dataset.ready = "true";
+    // Zotero puts the pane's name above it as a heading; the sidebar already shows it.
+    if (root.previousElementSibling?.localName === "h1") root.previousElementSibling.hidden = true;
     const api = Zotero.ModernZoteroThemes;
     if (!api) return;
     const zh = (Zotero.locale || navigator.language).startsWith("zh");
     const copy = zh ? {
-      heading: "让阅读更专注。",
       colors: "颜色", themes: "主题", interface: "界面",
       page: "阅读页面", pageFollow: "跟随主题", pageOriginal: "原始", pageOriginalMeta: "PDF 原本的颜色",
       pageZotero: "Zotero 设置", pageZoteroMeta: "阅读器 Aa 菜单",
