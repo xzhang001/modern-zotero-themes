@@ -12,9 +12,6 @@ Modern themes for Zotero 7–10. Zotero's three panes, toolbars and workflow sta
 
 ![The seven built-in themes](docs/images/en/themes.webp)
 
-- Seven themes: Modern Light, Modern Dark, Catppuccin Latte, Catppuccin Frappé, Paper, Solarized Light and Nord.
-- The theme you pick stays the same day and night; it doesn't follow the system's light/dark mode.
-
 ### Modern layout
 
 - The item list and the item pane float as two rounded cards on a shared canvas.

@@ -12,9 +12,6 @@
 
 ![七个内置主题](docs/images/zh-CN/themes.webp)
 
-- 七个主题：Modern Light、Modern Dark、Catppuccin Latte、Catppuccin Frappé、Paper、Solarized Light、Nord。
-- 选定的主题白天晚上都不变，不随系统的浅色/深色模式切换。
-
 ### 现代界面风格
 
 - 文献列表和详情面板是浮在底色上的两张圆角卡片。
