@@ -3,18 +3,6 @@
     "modern-zotero-themes@xzhang001.github.io": {
       "updates": [
         {
-          "version": "0.14.0",
-          "update_link": "https://github.com/xzhang001/modern-zotero-themes/releases/download/v0.14.0/modern-zotero-themes-0.14.0.xpi",
-          "update_hash": "sha256:0ea441b36c23a6b9113c9417e41044827510946dbef0d05309043b9632d69236",
-          "update_info_url": "https://github.com/xzhang001/modern-zotero-themes/releases/tag/v0.14.0",
-          "applications": {
-            "zotero": {
-              "strict_min_version": "7.0",
-              "strict_max_version": "10.0.*"
-            }
-          }
-        },
-        {
           "version": "0.15.0",
           "update_link": "https://github.com/xzhang001/modern-zotero-themes/releases/download/v0.15.0/modern-zotero-themes-0.15.0.xpi",
           "update_hash": "sha256:16b88447bc7eb472092732d2bd022612dce2902b0e0a052a9e3426ff0988f3d0",

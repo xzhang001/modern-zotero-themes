@@ -64,8 +64,6 @@ The theme you pick stays the same day and night; it does not switch with the sys
 
 Zotero updates the plugin automatically from then on (it checks about once a day); you can also use "Check for Updates" in the plugin manager's gear menu.
 
-**Upgrading from 0.13.0 or earlier**: starting with 0.14.0 the plugin ID is `modern-zotero-themes@xzhang001.github.io`, so older versions will not update to it automatically. Remove the old version in the plugin manager first, then install the new one. Your theme choice, collection icons and other settings live in Zotero's preferences and are kept. If the old version is not removed, both versions run at the same time.
-
 Trying it in a separate Zotero profile first is recommended. The native test items are listed in the [compatibility checklist](docs/compatibility.md).
 
 ## Development
