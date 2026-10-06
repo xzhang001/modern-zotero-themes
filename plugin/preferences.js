@@ -8,7 +8,7 @@ window.MZTPreferences = {
     const zh = (Zotero.locale || navigator.language).startsWith("zh");
     const copy = zh ? {
       heading: "让阅读更专注。",
-      themes: "主题", interface: "界面", fixed: "固定", system: "跟随系统",
+      colors: "颜色", themes: "主题", interface: "界面",
       page: "阅读页面", pageFollow: "跟随主题", pageOriginal: "原始", pageOriginalMeta: "PDF 原本的颜色",
       pageZotero: "Zotero 设置", pageZoteroMeta: "阅读器 Aa 菜单",
       pageHint: "PDF/EPUB 页面的底色和文字颜色。在阅读器的 Aa 菜单里临时换主题，下次打开文献或更改这里时会恢复为此处的选择。",
@@ -21,11 +21,8 @@ window.MZTPreferences = {
       saved: "✓ 已保存", inactive: "主题插件已停用",
       modes: { light: "浅色", dark: "深色" },
       modeNames: { light: "浅色", dark: "深色" },
-      usedFor: { light: "用于浅色模式", dark: "用于深色模式" },
       mismatch: m => `Zotero 自身外观为${m.current}，部分图标、PDF 页面和其他窗口仍会显示为${m.current}。`,
-      matchMode: m => `改为${m.wanted}`,
-      notAuto: m => `Zotero 自身外观固定为${m.current}，不会跟随系统切换。`,
-      useAuto: "改为自动"
+      matchMode: m => `改为${m.wanted}`
     } : {
       saved: "✓ Saved", inactive: "The theme plugin is disabled",
       pageOriginalMeta: "The PDF's own colors", pageZoteroMeta: "Reader's Aa menu",
@@ -33,11 +30,8 @@ window.MZTPreferences = {
       pageZoteroHint: "Zotero decides: pages use the theme chosen in the reader's Aa menu.",
       modes: { light: "light", dark: "dark" },
       modeNames: { light: "Light", dark: "Dark" },
-      usedFor: { light: "Used in light mode", dark: "Used in dark mode" },
       mismatch: m => `Zotero itself is set to ${m.current} appearance, so some icons, PDF pages and other windows will stay ${m.current}.`,
-      matchMode: m => `Switch to ${m.wanted}`,
-      notAuto: m => `Zotero's own appearance is set to ${m.current}, so this won't follow your system.`,
-      useAuto: "Set to Automatic"
+      matchMode: m => `Switch to ${m.wanted}`
     };
     for (const node of root.querySelectorAll("[data-mzt-text]")) {
       if (copy[node.dataset.mztText]) node.textContent = copy[node.dataset.mztText];
@@ -83,18 +77,43 @@ window.MZTPreferences = {
     };
     // Two-way choices are segmented controls: native <select> popups can't be styled.
     const segments = new Map();
-    for (const group of root.querySelectorAll(".mzt-seg")) {
+    for (const group of root.querySelectorAll(".mzt-seg[data-key]")) {
       segments.set(group.dataset.key, { group, buttons: Array.from(group.querySelectorAll("button")) });
       radioGroup(group, group.dataset.key);
     }
+
+    // Colors tabs: the theme cards or the reading page tiles. Not saved; the pane opens on the theme.
+    const tabs = Array.from(root.querySelectorAll("#mzt-color-tabs [role=tab]"));
+    const selectTab = selected => {
+      for (const tab of tabs) {
+        tab.setAttribute("aria-selected", String(tab === selected));
+        tab.tabIndex = tab === selected ? 0 : -1;
+        root.querySelector("#" + tab.getAttribute("aria-controls")).hidden = tab !== selected;
+      }
+    };
+    root.querySelector("#mzt-color-tabs").addEventListener("click", event => {
+      const tab = event.target.closest("[role=tab]");
+      if (tab) selectTab(tab);
+    });
+    root.querySelector("#mzt-color-tabs").addEventListener("keydown", event => {
+      const index = tabs.indexOf(event.target.closest("[role=tab]"));
+      if (index < 0 || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      const rtl = getComputedStyle(event.currentTarget).direction === "rtl";
+      const step = (event.key === "ArrowRight") !== rtl ? 1 : -1;
+      const next = event.key === "Home" ? tabs[0] : event.key === "End" ? tabs[tabs.length - 1]
+        : tabs[(index + step + tabs.length) % tabs.length];
+      next.focus();
+      selectTab(next);
+    });
+    selectTab(tabs[0]);
 
     const cards = root.querySelector("#mzt-theme-cards");
     for (const theme of api.themes) {
       const card = make("button", "mzt-theme-card");
       card.type = "button";
-      card.dataset.theme = theme.id;
-      card.dataset.mode = theme.mode;
-      card.setAttribute("aria-pressed", "false");
+      card.dataset.value = theme.id;
+      card.setAttribute("role", "radio");
       const preview = make("span", "mzt-miniature");
       preview.setAttribute("aria-hidden", "true");
       for (const [key, color] of Object.entries(theme.colors)) preview.style.setProperty("--mzt-" + key, color);
@@ -104,15 +123,13 @@ window.MZTPreferences = {
         preview.append(column);
       }
       const label = make("span", "mzt-theme-label");
-      label.append(make("span", "mzt-theme-name", theme.name), make("span", "mzt-theme-meta"));
+      label.append(make("span", "mzt-theme-name", theme.name), make("span", "mzt-theme-meta", copy.modeNames[theme.mode]));
       const check = make("span", "mzt-check");
       check.setAttribute("aria-hidden", "true");
       card.append(preview, label, check);
-      // Fixed mode picks the theme; system mode fills the light or dark slot the theme belongs to.
-      card.addEventListener("click", () => save(api.settings().mode === "system"
-        ? [theme.mode + "Theme", theme.id] : ["theme", theme.id]));
       cards.append(card);
     }
+    radioGroup(cards, "theme");
 
     // Reading page tiles: a miniature page in each option's background and text colors.
     const pageOptions = root.querySelector("#mzt-page-options");
@@ -152,26 +169,18 @@ window.MZTPreferences = {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     function render() {
       const available = Zotero.ModernZoteroThemes === api;
-      for (const control of root.querySelectorAll("button")) control.disabled = !available;
+      for (const control of root.querySelectorAll("button:not([role=tab])")) control.disabled = !available;
       if (!available) {
         clearTimeout(statusTimer);
         status.textContent = copy.inactive;
         status.classList.add("mzt-visible");
       }
       const settings = api.settings();
-      const system = settings.mode === "system";
-      const current = copy.modes[media.matches ? "dark" : "light"];
-      const fixed = !system && api.themes.find(t => t.id === settings.theme);
-      wantedAppearance = null;
-      if (fixed && fixed.mode !== (media.matches ? "dark" : "light")) {
-        wantedAppearance = fixed.mode;
-        noticeText.textContent = copy.mismatch({ current });
-        noticeButton.textContent = copy.matchMode({ wanted: copy.modes[fixed.mode] });
-      }
-      else if (system && api.zoteroAppearance() !== "auto") {
-        wantedAppearance = "auto";
-        noticeText.textContent = copy.notAuto({ current });
-        noticeButton.textContent = copy.useAuto;
+      const activeTheme = api.themes.find(t => t.id === settings.theme) || api.themes[0];
+      wantedAppearance = activeTheme.mode !== (media.matches ? "dark" : "light") ? activeTheme.mode : null;
+      if (wantedAppearance) {
+        noticeText.textContent = copy.mismatch({ current: copy.modes[media.matches ? "dark" : "light"] });
+        noticeButton.textContent = copy.matchMode({ wanted: copy.modes[wantedAppearance] });
       }
       notice.hidden = !wantedAppearance;
 
@@ -189,8 +198,6 @@ window.MZTPreferences = {
       }
 
       // "Follow theme" previews the page of the theme currently in use.
-      const activeID = system ? settings[media.matches ? "darkTheme" : "lightTheme"] : settings.theme;
-      const activeTheme = api.themes.find(t => t.id === activeID) || api.themes[0];
       const followSwatch = followTile.querySelector(".mzt-page-swatch");
       followSwatch.style.setProperty("--mzt-page-bg", activeTheme.page.background);
       followSwatch.style.setProperty("--mzt-page-fg", activeTheme.page.foreground);
@@ -204,10 +211,8 @@ window.MZTPreferences = {
       pageHint.textContent = pageChoice.dataset.value === "zotero" ? copy.pageZoteroHint : copy.pageHint;
 
       for (const card of cards.children) {
-        const { theme, mode } = card.dataset;
-        const pressed = system ? settings[mode + "Theme"] === theme : settings.theme === theme;
-        card.setAttribute("aria-pressed", String(pressed));
-        card.querySelector(".mzt-theme-meta").textContent = system && pressed ? copy.usedFor[mode] : copy.modeNames[mode];
+        card.setAttribute("aria-checked", String(card.dataset.value === activeTheme.id));
+        card.tabIndex = card.dataset.value === activeTheme.id ? 0 : -1;
       }
     }
     const unsubscribe = api.subscribe(render);

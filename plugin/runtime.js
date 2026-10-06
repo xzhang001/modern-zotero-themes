@@ -5,7 +5,7 @@
     // per-startup query the old CSS stays in effect until Zotero restarts.
     const assetQuery = `?v=${encodeURIComponent(version || "dev")}.${Date.now()}`;
     const prefix = "extensions.modernZoteroThemes.";
-    const defaults = { mode: "system", theme: "modern-light", lightTheme: "modern-light", darkTheme: "modern-dark", layout: "modern", emptyFields: "hide", folderIcons: "color", pageTheme: "zotero",
+    const defaults = { theme: "modern-light", layout: "modern", emptyFields: "hide", folderIcons: "color", pageTheme: "zotero",
       readingProgress: "show" };
     const layouts = ["modern", "classic"];
     const emptyFieldModes = ["hide", "show"];
@@ -55,11 +55,21 @@
       return Object.fromEntries(Object.entries(defaults).map(([key, fallback]) =>
         [key, Services.prefs.getStringPref(prefix + key, fallback)]));
     }
+    // Up to 0.14 the default was to match the system with a light and a dark theme. The first window after
+    // the upgrade (or a new install) keeps the theme that would show now, then "mode" marks this as done.
+    function migrateMode(dark) {
+      const legacy = key => Services.prefs.getStringPref(prefix + key, "");
+      if (legacy("mode") === "fixed") return;
+      const theme = themes.get(legacy(dark ? "darkTheme" : "lightTheme"), dark ? "dark" : "light");
+      Services.prefs.setStringPref(prefix + "theme", theme.id);
+      Services.prefs.setStringPref(prefix + "mode", "fixed");
+      for (const key of ["lightTheme", "darkTheme"]) Services.prefs.clearUserPref(prefix + key);
+    }
     function update() {
       for (const [win, state] of windows) {
         if (win.closed) { detach(win); continue; }
         const config = settings();
-        const theme = themes.resolve(config, state.media.matches);
+        const theme = themes.get(config.theme);
         const layout = layouts.includes(config.layout) ? config.layout : defaults.layout;
         state.tokens.textContent = themes.css(theme);
         state.iconStyles.textContent = collectionIcons.css(theme.mode);
@@ -333,6 +343,7 @@
       const tree = doc.getElementById?.("zotero-collections-tree");
       if (tree) sections.observe(tree, { childList: true, subtree: true });
       markCollectionSections(win);
+      migrateMode(media.matches);
       media.addEventListener("change", update);
       win.addEventListener("unload", unload, { once: true });
       win.addEventListener("DOMContentLoaded", frameLoaded, true);
@@ -374,10 +385,7 @@
       set(key, value) {
         if (!active) return;
         if (!Object.prototype.hasOwnProperty.call(defaults, key)) throw new Error("Unknown setting");
-        if (key === "mode") {
-          if (!["fixed", "system"].includes(value)) throw new Error("Invalid mode");
-        }
-        else if (key === "layout") {
+        if (key === "layout") {
           if (!layouts.includes(value)) throw new Error("Invalid layout");
         }
         else if (key === "emptyFields") {
@@ -392,11 +400,7 @@
         else if (key === "pageTheme") {
           if (!pageModes.includes(value) && !themes.themes.some(t => t.id === value)) throw new Error("Invalid page theme");
         }
-        else {
-          const theme = themes.themes.find(t => t.id === value);
-          if (!theme || (key === "lightTheme" && theme.mode !== "light")
-            || (key === "darkTheme" && theme.mode !== "dark")) throw new Error("Invalid theme");
-        }
+        else if (!themes.themes.some(t => t.id === value)) throw new Error("Invalid theme");
         Services.prefs.setStringPref(prefix + key, value);
       },
       collectionIcon(libraryKey) {
@@ -411,10 +415,6 @@
         if (normalized) icons.set(libraryKey, normalized);
         else icons.delete(libraryKey);
         Services.prefs.setStringPref(iconsPref, JSON.stringify(Object.fromEntries(icons)));
-      },
-      zoteroAppearance() {
-        const value = Services.prefs.getIntPref(appearancePref, appearances.auto);
-        return Object.keys(appearances).find(key => appearances[key] === value) || "auto";
       },
       // Only called from an explicit button in the settings pane; never changed on the user's behalf.
       setZoteroAppearance(value) {

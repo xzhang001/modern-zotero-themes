@@ -6,28 +6,29 @@
       <html:h2 data-mzt-text="heading">Make room for your research.</html:h2>
     </html:header>
 
-    <html:section class="mzt-section" aria-labelledby="mzt-theme-heading">
+    <html:section class="mzt-section" aria-labelledby="mzt-colors-heading">
       <html:div class="mzt-section-head">
-        <html:h3 id="mzt-theme-heading" data-mzt-text="themes">Theme</html:h3>
-        <html:div class="mzt-seg" data-key="mode" role="radiogroup" aria-labelledby="mzt-theme-heading">
-          <html:button type="button" role="radio" data-value="fixed" data-mzt-text="fixed">Fixed</html:button>
-          <html:button type="button" role="radio" data-value="system" data-mzt-text="system">Match system</html:button>
+        <html:h3 id="mzt-colors-heading" data-mzt-text="colors">Colors</html:h3>
+        <html:div class="mzt-seg" id="mzt-color-tabs" role="tablist" aria-labelledby="mzt-colors-heading">
+          <html:button type="button" role="tab" id="mzt-tab-theme" aria-controls="mzt-panel-theme" data-mzt-text="themes">Theme</html:button>
+          <html:button type="button" role="tab" id="mzt-tab-page" aria-controls="mzt-panel-page" data-mzt-text="page">Reading page</html:button>
         </html:div>
       </html:div>
-      <html:div id="mzt-theme-cards" role="group" aria-labelledby="mzt-theme-heading"/>
-      <html:div id="mzt-appearance-notice" hidden="hidden">
-        <html:span class="mzt-notice-icon" aria-hidden="true">i</html:span>
-        <html:p id="mzt-appearance-message"/>
-        <html:button id="mzt-appearance-fix" type="button"/>
+      <!-- Both panels share one grid cell, so switching tabs doesn't move the sections below. -->
+      <html:div class="mzt-panels">
+        <html:div id="mzt-panel-theme" role="tabpanel" aria-labelledby="mzt-tab-theme">
+          <html:div id="mzt-theme-cards" role="radiogroup" aria-labelledby="mzt-tab-theme"/>
+          <html:div id="mzt-appearance-notice" hidden="hidden">
+            <html:span class="mzt-notice-icon" aria-hidden="true">i</html:span>
+            <html:p id="mzt-appearance-message"/>
+            <html:button id="mzt-appearance-fix" type="button"/>
+          </html:div>
+        </html:div>
+        <html:div id="mzt-panel-page" role="tabpanel" aria-labelledby="mzt-tab-page">
+          <html:div id="mzt-page-options" role="radiogroup" aria-labelledby="mzt-tab-page" aria-describedby="mzt-page-hint"/>
+          <html:p id="mzt-page-hint" class="mzt-hint"/>
+        </html:div>
       </html:div>
-    </html:section>
-
-    <html:section class="mzt-section" aria-labelledby="mzt-page-heading">
-      <html:div class="mzt-section-head">
-        <html:h3 id="mzt-page-heading" data-mzt-text="page">Reading page</html:h3>
-      </html:div>
-      <html:div id="mzt-page-options" role="radiogroup" aria-labelledby="mzt-page-heading" aria-describedby="mzt-page-hint"/>
-      <html:p id="mzt-page-hint" class="mzt-hint"/>
     </html:section>
 
     <html:section class="mzt-section" aria-labelledby="mzt-interface-heading">

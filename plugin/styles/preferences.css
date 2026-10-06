@@ -58,7 +58,7 @@
   transition: background-color var(--mzt-p-ease), color var(--mzt-p-ease), box-shadow var(--mzt-p-ease);
 }
 #mzt-preferences .mzt-seg button:not(:disabled):hover { color: var(--fill-primary); }
-#mzt-preferences .mzt-seg button[aria-checked="true"] {
+#mzt-preferences .mzt-seg button:is([aria-checked="true"], [aria-selected="true"]) {
   background-color: var(--mzt-p-thumb); color: var(--fill-primary); font-weight: 600;
   box-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.12);
 }
@@ -78,6 +78,11 @@
 #mzt-preferences .mzt-row[data-disabled] { opacity: 0.45; }
 #mzt-preferences .mzt-row-title { font-size: 13px; font-weight: 500; color: var(--fill-primary); }
 
+/* Colors tabs: the hidden panel keeps its place, so the section is as tall as the taller panel. */
+#mzt-preferences .mzt-panels { display: grid; }
+#mzt-preferences .mzt-panels > [role="tabpanel"] { grid-area: 1 / 1; min-width: 0; }
+#mzt-preferences .mzt-panels > [role="tabpanel"][hidden] { display: block; visibility: hidden; }
+
 /* Theme cards */
 #mzt-theme-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 12px; }
 #mzt-preferences .mzt-theme-card {
@@ -91,8 +96,8 @@
   box-shadow: 0 2px 4px rgb(0 0 0 / 0.05), 0 8px 20px -10px rgb(0 0 0 / 0.25);
   translate: 0 -1px;
 }
-#mzt-preferences .mzt-theme-card[aria-pressed="true"],
-#mzt-preferences .mzt-theme-card[aria-pressed="true"]:not(:disabled):hover {
+#mzt-preferences .mzt-theme-card[aria-checked="true"],
+#mzt-preferences .mzt-theme-card[aria-checked="true"]:not(:disabled):hover {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 1px var(--color-accent), 0 6px 18px -10px var(--color-accent);
 }
@@ -100,7 +105,7 @@
 #mzt-preferences .mzt-theme-label { display: flex; flex-direction: column; gap: 1px; padding: 0 6px; }
 #mzt-preferences .mzt-theme-name { font-size: 13px; font-weight: 600; color: var(--fill-primary); }
 #mzt-preferences .mzt-theme-meta { font-size: 11.5px; color: var(--fill-secondary); }
-#mzt-preferences .mzt-theme-card[aria-pressed="true"] .mzt-theme-meta { color: var(--color-accent); }
+#mzt-preferences .mzt-theme-card[aria-checked="true"] .mzt-theme-meta { color: var(--color-accent); }
 #mzt-preferences .mzt-check {
   position: absolute; top: 12px; inset-inline-end: 12px; width: 18px; height: 18px;
   border-radius: 50%; background: var(--color-accent);
@@ -111,7 +116,7 @@
   content: ""; position: absolute; left: 6.5px; top: 3.5px; width: 4px; height: 8px;
   border: solid var(--color-accent-text, #fff); border-width: 0 2px 2px 0; rotate: 45deg;
 }
-#mzt-preferences .mzt-theme-card[aria-pressed="true"] .mzt-check { opacity: 1; scale: 1; }
+#mzt-preferences .mzt-theme-card[aria-checked="true"] .mzt-check { opacity: 1; scale: 1; }
 
 /* Miniature of the modern layout in the theme's own colors: canvas, sidebar, list card, item card. */
 #mzt-preferences .mzt-miniature {

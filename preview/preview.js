@@ -47,13 +47,13 @@ function renderPapers(query = '') {
 renderPapers();
 document.getElementById('library-search').addEventListener('input', event => renderPapers(event.target.value));
 const saved = (() => { try { return JSON.parse(localStorage.getItem('mzt-preview-settings')) || {}; } catch { return {}; } })();
-const config = { mode: 'fixed', theme: 'catppuccin-latte', lightTheme: 'catppuccin-latte', darkTheme: 'modern-dark', layout: 'modern', emptyFields: 'hide', folderIcons: 'color', ...saved };
+const config = { theme: 'catppuccin-latte', layout: 'modern', emptyFields: 'hide', folderIcons: 'color', ...saved };
 const callbacks = new Set();
 const media = matchMedia('(prefers-color-scheme: dark)');
 const picker = document.getElementById('theme-picker');
 for (const theme of MZTThemes.themes) { const option = document.createElement('option'); option.value = theme.id; option.textContent = theme.name; picker.append(option); }
 function updateTheme() {
-  const theme = MZTThemes.resolve(config, media.matches);
+  const theme = MZTThemes.get(config.theme);
   document.documentElement.dataset.mztTheme = theme.id;
   document.documentElement.dataset.mztLayout = config.layout;
   document.documentElement.dataset.mztEmptyFields = config.emptyFields;
@@ -67,11 +67,10 @@ window.Zotero = { locale: 'en-US', ModernZoteroThemes: {
   themes: MZTThemes.themes, settings: () => ({ ...config }),
   set: (key, value) => { config[key] = value; updateTheme(); },
   // A browser can't switch its own prefers-color-scheme, so this only records the choice.
-  zoteroAppearance: () => config.zoteroAppearance || 'auto',
   setZoteroAppearance: value => { config.zoteroAppearance = value; updateTheme(); },
   subscribe: cb => { callbacks.add(cb); return () => callbacks.delete(cb); }
 } };
-picker.addEventListener('change', () => { config.theme = picker.value; config.mode = 'fixed'; updateTheme(); });
+picker.addEventListener('change', () => { config.theme = picker.value; updateTheme(); });
 media.addEventListener('change', updateTheme);
 updateTheme();
 const dialog = document.getElementById('settings-dialog');

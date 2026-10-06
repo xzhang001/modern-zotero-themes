@@ -115,10 +115,6 @@
     return themes.find(t => t.id === id && (!mode || t.mode === mode))
       || themes.find(t => t.mode === (mode || "light"));
   }
-  function resolve(settings, dark) {
-    return settings.mode === "fixed" ? get(settings.theme)
-      : get(dark ? settings.darkTheme : settings.lightTheme, dark ? "dark" : "light");
-  }
   function css(theme, selector = ":root[data-mzt-theme]") {
     validate(theme);
     const c = theme.colors;
@@ -156,7 +152,7 @@
     validate(theme);
     return { id: "mzt-" + theme.id, label: theme.name, background: theme.page.background, foreground: theme.page.foreground };
   }
-  const api = Object.freeze({ themes, get, resolve, validate, css, readerTheme });
+  const api = Object.freeze({ themes, get, validate, css, readerTheme });
   scope.MZTThemes = api;
   if (typeof module !== "undefined") module.exports = api;
 })(this);

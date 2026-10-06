@@ -133,6 +133,7 @@ function setup(windows = [fakeWindow()], { readingProgress } = {}) {
   const Services = { prefs: {
     getStringPref(key, fallback) { return prefs.get(key) ?? fallback; },
     setStringPref(key, value) { prefs.set(key, value); notify(key); },
+    clearUserPref(key) { prefs.delete(key); notify(key); },
     getIntPref(key, fallback) { return prefs.get(key) ?? fallback; },
     setIntPref(key, value) { prefs.set(key, value); notify(key); },
     addObserver(branch, o) { observers.set(branch, o); },
@@ -177,19 +178,40 @@ test('startup and repeated attach load exactly one set of styles per window', as
   assert.equal(s.panes.size, 1);
   s.runtime.stop();
 });
-test('settings propagate to all windows; system transitions and new windows work', async () => {
+test('settings propagate to all windows and stay put when Zotero switches between light and dark', async () => {
   const s = setup([fakeWindow(), fakeWindow(true)]); await s.runtime.start();
-  s.Zotero.ModernZoteroThemes.set('lightTheme', 'catppuccin-latte');
-  assert.equal(s.windows[0].attributes.get('data-mzt-theme'), 'catppuccin-latte');
-  assert.equal(s.windows[1].attributes.get('data-mzt-theme'), 'modern-dark');
-  s.windows[0].media.change(true);
-  assert.equal(s.windows[0].attributes.get('data-mzt-theme'), 'modern-dark');
   s.Zotero.ModernZoteroThemes.set('theme', 'catppuccin-latte');
-  s.Zotero.ModernZoteroThemes.set('mode', 'fixed');
+  s.windows[0].media.change(true);
   const win = fakeWindow(true); s.runtime.attach(win);
   assert.equal(win.attributes.get('data-mzt-theme'), 'catppuccin-latte');
   assert.ok(s.windows.every(w => w.attributes.get('data-mzt-theme') === 'catppuccin-latte'));
   s.runtime.stop();
+});
+test('the light/dark pair from earlier versions becomes the theme in use at the first window', async () => {
+  const prefix = 'extensions.modernZoteroThemes.';
+  // A new install, or the old default of matching the system, in dark appearance.
+  const fresh = setup([fakeWindow(true)]); await fresh.runtime.start();
+  assert.equal(fresh.prefs.get(prefix + 'theme'), 'modern-dark');
+  assert.equal(fresh.windows[0].attributes.get('data-mzt-theme'), 'modern-dark');
+  fresh.runtime.stop();
+  const s = setup([fakeWindow()]);
+  for (const [key, value] of [['mode', 'system'], ['lightTheme', 'catppuccin-latte'], ['darkTheme', 'nord']]) {
+    s.prefs.set(prefix + key, value);
+  }
+  await s.runtime.start();
+  assert.equal(s.windows[0].attributes.get('data-mzt-theme'), 'catppuccin-latte');
+  assert.equal(s.prefs.get(prefix + 'mode'), 'fixed');
+  assert.equal(s.prefs.has(prefix + 'lightTheme') || s.prefs.has(prefix + 'darkTheme'), false);
+  // Runs once: a later dark window and restart keep the chosen theme.
+  s.runtime.attach(fakeWindow(true)); s.runtime.stop(); await s.runtime.start();
+  assert.equal(s.windows[0].attributes.get('data-mzt-theme'), 'catppuccin-latte');
+  s.runtime.stop();
+  // A theme fixed in an earlier version is kept.
+  const fixed = setup([fakeWindow(true)]);
+  fixed.prefs.set(prefix + 'mode', 'fixed'); fixed.prefs.set(prefix + 'theme', 'paper');
+  await fixed.runtime.start();
+  assert.equal(fixed.windows[0].attributes.get('data-mzt-theme'), 'paper');
+  fixed.runtime.stop();
 });
 test('disable cleans up styles, attributes, observers, listeners, settings API', async () => {
   const s = setup(); const win = s.windows[0];
@@ -209,7 +231,6 @@ test('disable cleans up styles, attributes, observers, listeners, settings API',
 test('closed windows detach and re-enable preserves saved settings', async () => {
   const s = setup(); await s.runtime.start();
   s.Zotero.ModernZoteroThemes.set('theme', 'modern-dark');
-  s.Zotero.ModernZoteroThemes.set('mode', 'fixed');
   s.windows[0].events.get('unload')();
   assert.equal(s.windows[0].children.length, 0);
   s.runtime.stop(); await s.runtime.start();
@@ -218,11 +239,13 @@ test('closed windows detach and re-enable preserves saved settings', async () =>
 });
 test('invalid settings cannot write arbitrary preferences', async () => {
   const s = setup(); await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
-  assert.throws(() => api.set('darkTheme', 'catppuccin-latte'));
-  assert.throws(() => api.set('mode', 'invalid'));
+  const stored = new Map(s.prefs);
+  assert.throws(() => api.set('theme', 'removed-theme'));
+  assert.throws(() => api.set('darkTheme', 'modern-dark'));
+  assert.throws(() => api.set('mode', 'system'));
   assert.throws(() => api.set('other', 'value'));
   assert.throws(() => api.set('__proto__', 'modern-light'));
-  assert.equal(s.prefs.size, 0); s.runtime.stop();
+  assert.deepEqual(s.prefs, stored); s.runtime.stop();
 });
 test('disable while settings registration is pending does not leave a pane behind', async () => {
   const s = setup(); let resolveRegistration;
@@ -242,13 +265,11 @@ test('subscripts expose their API on an explicit Zotero-style target scope', () 
   assert.equal(scope.MZTThemes.themes.length, require('../plugin/themes.js').themes.length);
   assert.equal(typeof scope.MZTCreateRuntime, 'function');
 });
-test('Zotero appearance is read, written only with valid values, and notifies settings panes', async () => {
+test('Zotero appearance is written only with valid values and notifies settings panes', async () => {
   const s = setup(); await s.runtime.start(); const api = s.Zotero.ModernZoteroThemes;
-  assert.equal(api.zoteroAppearance(), 'auto');
   let notified = 0; api.subscribe(() => notified++);
   api.setZoteroAppearance('dark');
   assert.equal(s.prefs.get('browser.theme.toolbar-theme'), 0);
-  assert.equal(api.zoteroAppearance(), 'dark');
   assert.equal(notified, 1);
   for (const value of ['system', 2, '__proto__']) assert.throws(() => api.setZoteroAppearance(value));
   s.runtime.stop();
@@ -385,7 +406,7 @@ test('reader tabs get the reader sheet and theme tokens, follow settings, and ar
   win.events.get('DOMContentLoaded')({ target: other });
   assert.equal(other.head.children.length, 0);
 
-  api.set('theme', 'modern-dark'); api.set('mode', 'fixed'); api.set('layout', 'classic');
+  api.set('theme', 'modern-dark'); api.set('layout', 'classic');
   for (const doc of [early, opened]) {
     assert.equal(doc.attributes.get('data-mzt-theme'), 'modern-dark');
     assert.equal(doc.attributes.get('data-mzt-zotero-scheme'), 'light');
@@ -432,7 +453,7 @@ test('reading page is Zotero\'s by default and can follow the theme, be fixed or
   await settle();
   // By default theme changes leave the page alone.
   assert.equal(api.settings().pageTheme, 'zotero');
-  api.set('theme', 'catppuccin-frappe'); api.set('mode', 'fixed'); await settle();
+  api.set('theme', 'catppuccin-frappe'); await settle();
   assert.deepEqual(reader.calls, []);
   api.set('theme', 'modern-light');
   api.set('pageTheme', 'follow'); await settle();
@@ -548,7 +569,7 @@ test('note editors get the note sheet and theme tokens, follow settings, and are
   win.events.get('DOMContentLoaded')({ target: opened });
   assert.equal(opened.head.children.length, 2);
 
-  api.set('theme', 'nord'); api.set('mode', 'fixed');
+  api.set('theme', 'nord');
   for (const doc of [early, opened]) {
     assert.equal(doc.attributes.get('data-mzt-theme'), 'nord');
     assert.match(doc.head.children[0].textContent, /--mzt-accent: #88c0d0/);

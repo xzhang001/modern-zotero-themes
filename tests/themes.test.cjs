@@ -28,16 +28,10 @@ test('subtle text stays legible on every surface', () => {
     }
   }
 });
-test('fixed theme is independent of system and system chooses configured pair', () => {
-  const config = { mode: 'fixed', theme: 'catppuccin-latte', lightTheme: 'catppuccin-latte', darkTheme: 'modern-dark' };
-  assert.equal(themes.resolve(config, true).id, 'catppuccin-latte');
-  config.mode = 'system';
-  assert.equal(themes.resolve(config, false).id, 'catppuccin-latte');
-  assert.equal(themes.resolve(config, true).id, 'modern-dark');
-});
 test('missing and mismatched stored themes fall back to a matching mode', () => {
-  assert.equal(themes.resolve({ mode: 'fixed', theme: 'removed-theme' }, true).id, 'modern-light');
-  assert.equal(themes.resolve({ mode: 'system', darkTheme: 'catppuccin-latte' }, true).id, 'modern-dark');
+  assert.equal(themes.get('catppuccin-latte').id, 'catppuccin-latte');
+  assert.equal(themes.get('removed-theme').id, 'modern-light');
+  assert.equal(themes.get('catppuccin-latte', 'dark').id, 'modern-dark');
 });
 test('theme definition rejects missing colors and CSS injection', () => {
   for (const color of [undefined, 'red; background: url(https://example.org)', '#ffffff80']) {

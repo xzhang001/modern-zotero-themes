@@ -6,7 +6,7 @@ A modern visual theme plugin for Zotero that keeps Zotero's three panes, toolbar
 
 ![Zotero with Modern Zotero Themes in Catppuccin Latte, Paper and Nord](docs/images/en/hero.webp)
 
-**This is a 0.14.0 development preview.** Its interfaces have been checked against the Zotero 7.0, 8.0, 9.0 and 10.0.5 sources, with 10.0.5 as the main development target; native acceptance testing on Windows and macOS is not finished yet. The installable version range is an entry point for testing, not a claim of verified compatibility with every version.
+**This is a 0.15.0 development preview.** Its interfaces have been checked against the Zotero 7.0, 8.0, 9.0 and 10.0.5 sources, with 10.0.5 as the main development target; native acceptance testing on Windows and macOS is not finished yet. The installable version range is an entry point for testing, not a claim of verified compatibility with every version.
 
 ## Features
 
@@ -46,20 +46,20 @@ A modern visual theme plugin for Zotero that keeps Zotero's three panes, toolbar
 
 <img src="docs/images/en/settings.webp" alt="The Modern Themes settings page" width="460">
 
-- Settings page: theme cards with interface thumbnails; reading pages picked from small page swatches; a "Fixed / Match system" segmented switch, where in "Match system" you click cards to pick the light and the dark theme separately; interface options as a grouped list, all with segmented buttons instead of dropdowns.
+- Settings page: theme cards with interface thumbnails; a "Theme / Reading page" switch under Colors, so only one set of cards shows at a time, with reading pages picked from small page swatches; interface options as a grouped list, all with segmented buttons instead of dropdowns.
 - Settings save instantly and apply to open and newly opened main windows.
 - Disabling removes the styles, listeners and the settings page; re-enabling keeps your theme choices.
 - Respects reduced-motion and the system's forced-colors (high contrast) mode.
 
 Item data, tags and annotation colors are never modified, and the virtualized lists keep their row heights, column widths and cell padding; list row spacing follows Zotero's own density setting (View → Density). The main window is covered, along with the reader tabs (including page colors) and the note editors in it. Separate reader windows (a PDF opened in a new window), separate note windows (a note edited in a separate window) and system dialogs are not.
 
-Zotero's native icons and its settings window follow Zotero's own appearance setting (Settings → General → Appearance), and automatic light/dark switching also reads it. When the two disagree, the settings page tells you: a fixed theme whose light/dark mode differs from Zotero's appearance, or "Match system" while Zotero's appearance is not "Automatic". The button in the notice changes Zotero's appearance in one click; the plugin never changes it on its own.
+The theme you pick stays the same day and night; it does not switch with the system's light or dark mode. Zotero's native icons and its settings window follow Zotero's own appearance setting (Settings → General → Appearance). When a dark theme meets a light appearance (or the other way round), the settings page tells you. The button in the notice changes Zotero's appearance in one click; the plugin never changes it on its own.
 
 ## Installation
 
 1. Download the latest `modern-zotero-themes-<version>.xpi` from [Releases](https://github.com/xzhang001/modern-zotero-themes/releases).
 2. In Zotero, open Tools → Plugins, click the gear icon, choose "Install Plugin From File…" and select the XPI.
-3. Open Zotero Settings → **Modern Themes** and pick a theme card, or set up a light/dark pair that follows the system.
+3. Open Zotero Settings → **Modern Themes** and pick a theme card.
 4. To go back to Zotero's original look, disable Modern Zotero Themes in the plugin manager.
 
 Zotero updates the plugin automatically from then on (it checks about once a day); you can also use "Check for Updates" in the plugin manager's gear menu.
@@ -91,7 +91,7 @@ The build output is a reproducible ZIP-format XPI. Only the contents of `plugin/
 
 ## Adding themes
 
-Themes are defined in `plugin/themes.js`. Each one has an `id`, `name`, `author`, `mode` and semantic `colors`. A new definition shows up automatically as a theme card and in the light/dark choices. See the [theme design conventions](docs/themes.md).
+Themes are defined in `plugin/themes.js`. Each one has an `id`, `name`, `author`, `mode` and semantic `colors`. A new definition shows up automatically as a theme card and a reading page option. See the [theme design conventions](docs/themes.md).
 
 Themes are currently built into the plugin; importing VS Code themes or running external scripts is not supported. Importing theme files is a possible future extension.
 
