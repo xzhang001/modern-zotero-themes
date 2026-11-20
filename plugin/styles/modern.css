@@ -55,7 +55,9 @@
     background-color: var(--mzt-selected);
     color: var(--mzt-selectedText);
   }
-  :root[data-mzt-theme] #zotero-pane :is(quick-search-textbox, search-textbox) {
+  /* Style the field, not quick-search-textbox: that wrapper is the same size, so styling both
+     draws two rings around the main search bar. */
+  :root[data-mzt-theme] #zotero-pane search-textbox {
     appearance: none;
     background: var(--mzt-elevated);
     color: var(--mzt-text);
@@ -64,7 +66,7 @@
     box-shadow: 0 1px 2px var(--mzt-shadow);
     transition: box-shadow 120ms ease, border-color 120ms ease;
   }
-  :root[data-mzt-theme] #zotero-pane :is(quick-search-textbox, search-textbox):focus-within {
+  :root[data-mzt-theme] #zotero-pane search-textbox:focus-within {
     border-color: var(--mzt-accent);
     box-shadow: 0 0 0 1px var(--mzt-accent);
   }
@@ -146,7 +148,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  :root[data-mzt-theme] #zotero-pane :is(toolbarbutton, .toolbar-button, quick-search-textbox, search-textbox) {
+  :root[data-mzt-theme] #zotero-pane :is(toolbarbutton, .toolbar-button, search-textbox) {
     transition: none;
   }
 }
