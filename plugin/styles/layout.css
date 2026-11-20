@@ -94,11 +94,6 @@
   }
 
   /* Search: filled field, no outline until focused */
-  :root[data-mzt-layout="modern"] #zotero-pane quick-search-textbox {
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-  }
   :root[data-mzt-layout="modern"] #zotero-pane search-textbox {
     background: var(--mzt-hover);
     border-color: transparent;
