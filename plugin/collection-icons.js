@@ -108,14 +108,30 @@
     "circle-x": '<circle cx="12" cy="12" r="10"/> <path d="m15 9-6 6"/> <path d="m9 9 6 6"/>',
     "circle-alert": '<circle cx="12" cy="12" r="10"/> <line x1="12" x2="12" y1="8" y2="12"/> <line x1="12" x2="12.01" y1="16" y2="16"/>',
     "triangle-alert": '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/> <path d="M12 9v4"/> <path d="M12 17h.01"/>',
-    "circle-help": '<circle cx="12" cy="12" r="10"/> <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/> <path d="M12 17h.01"/>'
+    "circle-help": '<circle cx="12" cy="12" r="10"/> <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/> <path d="M12 17h.01"/>',
+    "book": '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />',
+    "glasses": '<circle cx="6" cy="15" r="4" /> <circle cx="18" cy="15" r="4" /> <path d="M14 15a2 2 0 0 0-2-2 2 2 0 0 0-2 2" /> <path d="M2.5 13 5 7c.7-1.3 1.4-2 3-2" /> <path d="M21.5 13 19 7c-.7-1.3-1.5-2-3-2" />',
+    "book-check": '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" /> <path d="m9 9.5 2 2 4-4" />',
+    "list-todo": '<path d="M13 5h8" /> <path d="M13 12h8" /> <path d="M13 19h8" /> <path d="m3 17 2 2 4-4" /> <rect x="3" y="4" width="6" height="6" rx="1" />',
+    "search": '<path d="m21 21-4.34-4.34" /> <circle cx="11" cy="11" r="8" />',
+    "pill": '<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" /> <path d="m8.5 8.5 7 7" />',
+    "heart-pulse": '<path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /> <path d="M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27" />',
+    "paw-print": '<circle cx="11" cy="4" r="2" /> <circle cx="18" cy="8" r="2" /> <circle cx="20" cy="16" r="2" /> <path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z" />',
+    "bug": '<path d="M12 20v-9" /> <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" /> <path d="M14.12 3.88 16 2" /> <path d="M21 21a4 4 0 0 0-3.81-4" /> <path d="M21 5a4 4 0 0 1-3.55 3.97" /> <path d="M22 13h-4" /> <path d="M3 21a4 4 0 0 1 3.81-4" /> <path d="M3 5a4 4 0 0 0 3.55 3.97" /> <path d="M6 13H2" /> <path d="m8 2 1.88 1.88" /> <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />',
+    "gavel": '<path d="m14 13-8.381 8.38a1 1 0 0 1-3.001-3l8.384-8.381" /> <path d="m16 16 6-6" /> <path d="m21.5 10.5-8-8" /> <path d="m8 8 6-6" /> <path d="m8.5 7.5 8 8" />',
+    "banknote": '<rect width="20" height="12" x="2" y="6" rx="2" /> <circle cx="12" cy="12" r="2" /> <path d="M6 12h.01M18 12h.01" />',
+    "history": '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" /> <path d="M12 7v5l4 2" />',
+    "earth": '<path d="M21.54 15H17a2 2 0 0 0-2 2v4.54" /> <path d="M7 3.34V5a3 3 0 0 0 3 3a2 2 0 0 1 2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2c0-1.1.9-2 2-2h3.17" /> <path d="M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05" /> <circle cx="12" cy="12" r="10" />',
+    "image": '<rect width="18" height="18" x="3" y="3" rx="2" ry="2" /> <circle cx="9" cy="9" r="2" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />',
+    "mic": '<path d="M12 19v3" /> <path d="M19 10v2a7 7 0 0 1-14 0v-2" /> <rect x="9" y="2" width="6" height="13" rx="3" />',
+    "mail": '<path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /> <rect x="2" y="4" width="20" height="16" rx="2" />'
   });
   // Picker sections, in display order.
   const groups = Object.freeze([
-    { id: "reading", icons: ["folder", "folder-open", "book-open", "book-marked", "bookmark", "library", "notebook", "notebook-pen", "file-text", "files", "newspaper", "scroll-text", "quote", "highlighter", "pencil", "sticky-note", "clipboard-list", "presentation", "graduation-cap", "school", "archive", "inbox"] },
-    { id: "science", icons: ["flask-conical", "test-tube", "microscope", "telescope", "atom", "dna", "brain", "orbit", "magnet", "zap", "thermometer", "leaf", "sprout", "trees", "mountain", "waves", "sun", "moon", "cloud", "globe"] },
+    { id: "reading", icons: ["folder", "folder-open", "book-open", "book-marked", "bookmark", "library", "notebook", "notebook-pen", "file-text", "files", "newspaper", "scroll-text", "quote", "highlighter", "pencil", "sticky-note", "clipboard-list", "presentation", "graduation-cap", "school", "archive", "inbox", "book", "glasses", "book-check", "list-todo", "search", "image", "mic", "mail"] },
+    { id: "science", icons: ["flask-conical", "test-tube", "microscope", "telescope", "atom", "dna", "brain", "orbit", "magnet", "zap", "thermometer", "leaf", "sprout", "trees", "mountain", "waves", "sun", "moon", "cloud", "globe", "earth", "pill", "heart-pulse", "paw-print", "bug"] },
     { id: "data", icons: ["cpu", "server", "network", "database", "code", "terminal", "git-branch", "bot", "binary", "chart-line", "chart-column", "chart-pie", "table", "sigma", "calculator", "infinity", "shapes", "sparkles", "layers", "puzzle"] },
-    { id: "people", icons: ["user", "users", "building", "landmark", "map-pin", "hospital", "stethoscope", "scale", "languages", "briefcase", "palette", "music", "camera", "film", "coffee"] },
+    { id: "people", icons: ["user", "users", "building", "landmark", "map-pin", "hospital", "stethoscope", "scale", "languages", "briefcase", "palette", "music", "camera", "film", "coffee", "gavel", "banknote", "history"] },
     { id: "status", icons: ["star", "heart", "flag", "tag", "pin", "bell", "clock", "hourglass", "calendar", "target", "trophy", "award", "crown", "gem", "flame", "rocket", "lightbulb", "key", "lock", "shield", "eye", "link", "paperclip", "circle-check", "circle-x", "circle-alert", "triangle-alert", "circle-help"] }
   ]);
   // Tuned per theme mode for at least 3:1 against card, canvas and sidebar surfaces (see tests).
